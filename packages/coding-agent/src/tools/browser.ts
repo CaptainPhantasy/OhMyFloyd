@@ -968,11 +968,12 @@ export class BrowserTool implements AgentTool<typeof browserSchema, BrowserToolD
 				script => `
 		try {
 			${script};
-		} catch (e) {}
+		} catch (e) {
+			console.warn("[omp-browser] stealth script injection failed", e);
+		}
 	`,
 			)
 			.join(";\n");
-
 		await page.evaluateOnNewDocument(`(() => {
 				// Native function cache - captured before any tampering
 				const iframe = document.createElement("iframe");

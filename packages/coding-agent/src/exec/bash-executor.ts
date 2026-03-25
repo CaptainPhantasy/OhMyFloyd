@@ -100,15 +100,18 @@ export async function executeBash(command: string, options?: BashExecutorOptions
 		shellSession = new Shell({ sessionEnv: shellEnv, snapshotPath: snapshotPath ?? undefined });
 		shellSessions.set(sessionKey, shellSession);
 	}
+	let abortPromise: Promise<void> | undefined;
+
 	const userSignal = options?.signal;
 	const runAbortController = new AbortController();
 	const abortCurrentExecution = () => {
 		if (!runAbortController.signal.aborted) {
 			runAbortController.abort();
 		}
-		if (shellSession) {
-			// Native abort is async; fire-and-forget because the caller races the command separately.
-			void shellSession.abort();
+		if (shellSession && !abortPromise) {
+			abortPromise = shellSession.abort().catch(() => {
+				resetSession = true;
+			});
 		}
 	};
 	const abortHandler = () => {
@@ -214,6 +217,9 @@ export async function executeBash(command: string, options?: BashExecutorOptions
 		resetSession = true;
 		throw err;
 	} finally {
+		if (abortPromise) {
+			await abortPromise;
+		}
 		if (hardTimeoutTimer) {
 			clearTimeout(hardTimeoutTimer);
 		}
@@ -222,6 +228,9 @@ export async function executeBash(command: string, options?: BashExecutorOptions
 		}
 		if (resetSession) {
 			shellSessions.delete(sessionKey);
+			if (shellSession) {
+				await shellSession.abort().catch(() => {});
+			}
 		}
 	}
 }

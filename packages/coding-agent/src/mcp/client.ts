@@ -190,7 +190,14 @@ export async function connectToServer(
 		// If withTimeout rejected (timeout/abort) while connect() was still pending,
 		// the transport may be alive with an open SSE listener. Close it.
 		if (transport) {
-			void transport.close().catch(() => {});
+			try {
+				await transport.close();
+			} catch (closeError) {
+				logger.warn("Failed to close MCP transport after connection error", {
+					server: name,
+					error: closeError instanceof Error ? closeError.message : String(closeError),
+				});
+			}
 		}
 		throw error;
 	}
