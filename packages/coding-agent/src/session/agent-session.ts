@@ -127,7 +127,7 @@ import { clampTimeout } from "../tools/tool-timeouts";
 import { parseCommandArgs } from "../utils/command-args";
 import { resolveFileDisplayMode } from "../utils/file-display-mode";
 import { extractFileMentions, generateFileMentionMessages } from "../utils/file-mentions";
-import { buildNamedToolChoice } from "../utils/tool-choice";
+
 import {
 	type CompactionResult,
 	calculateContextTokens,
@@ -178,7 +178,7 @@ export type AgentSessionEvent =
 	| { type: "retry_fallback_applied"; from: string; to: string; role: string }
 	| { type: "retry_fallback_succeeded"; model: string; role: string }
 	| { type: "ttsr_triggered"; rules: Rule[] }
-	| { type: "todo_reminder"; todos: TodoItem[]; attempt: number; maxAttempts: number }
+	| { type: "todo_reminder"; todos: TodoItem[]; attempt: number; maxAttempts: number; yielded: boolean }
 	| { type: "todo_auto_clear" };
 
 /** Listener function for agent session events */
@@ -442,6 +442,7 @@ export class AgentSession {
 	#activeRetryFallback: ActiveRetryFallbackState | undefined = undefined;
 	// Todo completion reminder state
 	#todoReminderCount = 0;
+	#lastCompletedTodoCount = 0;
 	#todoPhases: TodoPhase[] = [];
 	#todoClearTimers = new Map<string, Timer>();
 	#toolChoiceQueue = new ToolChoiceQueue();
@@ -1740,6 +1741,7 @@ export class AgentSession {
 				todos: event.todos,
 				attempt: event.attempt,
 				maxAttempts: event.maxAttempts,
+				yielded: event.yielded,
 			});
 		}
 	}
@@ -2469,7 +2471,7 @@ export class AgentSession {
 		// Skip eager todo prelude when the user has already queued a directive
 		const hasPendingUserDirective = this.#toolChoiceQueue.inspect().includes("user-force");
 		const eagerTodoPrelude =
-			!options?.synthetic && !hasPendingUserDirective ? this.#createEagerTodoPrelude(expandedText) : undefined;
+			!options?.synthetic && !hasPendingUserDirective ? this.#createEagerTodoPrelude() : undefined;
 
 		const userContent: (TextContent | ImageContent)[] = [{ type: "text", text: expandedText }];
 		if (options?.images) {
@@ -2550,8 +2552,9 @@ export class AgentSession {
 			this.#flushPendingBashMessages();
 			this.#flushPendingPythonMessages();
 
-			// Reset todo reminder count on new user prompt
+			// Reset todo reminder and progress tracking on new user prompt
 			this.#todoReminderCount = 0;
+			this.#lastCompletedTodoCount = 0;
 
 			await this.#maybeRestoreRetryFallbackPrimary();
 
@@ -3284,6 +3287,7 @@ export class AgentSession {
 		);
 
 		this.#todoReminderCount = 0;
+		this.#lastCompletedTodoCount = 0;
 		this.#planReferenceSent = false;
 		this.#planReferencePath = "local://PLAN.md";
 		this.#reconnectToAgent();
@@ -4013,6 +4017,7 @@ export class AgentSession {
 			this.#pendingNextTurnMessages = [];
 			this.#scheduledHiddenNextTurnGeneration = undefined;
 			this.#todoReminderCount = 0;
+			this.#lastCompletedTodoCount = 0;
 
 			// Inject the handoff document as a custom message
 			const handoffContent = `<handoff-context>\n${handoffText}\n</handoff-context>\n\nThe above is a handoff document from a previous session. Use this context to continue the work seamlessly.`;
@@ -4212,7 +4217,7 @@ export class AgentSession {
 		});
 	}
 
-	#createEagerTodoPrelude(promptText: string): { message: AgentMessage; toolChoice: ToolChoice } | undefined {
+	#createEagerTodoPrelude(): { message: AgentMessage; toolChoice?: ToolChoice } | undefined {
 		const eagerTodosEnabled = this.settings.get("todo.eager");
 		const todosEnabled = this.settings.get("todo.enabled");
 		if (!eagerTodosEnabled || !todosEnabled) {
@@ -4238,17 +4243,10 @@ export class AgentSession {
 			return undefined;
 		}
 
-		const todoWriteToolChoice = buildNamedToolChoice("todo_write", this.model);
-		if (!todoWriteToolChoice) {
-			logger.warn("Eager todo enforcement skipped because the current model does not support forcing todo_write", {
-				modelApi: this.model?.api,
-				modelId: this.model?.id,
-			});
-			return undefined;
-		}
-
 		const eagerTodoReminder = prompt.render(eagerTodoPrompt);
 
+		// Deliver the classification instruction but do NOT force toolChoice.
+		// The model decides whether to call todo_write based on request type.
 		return {
 			message: {
 				role: "custom",
@@ -4258,11 +4256,19 @@ export class AgentSession {
 				attribution: "agent",
 				timestamp: Date.now(),
 			},
-			toolChoice: todoWriteToolChoice,
 		};
 	}
 	/**
 	 * Check if agent stopped with incomplete todos and prompt to continue.
+	 *
+	 * Uses a progress-based check: auto-continue only fires when the agent
+	 * has completed tasks since the last reminder. If no tasks were completed,
+	 * the reminder is shown as a UI notification but the agent does NOT
+	 * auto-continue — the user decides when to respond.
+	 *
+	 * This is deterministic (integer comparison, not text parsing) and gives
+	 * predictable behavior: progress earns continuation, no progress yields
+	 * to the user.
 	 */
 	async #checkTodoCompletion(): Promise<void> {
 		// Skip todo reminders when the most recent turn was driven by an explicit user force —
@@ -4308,30 +4314,52 @@ export class AgentSession {
 			return;
 		}
 
-		// Build reminder message
+		// Progress check: did the agent complete any tasks since the last check?
+		const allTasks = phases.flatMap(p => p.tasks);
+		const completedCount = allTasks.filter(t => t.status === "completed").length;
+		const madeProgress = completedCount > this.#lastCompletedTodoCount;
+		this.#lastCompletedTodoCount = completedCount;
+
 		this.#todoReminderCount++;
+		const yielded = !madeProgress;
+
+		logger.debug("Todo completion: sending reminder", {
+			incomplete: incomplete.length,
+			attempt: this.#todoReminderCount,
+			completedCount,
+			madeProgress,
+			yielded,
+		});
+
 		const todoList = incompleteByPhase
 			.map(phase => `- ${phase.name}\n${phase.tasks.map(task => `  - ${task.content}`).join("\n")}`)
 			.join("\n");
+
+		// Always emit event for UI to render notification
+		await this.#emitSessionEvent({
+			type: "todo_reminder",
+			todos: incomplete,
+			attempt: this.#todoReminderCount,
+			maxAttempts: remindersMax,
+			yielded,
+		});
+
+		// No progress since last check — agent is either yielding to the user or stuck.
+		// Show the notification but do NOT auto-continue. The user decides when to respond.
+		if (yielded) {
+			logger.debug("Todo completion: no progress since last check, skipping auto-continue", {
+				incomplete: incomplete.length,
+				attempt: this.#todoReminderCount,
+			});
+			return;
+		}
+
 		const reminder =
 			`<system-reminder>\n` +
 			`You stopped with ${incomplete.length} incomplete todo item(s):\n${todoList}\n\n` +
 			`Please continue working on these tasks or mark them complete if finished.\n` +
 			`(Reminder ${this.#todoReminderCount}/${remindersMax})\n` +
 			`</system-reminder>`;
-
-		logger.debug("Todo completion: sending reminder", {
-			incomplete: incomplete.length,
-			attempt: this.#todoReminderCount,
-		});
-
-		// Emit event for UI to render notification
-		await this.#emitSessionEvent({
-			type: "todo_reminder",
-			todos: incomplete,
-			attempt: this.#todoReminderCount,
-			maxAttempts: remindersMax,
-		});
 
 		// Inject reminder and continue the conversation
 		this.agent.appendMessage({

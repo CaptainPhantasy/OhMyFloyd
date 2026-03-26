@@ -552,6 +552,7 @@ function createCustomToolsExtension(tools: CustomTool[]): ExtensionFactory {
 					todos: event.todos,
 					attempt: event.attempt,
 					maxAttempts: event.maxAttempts,
+					yielded: event.yielded,
 				},
 				ctx,
 			),

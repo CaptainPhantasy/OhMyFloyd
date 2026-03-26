@@ -204,7 +204,10 @@ describe("AgentSession auto-compaction queue resume", () => {
 			{
 				id: "phase-1",
 				name: "Execution",
-				tasks: [{ id: "task-1", content: "Finish pending task", status: "in_progress" }],
+				tasks: [
+					{ id: "task-1", content: "Completed setup task", status: "completed" },
+					{ id: "task-2", content: "Finish pending task", status: "in_progress" },
+				],
 			},
 		]);
 

@@ -439,6 +439,9 @@ export interface TodoReminderEvent {
 	todos: TodoItem[];
 	attempt: number;
 	maxAttempts: number;
+	/** True when the agent's last message yielded control to the user (question/decision request).
+	 *  When yielded, the reminder is shown in UI but the agent does NOT auto-continue. */
+	yielded: boolean;
 }
 
 /**

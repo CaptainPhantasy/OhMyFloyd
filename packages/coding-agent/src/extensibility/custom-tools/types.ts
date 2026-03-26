@@ -127,6 +127,8 @@ export type CustomToolSessionEvent =
 			todos: TodoItem[];
 			attempt: number;
 			maxAttempts: number;
+			/** True when the agent yielded control to the user; auto-continue is skipped. */
+			yielded: boolean;
 	  };
 
 /** Rendering options passed to renderResult */

@@ -210,11 +210,11 @@ describe("AgentSession eager todo enforcement", () => {
 
 		expect(observedCalls).toHaveLength(1);
 		expect(observedCalls[0]).toEqual({
-			toolChoice: "todo_write",
+			toolChoice: undefined,
 			toolNames: ["todo_write", "bash"],
 			messageRoles: ["user", "user"],
 			messageTexts: [
-				expect.stringContaining("Before doing substantive work on the upcoming user request"),
+				expect.stringContaining("Before responding, classify the user"),
 				"list all work trees",
 			],
 			lastMessageRole: "user",
@@ -248,11 +248,11 @@ describe("AgentSession eager todo enforcement", () => {
 		expect(streamCallCount).toBe(2);
 		expect(observedCalls).toHaveLength(2);
 		expect(observedCalls[0]).toEqual({
-			toolChoice: "todo_write",
+			toolChoice: undefined,
 			toolNames: ["todo_write", "bash"],
 			messageRoles: ["user", "user"],
 			messageTexts: [
-				expect.stringContaining("Before doing substantive work on the upcoming user request"),
+				expect.stringContaining("Before responding, classify the user"),
 				"list all work trees",
 			],
 			lastMessageRole: "user",
