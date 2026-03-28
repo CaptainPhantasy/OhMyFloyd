@@ -20,10 +20,7 @@ export interface CommandSanitizationResult {
 	reason?: string;
 }
 
-export function sanitizeCommand(
-	command: string,
-	options: CommandSanitizerOptions = {},
-): CommandSanitizationResult {
+export function sanitizeCommand(command: string, options: CommandSanitizerOptions = {}): CommandSanitizationResult {
 	const trimmed = command.trim();
 	if (trimmed.length === 0) {
 		return options.allowEmpty

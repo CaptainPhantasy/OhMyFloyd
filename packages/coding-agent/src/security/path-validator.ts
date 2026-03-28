@@ -21,8 +21,7 @@ export function validatePath(input: string, options: PathValidationOptions): Pat
 
 	const resolvedPath = resolveToCwd(trimmed, options.cwd);
 	const relative = path.relative(options.cwd, resolvedPath);
-	const escapesCwd =
-		relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative);
+	const escapesCwd = relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative);
 
 	if (escapesCwd && !options.allowOutsideCwd) {
 		return {

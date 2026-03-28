@@ -213,10 +213,7 @@ describe("AgentSession eager todo enforcement", () => {
 			toolChoice: undefined,
 			toolNames: ["todo_write", "bash"],
 			messageRoles: ["user", "user"],
-			messageTexts: [
-				expect.stringContaining("Before responding, classify the user"),
-				"list all work trees",
-			],
+			messageTexts: [expect.stringContaining("Before responding, classify the user"), "list all work trees"],
 			lastMessageRole: "user",
 			lastMessageText: "list all work trees",
 		});
@@ -251,10 +248,7 @@ describe("AgentSession eager todo enforcement", () => {
 			toolChoice: undefined,
 			toolNames: ["todo_write", "bash"],
 			messageRoles: ["user", "user"],
-			messageTexts: [
-				expect.stringContaining("Before responding, classify the user"),
-				"list all work trees",
-			],
+			messageTexts: [expect.stringContaining("Before responding, classify the user"), "list all work trees"],
 			lastMessageRole: "user",
 			lastMessageText: "list all work trees",
 		});
