@@ -139,13 +139,17 @@ export default function myHook(pi: HookAPI): void {
 			toolName: "read",
 			input: {},
 			content: [{ type: "text" as const, text: "hello" }],
+			details: undefined,
+			isError: false,
 		});
 		log = fs.readFileSync(eventLogPath, "utf-8");
 		expect(log).toContain("tool_result:read");
 
 		// PROOF POINT 5: context handler fires
 		fs.writeFileSync(eventLogPath, ""); // clear
-		await runner.emitContext([{ role: "user" as const, content: [{ type: "text" as const, text: "test" }] }]);
+		await runner.emitContext([
+			{ role: "user" as const, content: [{ type: "text" as const, text: "test" }], timestamp: Date.now() },
+		]);
 		log = fs.readFileSync(eventLogPath, "utf-8");
 		expect(log).toContain("context:1");
 
@@ -257,11 +261,15 @@ export default function myHook(pi: HookAPI): void {
 		const compactResult = await runner.emit({
 			type: "session_before_compact",
 			preparation: {
+				firstKeptEntryId: "entry-0",
 				messagesToSummarize: [],
 				turnPrefixMessages: [],
-				previousSummary: null,
-				fileOperations: [],
-				totalTurns: 0,
+				recentMessages: [],
+				isSplitTurn: false,
+				tokensBefore: 0,
+				previousSummary: undefined,
+				fileOps: { read: new Set(), written: new Set(), edited: new Set() },
+				settings: { enabled: true, reserveTokens: 0, keepRecentTokens: 0 },
 			},
 			branchEntries: [],
 			signal: new AbortController().signal,
