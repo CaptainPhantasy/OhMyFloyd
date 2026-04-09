@@ -472,6 +472,7 @@ async function runBehavioralAnalysis(): Promise<void> {
 	if (!state.storage || !state.project) return;
 
 	try {
+		logger.debug("[CL_MARKER] ANALYSIS_STARTED");
 		const allObservations = await state.storage.readObservations(state.project.id);
 		// Filter to current session only
 		const sessionObs = allObservations.filter(o => o.sessionId === state.sessionId);
@@ -518,6 +519,7 @@ async function runBehavioralAnalysis(): Promise<void> {
 			};
 
 			await state.storage.writeInstinct(instinct);
+			logger.debug("[CL_MARKER] INSTINCT_WRITTEN");
 			created++;
 		}
 

@@ -117,7 +117,8 @@ export type ShutdownHandler = () => void;
  * Returns true if the event was emitted, false if there were no handlers.
  */
 export async function emitSessionShutdownEvent(extensionRunner: ExtensionRunner | undefined): Promise<boolean> {
-	if (extensionRunner?.hasHandlers("session_shutdown")) {
+	if (extensionRunner) {
+		logger.debug("[CL_MARKER] SESSION_SHUTDOWN_FIRED");
 		await extensionRunner.emit({
 			type: "session_shutdown",
 		});

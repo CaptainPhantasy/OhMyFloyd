@@ -10,7 +10,7 @@
  * - Events: AgentSessionEvent objects streamed as they occur
  * - Extension UI: Extension UI requests are emitted, client responds with extension_ui_response
  */
-import { $env, readJsonl, Snowflake } from "@oh-my-pi/pi-utils";
+import { $env, logger, readJsonl, Snowflake } from "@oh-my-pi/pi-utils";
 import type {
 	ExtensionUIContext,
 	ExtensionUIDialogOptions,
@@ -777,7 +777,8 @@ export async function runRpcMode(session: AgentSession): Promise<never> {
 	async function checkShutdownRequested(): Promise<void> {
 		if (!shutdownState.requested) return;
 
-		if (extensionRunner?.hasHandlers("session_shutdown")) {
+		if (extensionRunner) {
+			logger.debug("[CL_MARKER] SESSION_SHUTDOWN_FIRED");
 			await extensionRunner.emit({ type: "session_shutdown" });
 		}
 

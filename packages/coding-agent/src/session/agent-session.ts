@@ -1790,7 +1790,8 @@ export class AgentSession {
 	 */
 	async dispose(): Promise<void> {
 		try {
-			if (this.#extensionRunner?.hasHandlers("session_shutdown")) {
+			if (this.#extensionRunner) {
+				logger.debug("[CL_MARKER] SESSION_SHUTDOWN_FIRED");
 				await this.#extensionRunner.emit({ type: "session_shutdown" });
 			}
 		} catch (error) {

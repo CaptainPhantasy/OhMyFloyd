@@ -14,7 +14,15 @@
  * The model sees these as binding rules, not suggestions.
  */
 
+import { logger } from "@oh-my-pi/pi-utils";
 import type { ExtensionAPI } from "../extensions/types";
+import {
+	instinctAnalyzeCommand,
+	instinctHealthCommand,
+	instinctPromoteCommand,
+	instinctPruneCommand,
+	instinctStatusCommand,
+} from "./commands";
 import {
 	getActiveInstincts,
 	handleSessionEnd,
@@ -23,13 +31,6 @@ import {
 	handleToolResult,
 	reloadActiveInstincts,
 } from "./observer";
-import {
-	instinctAnalyzeCommand,
-	instinctHealthCommand,
-	instinctPromoteCommand,
-	instinctPruneCommand,
-	instinctStatusCommand,
-} from "./commands";
 
 // Re-export public API for external consumers
 export {
@@ -38,8 +39,8 @@ export {
 	getActiveInstincts,
 	getObserverState,
 	getStorage,
-	reloadActiveInstincts,
 	refreshProjectContext,
+	reloadActiveInstincts,
 } from "./observer";
 export { analyzeObservations, promoteInstincts, pruneExpiredInstincts } from "./pattern-detector";
 export { ContinuousLearningStorage, computeChecksum, isoTimestamp, redactSecrets, uuid } from "./storage";
@@ -136,6 +137,8 @@ export function continuousLearningExtension(api: ExtensionAPI): void {
 		const instincts = getActiveInstincts();
 		const enforcementBlock = buildEnforcementBlock(instincts);
 		if (!enforcementBlock) return;
+
+		logger.debug("[CL_MARKER] CONTEXT_INJECTED");
 
 		// Prepend a developer message containing the enforcement rules.
 		// The model sees this before all user/assistant messages, making the
