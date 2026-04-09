@@ -1,0 +1,54 @@
+From b7a9a56ce36e3bfe1075ce1873a78fa04b9ccaa6 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 9 Apr 2026 06:06:37 -0400
+Subject: [PATCH 12/13] doc: update OHMYFLOYD.md with continuous-learning as
+ commit 10
+
+---
+ OHMYFLOYD.md | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/OHMYFLOYD.md b/OHMYFLOYD.md
+index 8414708af..3fd327b64 100644
+--- a/OHMYFLOYD.md
++++ b/OHMYFLOYD.md
+@@ -63,23 +63,23 @@ The fork carries exactly 8 commits on top of upstream. Each commit is a self-con
+ | 6 | `5535ca93b` | GLM-5.1 model in ZAI provider catalog | 4 (modifies `models.json`, adds security whitelist entries, test) |
+ | 7 | `673b3f156` | Fork branding and documentation | 3 (STAGES.md, `assets/FLOYD_ASCII.txt`, `docs/guides/zai-claude-provider.md`) |
+ | 8 | `0af5502ed` | Hooks refactor: consolidate hook runtime into extension system | 21 (deletes `hooks/loader.ts`, `hooks/runner.ts`, `hooks/tool-wrapper.ts`; guts `hooks/types.ts` to aliases; adds 4 test files + `check-dead-runtime.ts`) |
++| 9 | `d4dcf670b` | OHMYFLOYD.md: fork SSOT document | 1 (this file) |
++| 10 | `27611f5b0` | Continuous learning system: built-in extension | 7 (6 module files in `extensibility/continuous-learning/` + `sdk.ts` wiring) |
+ 
+ ### What is NOT a customization
+ 
+ The following items from earlier fork history are explicitly excluded. They are not carried forward and must not be re-introduced:
+-
+-- **continuous-learning/** (6 files) — Dead code. Not imported by any module. Removed during rebase.
+ - **`packages/coding-agent/src/patch/`** (4 files) — Stale copy of upstream's edit system. Upstream renamed `patch/` to `edit/` in 14.0.x. Removed during rebase.
+ - **`packages/react-edit-benchmark/runs/`** (~80 files) — Benchmark run data. Not runtime code. Not carried forward.
+ - **`packages/coding-agent/src/commit/git/`** (3 files) — Unintegrated git operations module. Not imported by any consumer. Not carried forward.
+ - **`packages/coding-agent/src/web/search/code-search.ts`** — Unintegrated code search. Not carried forward.
+-- **Commit `ed5560c4f`** ("OhMyFloyd v13.19.0 rollup") — A 700-file squash commit that mixed upstream sync with fork features. This commit is the reason the old patch set was unmaintainable. It has been decomposed: upstream content is now provided by the upstream base, and fork-specific content is captured in commits 1-8 above. This commit must never be cherry-picked or re-applied.
++- **Commit `ed5560c4f`** ("OhMyFloyd v13.19.0 rollup") — A 700-file squash commit that mixed upstream sync with fork features. This commit is the reason the old patch set was unmaintainable. It has been decomposed: upstream content is now provided by the upstream base, and fork-specific content is captured in commits 1-10 above. This commit must never be cherry-picked or re-applied.
+ 
+ ---
+ 
+ ## 5. Patch Layer
+ 
+-All 8 customization commits are exported as sequential `git format-patch` files in `patches/rebased/`:
++All 10 customization commits are exported as sequential `git format-patch` files in `patches/rebased/`:
+ 
+ ```
+ patches/
+@@ -93,6 +93,8 @@ patches/
+     0006-feat-add-GLM-5.1-model-to-ZAI-provider-catalog.patch
+     0007-chore-add-OhMyFloyd-fork-branding-and-documentation.patch
+     0008-refactor-extensibility-consolidate-hook-runtime-into.patch
++    0009-doc-establish-OHMYFLOYD.md-as-fork-SSOT-supersede-st.patch
++    0010-feat-integrate-continuous-learning-system-as-built-i.patch
+ ```
+ 
+ **Patches are sequential.** They must be applied in order. Patch 0006 depends on files created by 0002. Patch 0008 depends on types modified by 0003.
+-- 
+2.50.1 (Apple Git-155)
+

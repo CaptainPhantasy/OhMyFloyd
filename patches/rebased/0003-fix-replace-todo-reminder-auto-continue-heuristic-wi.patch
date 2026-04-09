@@ -1,7 +1,7 @@
 From b5ef9375ecba387b3abb1b428c2419c5070e1220 Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Thu, 26 Mar 2026 00:28:07 -0400
-Subject: [PATCH 03/10] fix: replace todo reminder auto-continue heuristic with
+Subject: [PATCH 03/13] fix: replace todo reminder auto-continue heuristic with
  progress-based check
 
 - Remove text-parsing #isYieldedToUser heuristic (unreliable, non-deterministic)

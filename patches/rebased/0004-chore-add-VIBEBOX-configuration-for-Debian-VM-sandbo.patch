@@ -1,7 +1,7 @@
 From 2369d5ebc509e9d0c139098632fd77dc8c679d48 Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Thu, 26 Mar 2026 07:25:00 -0400
-Subject: [PATCH 04/10] chore: add VIBEBOX configuration for Debian VM sandbox
+Subject: [PATCH 04/13] chore: add VIBEBOX configuration for Debian VM sandbox
 
 - Configure VIBEBOX for isolated development environment
 - Set up 2 CPU cores, 2GB RAM, 5GB disk

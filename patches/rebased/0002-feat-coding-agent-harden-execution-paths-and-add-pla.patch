@@ -1,7 +1,7 @@
 From 957c577997f7a5428e49a7e376cd1571ec9c8c66 Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Wed, 25 Mar 2026 01:07:17 -0400
-Subject: [PATCH 02/10] feat(coding-agent): harden execution paths and add
+Subject: [PATCH 02/13] feat(coding-agent): harden execution paths and add
  planning guards
 
 ---

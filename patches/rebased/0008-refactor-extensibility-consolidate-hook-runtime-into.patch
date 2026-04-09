@@ -1,7 +1,7 @@
 From 0af5502ed985eb042585655c80960efcd178803a Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Wed, 8 Apr 2026 23:44:04 -0400
-Subject: [PATCH 08/10] refactor(extensibility): consolidate hook runtime into
+Subject: [PATCH 08/13] refactor(extensibility): consolidate hook runtime into
  extension system
 
 BREAKING CHANGE: Legacy hook runtime removed. Use extension system instead.
