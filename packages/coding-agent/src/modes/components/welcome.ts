@@ -176,6 +176,10 @@ export class WelcomeComponent implements Component {
 			` ${theme.fg("dim", "DIR:")} ${theme.fg("muted", cwdShort)}  ${theme.fg("dim", "|")}  ${theme.fg("dim", "NET:")} ${theme.fg("muted", netLabel)}`,
 			` ${theme.fg("dim", "LSP:")} ${lspDot} ${theme.fg("muted", lspStatus)}  ${theme.fg("dim", "|")}  ${theme.fg("dim", "BUN:")} ${theme.fg("muted", telemetry.bunVersion)}`,
 			separator,
+			` ${theme.bold(theme.fg("accent", "Tips"))}`,
+			` ${theme.fg("dim", "?")} ${theme.fg("muted", "keyboard shortcuts")}  ${theme.fg("dim", "#")} ${theme.fg("muted", "prompt actions")}  ${theme.fg("dim", "/")} ${theme.fg("muted", "commands")}`,
+			` ${theme.fg("dim", "!")} ${theme.fg("muted", "run bash")}  ${theme.fg("dim", "$")} ${theme.fg("muted", "run python")}  ${theme.fg("dim", "@")} ${theme.fg("muted", "mention files")}`,
+			separator,
 			` ${theme.bold(theme.fg("accent", "Recent Sessions"))}`,
 			...sessionLines,
 		];
@@ -231,14 +235,8 @@ export class WelcomeComponent implements Component {
 	#gatherTelemetry(): SystemTelemetry {
 		if (this.#telemetry) return this.#telemetry;
 
-		const loadAvg = os.loadavg()[0] ?? 0;
-		const cpuCount = os.cpus().length || 1;
-		const cpuPct = Math.min(100, Math.round((loadAvg / cpuCount) * 100));
-
-		const totalMem = os.totalmem();
-		const freeMem = os.freemem();
-		const ramPct = Math.round(((totalMem - freeMem) / totalMem) * 100);
-
+		const cpuPct = this.#getCpuUsage();
+		const ramPct = this.#getRamUsage();
 		const storage = this.#detectStorage();
 		const localIp = this.#getLocalIp();
 		const cwd = process.cwd();
@@ -246,6 +244,53 @@ export class WelcomeComponent implements Component {
 
 		this.#telemetry = { cpuPct, ramPct, storage, localIp, cwd, bunVersion };
 		return this.#telemetry;
+	}
+
+	/** Actual CPU utilization via macOS top (user% + sys%). Falls back to load average. */
+	#getCpuUsage(): number {
+		try {
+			const result = Bun.spawnSync(["top", "-l", "1", "-n", "0", "-s", "0"], {
+				stdout: "pipe",
+				stderr: "pipe",
+			});
+			const output = result.stdout.toString();
+			const match = output.match(/CPU usage:\s+([\d.]+)%\s+user,\s+([\d.]+)%\s+sys,\s+([\d.]+)%\s+idle/);
+			if (match) {
+				const user = parseFloat(match[1] ?? "0");
+				const sys = parseFloat(match[2] ?? "0");
+				return Math.round(user + sys);
+			}
+		} catch {}
+		const loadAvg = os.loadavg()[0] ?? 0;
+		const cpuCount = os.cpus().length || 1;
+		return Math.min(100, Math.round((loadAvg / cpuCount) * 100));
+	}
+
+	/** Actual RAM utilization via macOS vm_stat (active + wired + compressed). */
+	#getRamUsage(): number {
+		try {
+			const result = Bun.spawnSync(["vm_stat"], { stdout: "pipe", stderr: "pipe" });
+			const output = result.stdout.toString();
+
+			const pageSizeMatch = output.match(/page size of (\d+) bytes/);
+			const pageSize = pageSizeMatch ? parseInt(pageSizeMatch[1] ?? "16384", 10) : 16384;
+
+			const active = this.#parseVmStatField(output, "Pages active");
+			const wired = this.#parseVmStatField(output, "Pages wired down");
+			const compressed = this.#parseVmStatField(output, "Pages occupied by compressor");
+
+			const usedBytes = (active + wired + compressed) * pageSize;
+			const totalBytes = os.totalmem();
+			return Math.min(100, Math.round((usedBytes / totalBytes) * 100));
+		} catch {}
+		const totalMem = os.totalmem();
+		const freeMem = os.freemem();
+		return Math.round(((totalMem - freeMem) / totalMem) * 100);
+	}
+
+	#parseVmStatField(output: string, field: string): number {
+		const match = output.match(new RegExp(`${field}:\\s+(\\d+)`));
+		return match ? parseInt(match[1] ?? "0", 10) : 0;
 	}
 
 	#detectStorage(): StorageEntry[] {
