@@ -1,7 +1,7 @@
 From 5535ca93b8394d691d95e511239bb5cb0ca7638a Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Fri, 27 Mar 2026 21:53:59 -0400
-Subject: [PATCH 06/13] feat: add GLM-5.1 model to ZAI provider catalog
+Subject: [PATCH 06/15] feat: add GLM-5.1 model to ZAI provider catalog
 
 - Add glm-5.1 entry to models.json with 400K context window,
   131072 max tokens, budget thinking, and research-verified pricing

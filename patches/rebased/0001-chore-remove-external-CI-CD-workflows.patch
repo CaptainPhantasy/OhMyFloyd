@@ -1,7 +1,7 @@
 From de20c1fd302f2d653a18f721c3eeb9e95cc32802 Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Mon, 23 Mar 2026 13:15:18 -0400
-Subject: [PATCH 01/13] chore: remove external CI/CD workflows
+Subject: [PATCH 01/15] chore: remove external CI/CD workflows
 
 All CI/CD will run in-house. No external GitHub Actions.
 ---

@@ -1,7 +1,7 @@
 From 673b3f1560d6cf189cc7385fe7ff1fec143e8a2c Mon Sep 17 00:00:00 2001
 From: CaptainPhantasy <DouglasTalley1977@gmail.com>
 Date: Thu, 9 Apr 2026 05:41:27 -0400
-Subject: [PATCH 07/13] chore: add OhMyFloyd fork branding and documentation
+Subject: [PATCH 07/15] chore: add OhMyFloyd fork branding and documentation
 
 ---
  assets/FLOYD_ASCII.txt             |   7 +

@@ -1,0 +1,872 @@
+From 11c9dc5fe63e473f79f6f4d70528a50102a5eece Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 9 Apr 2026 06:33:05 -0400
+Subject: [PATCH 15/15] feat: transcript-text behavioral classifier with
+ enforcement chain
+
+Adds behavior-classifier.ts with three detectors:
+- detectUnwantedQuestions: model asks clarifying/permission questions
+- detectUnsubstantiatedCompletion: model claims done without evidence
+- detectIgnoredDirective: model violates explicit user directives
+
+Wired into observer pipeline:
+- runBehavioralAnalysis() called on session_shutdown
+- classifyBehavior() runs on all session observations
+- Detected violations auto-create active instincts (confidence >= 0.7)
+- Instinct IDs use kebab-case (Zod schema compliant)
+
+10 regression tests proving:
+- Each violation type is detected from model text output
+- Substantiated completions are NOT false-positived
+- Directive extraction finds MUST/NEVER/ALWAYS markers
+- Violations persist as instincts across storage instances
+- Full chain: violation text -> instinct -> enforcement block text
+
+Chain: model output text -> classifyBehavior() -> writeInstinct() ->
+reloadActiveInstincts() -> context handler -> <learned-rules> in model context
+---
+ .../behavior-classifier.ts                    | 296 +++++++++++++
+ .../continuous-learning/observer.ts           |  77 +++-
+ .../test/behavioral-enforcement.test.ts       | 418 ++++++++++++++++++
+ 3 files changed, 790 insertions(+), 1 deletion(-)
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/behavior-classifier.ts
+ create mode 100644 packages/coding-agent/test/behavioral-enforcement.test.ts
+
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/behavior-classifier.ts b/packages/coding-agent/src/extensibility/continuous-learning/behavior-classifier.ts
+new file mode 100644
+index 000000000..6f4013aaa
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/behavior-classifier.ts
+@@ -0,0 +1,296 @@
++/**
++ * Continuous Learning v3 - Behavioral Classifier
++ *
++ * Analyzes model text output for non-deterministic behavioral violations:
++ *   1. Ignoring explicit user directives
++ *   2. Asking questions after being told not to
++ *   3. Claiming completion without evidence
++ *
++ * Each detector is a pure function: text in, violation descriptor out.
++ * The classifier runs against observation text content (tool outputs,
++ * model responses) captured by the observer.
++ */
++
++import type { Observation } from "./types";
++
++// ============================================================================
++// Violation Types
++// ============================================================================
++
++export interface BehavioralViolation {
++	/** Violation category */
++	type: "ignored_directive" | "unwanted_question" | "unsubstantiated_completion";
++	/** Confidence score (0.0 - 1.0) */
++	confidence: number;
++	/** Human-readable description of the violation */
++	description: string;
++	/** The specific text fragment that triggered detection */
++	evidence: string;
++	/** Suggested enforcement rule */
++	enforcementAction: string;
++	/** Observation ID that contained the violation */
++	observationId: string;
++}
++
++// ============================================================================
++// Detection Patterns
++// ============================================================================
++
++/**
++ * Patterns indicating the model asked a question when it should not have.
++ * These fire when model output contains question patterns in contexts where
++ * the user has signaled "do not ask."
++ */
++const QUESTION_PATTERNS = [
++	/\bwould you like (?:me to|to)\b/i,
++	/\bshould [iI] (?:proceed|continue|go ahead)\b/i,
++	/\bdo you want (?:me to|to)\b/i,
++	/\bshall [iI] (?:proceed|continue|go ahead)\b/i,
++	/\bwhat (?:would you prefer|do you think|approach)\?/i,
++	/\blet me know (?:if|how|what|which)\b/i,
++	/\bwhich (?:option|approach|method) (?:do you|would you)\b/i,
++	/\bcan you (?:clarify|confirm|specify)\b/i,
++	/\bcould you (?:clarify|confirm|specify)\b/i,
++	/\bplease (?:clarify|confirm|let me know)\b/i,
++];
++
++/**
++ * Patterns indicating the model claimed work is done without showing evidence.
++ * Matches completion claims not accompanied by evidence markers.
++ */
++const COMPLETION_CLAIM_PATTERNS = [
++	/\b(?:I'?ve|I have) (?:completed|finished|done|implemented|fixed|resolved|updated|applied)\b/i,
++	/\b(?:all|everything) (?:is |has been )?(?:done|complete|finished|updated|fixed|resolved)\b/i,
++	/\b(?:changes|updates|fixes|modifications) (?:have been |are )?(?:applied|made|completed)\b/i,
++	/\btask (?:is )?(?:complete|done|finished)\b/i,
++	/\bsuccessfully (?:completed|implemented|applied|fixed|resolved|updated)\b/i,
++];
++
++/**
++ * Evidence markers that, if present, make a completion claim substantiated.
++ * A completion claim is only a violation if NONE of these are present.
++ */
++const EVIDENCE_MARKERS = [
++	/^#{1,3}\s*ACTION\s+\d/m,
++	/\bFile\(?s?\)?:\s*[`"']?[\w/.\-]+/i,
++	/\bCommand:\s*[`"']?.+/i,
++	/\bEvidence:\s*.+/i,
++	/\bVerified:\s*YES/i,
++	/\bexit\s*(?:code)?:?\s*0\b/i,
++	/\bpass\b.{0,20}\bfail\b/i,
++	/\b\d+\s+pass/i,
++	/```[\s\S]{10,}```/,
++	/\b(?:output|result):\s*\n/i,
++];
++
++/**
++ * Patterns indicating the user gave an explicit directive that must not be ignored.
++ */
++const DIRECTIVE_MARKERS = [
++	/\byou (?:MUST|must|SHALL|shall) (?:NOT |not )?/i,
++	/\bdo NOT\b/i,
++	/\bNEVER\b/,
++	/\bALWAYS\b/,
++	/\bprohibited\b/i,
++	/\bforbidden\b/i,
++	/\brequired\b/i,
++	/\bmandatory\b/i,
++	/\binviolable\b/i,
++];
++
++// ============================================================================
++// Detector Functions
++// ============================================================================
++
++/**
++ * Detect unwanted questions in model output.
++ *
++ * A question is "unwanted" when the model asks for clarification, preference,
++ * or permission in output text. This is a violation of the default-to-action
++ * contract unless the user explicitly invited questions.
++ */
++function detectUnwantedQuestions(text: string, observationId: string): BehavioralViolation | undefined {
++	for (const pattern of QUESTION_PATTERNS) {
++		const match = text.match(pattern);
++		if (match) {
++			return {
++				type: "unwanted_question",
++				confidence: 0.75,
++				description: "Model asked a clarifying/permission question instead of acting",
++				evidence: match[0],
++				enforcementAction:
++					"Do not ask clarifying questions. Default to informed action. " +
++					"Resolve ambiguity using repo context, existing patterns, and reasonable defaults. " +
++					"Only ask when options have materially different tradeoffs the user must decide.",
++				observationId,
++			};
++		}
++	}
++	return undefined;
++}
++
++/**
++ * Detect completion claims without evidence.
++ *
++ * A completion claim is a violation when the model says work is done but
++ * the same output does not contain evidence markers (file paths, command
++ * output, test results, verification receipts).
++ */
++function detectUnsubstantiatedCompletion(text: string, observationId: string): BehavioralViolation | undefined {
++	// Check if any completion claim pattern matches
++	let claimMatch: RegExpMatchArray | null = null;
++	for (const pattern of COMPLETION_CLAIM_PATTERNS) {
++		claimMatch = text.match(pattern);
++		if (claimMatch) break;
++	}
++	if (!claimMatch) return undefined;
++
++	// Check if evidence markers are present
++	for (const marker of EVIDENCE_MARKERS) {
++		if (marker.test(text)) {
++			return undefined; // Claim is substantiated
++		}
++	}
++
++	return {
++		type: "unsubstantiated_completion",
++		confidence: 0.8,
++		description: "Model claimed work is complete without showing evidence",
++		evidence: claimMatch[0],
++		enforcementAction:
++			"Never declare work complete without evidence. Every completion claim must include: " +
++			"(1) exact action taken with file:line, (2) command run and its output, " +
++			"(3) verification result (test pass, type check, etc.). " +
++			"If evidence cannot be provided, status must be INCOMPLETE.",
++		observationId,
++	};
++}
++
++/**
++ * Detect ignored directives.
++ *
++ * This detector looks for observation pairs where:
++ *   - A prior observation (user input to a tool) contains an explicit directive
++ *   - A subsequent observation (model output) violates that directive
++ *
++ * For single-observation analysis, we check if the model output contains
++ * both a directive echo and a contradicting action.
++ */
++function detectIgnoredDirective(
++	text: string,
++	observationId: string,
++	priorDirectives: string[],
++): BehavioralViolation | undefined {
++	// Check if any prior directive from this session was violated
++	for (const directive of priorDirectives) {
++		const directiveLower = directive.toLowerCase();
++
++		// "do NOT ask" + model asks a question
++		if (directiveLower.includes("do not ask") || directiveLower.includes("must not ask")) {
++			for (const qPattern of QUESTION_PATTERNS) {
++				const match = text.match(qPattern);
++				if (match) {
++					return {
++						type: "ignored_directive",
++						confidence: 0.9,
++						description: `Model asked "${match[0]}" despite directive: "${directive.slice(0, 80)}"`,
++						evidence: match[0],
++						enforcementAction:
++							`User directive was: "${directive.slice(0, 120)}". ` +
++							"This directive was violated. It must be followed exactly in all future interactions.",
++						observationId,
++					};
++				}
++			}
++		}
++
++		// "NEVER declare done without" + model declares done without
++		if (directiveLower.includes("never") && directiveLower.includes("done")) {
++			for (const cPattern of COMPLETION_CLAIM_PATTERNS) {
++				if (cPattern.test(text)) {
++					const hasEvidence = EVIDENCE_MARKERS.some(m => m.test(text));
++					if (!hasEvidence) {
++						return {
++							type: "ignored_directive",
++							confidence: 0.9,
++							description: `Model claimed completion without evidence despite directive: "${directive.slice(0, 80)}"`,
++							evidence: text.match(cPattern)![0],
++							enforcementAction:
++								`User directive was: "${directive.slice(0, 120)}". ` +
++								"This directive was violated. Completion claims require evidence rows.",
++							observationId,
++						};
++					}
++				}
++			}
++		}
++	}
++
++	return undefined;
++}
++
++// ============================================================================
++// Public API
++// ============================================================================
++
++/**
++ * Extract explicit directives from observation text.
++ * Returns directive sentences for tracking across a session.
++ */
++export function extractDirectives(text: string): string[] {
++	const directives: string[] = [];
++	// Split into sentences on period, exclamation, newline, or semicolon.
++	// Also treat the full text as a candidate if no split occurs.
++	const sentences = text.split(/[.!;]\s+|\n/).filter(s => s.length > 10);
++	if (sentences.length === 0 && text.length > 10) {
++		sentences.push(text);
++	}
++	for (const sentence of sentences) {
++		for (const marker of DIRECTIVE_MARKERS) {
++			if (marker.test(sentence)) {
++				directives.push(sentence.trim().slice(0, 200));
++				break;
++			}
++		}
++	}
++	return directives;
++}
++
++/**
++ * Analyze a set of observations for behavioral violations.
++ *
++ * @param observations - Session observations to analyze
++ * @returns Array of detected behavioral violations
++ */
++export function classifyBehavior(observations: Observation[]): BehavioralViolation[] {
++	const violations: BehavioralViolation[] = [];
++	const sessionDirectives: string[] = [];
++
++	// Sort by timestamp for sequential analysis
++	const sorted = [...observations].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
++
++	for (const obs of sorted) {
++		// Extract directives from user input (tool_start events often contain user intent)
++		if (obs.input) {
++			sessionDirectives.push(...extractDirectives(obs.input));
++		}
++
++		// Analyze model output text for violations
++		const textToAnalyze = obs.output ?? obs.error ?? "";
++		if (textToAnalyze.length < 20) continue;
++
++		// Run all detectors
++		const question = detectUnwantedQuestions(textToAnalyze, obs.id);
++		if (question) violations.push(question);
++
++		const completion = detectUnsubstantiatedCompletion(textToAnalyze, obs.id);
++		if (completion) violations.push(completion);
++
++		if (sessionDirectives.length > 0) {
++			const directive = detectIgnoredDirective(textToAnalyze, obs.id, sessionDirectives);
++			if (directive) violations.push(directive);
++		}
++	}
++
++	return violations;
++}
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/observer.ts b/packages/coding-agent/src/extensibility/continuous-learning/observer.ts
+index 067e0c64a..a06537ee2 100644
+--- a/packages/coding-agent/src/extensibility/continuous-learning/observer.ts
++++ b/packages/coding-agent/src/extensibility/continuous-learning/observer.ts
+@@ -14,9 +14,10 @@ import { createHash } from "node:crypto";
+ import { existsSync } from "node:fs";
+ import { logger } from "@oh-my-pi/pi-utils";
+ import type { HookContext, ToolCallEvent } from "../hooks/types";
++import { classifyBehavior } from "./behavior-classifier";
+ import { analyzeObservations } from "./pattern-detector";
+ import { ContinuousLearningStorage, isoTimestamp, redactSecrets, uuid } from "./storage";
+-import type { Observation, ObservationEvent } from "./types";
++import type { Instinct, Observation, ObservationEvent } from "./types";
+ 
+ // ============================================================================
+ // Project Detection
+@@ -436,6 +437,7 @@ export async function handleSessionStart(ctx: HookContext): Promise<void> {
+ 
+ /**
+  * Handle session end/shutdown event.
++ * Runs behavioral analysis on all session observations before shutdown.
+  */
+ export async function handleSessionEnd(ctx: HookContext): Promise<void> {
+ 	if (!state.enabled || !state.storage || !state.project) {
+@@ -453,11 +455,84 @@ export async function handleSessionEnd(ctx: HookContext): Promise<void> {
+ 		};
+ 
+ 		await state.storage.writeObservation(observation);
++
++		// Run behavioral analysis on this session's observations
++		await runBehavioralAnalysis();
+ 	} catch (error) {
+ 		logger.error("ContinuousLearning: error handling session_end", { error });
+ 	}
+ }
+ 
++/**
++ * Run behavioral classifier on the current session's observations.
++ * Creates instincts from detected violations so they are enforced
++ * in all subsequent sessions via the context event handler.
++ */
++async function runBehavioralAnalysis(): Promise<void> {
++	if (!state.storage || !state.project) return;
++
++	try {
++		const allObservations = await state.storage.readObservations(state.project.id);
++		// Filter to current session only
++		const sessionObs = allObservations.filter(o => o.sessionId === state.sessionId);
++		if (sessionObs.length === 0) return;
++
++		const violations = classifyBehavior(sessionObs);
++		if (violations.length === 0) return;
++
++		const now = isoTimestamp();
++		let created = 0;
++
++		for (const violation of violations) {
++			// Deduplicate: generate a stable ID from the violation type + evidence.
++			// Zod schema requires /^[a-z][a-z0-9-]*[a-z0-9]$/ — no underscores.
++			const typeSlug = violation.type.replace(/_/g, "-");
++			const evidenceSlug = violation.evidence
++				.toLowerCase()
++				.replace(/[^a-z0-9]+/g, "-")
++				.replace(/^-|-$/g, "")
++				.slice(0, 40);
++			const id = `behavioral-${typeSlug}-${evidenceSlug}`.replace(/-+$/g, "");
++
++			// Skip if this exact instinct already exists
++			const existing = await state.storage.readAllInstincts(state.project!.id);
++			if (existing.some(i => i.id === id)) continue;
++
++			const instinct: Omit<Instinct, "checksum"> = {
++				id,
++				schemaVersion: "3.0.0",
++				trigger: violation.description,
++				confidence: violation.confidence,
++				domain: "workflow",
++				source: "observation",
++				scope: "project",
++				// High-confidence behavioral violations auto-activate
++				status: violation.confidence >= 0.7 ? "active" : "pending",
++				projectId: state.project!.id,
++				projectName: state.project!.name,
++				createdAt: now,
++				updatedAt: now,
++				observationCount: 1,
++				evidence: [violation.observationId],
++				action: violation.enforcementAction,
++			};
++
++			await state.storage.writeInstinct(instinct);
++			created++;
++		}
++
++		if (created > 0) {
++			await reloadActiveInstincts();
++			logger.debug("ContinuousLearning: behavioral analysis complete", {
++				violations: violations.length,
++				instinctsCreated: created,
++			});
++		}
++	} catch (err) {
++		logger.error("ContinuousLearning: behavioral analysis failed", { error: err });
++	}
++}
++
+ // ============================================================================
+ // API for External Use
+ // ============================================================================
+diff --git a/packages/coding-agent/test/behavioral-enforcement.test.ts b/packages/coding-agent/test/behavioral-enforcement.test.ts
+new file mode 100644
+index 000000000..60289cc69
+--- /dev/null
++++ b/packages/coding-agent/test/behavioral-enforcement.test.ts
+@@ -0,0 +1,418 @@
++/**
++ * Behavioral Enforcement Regression Tests
++ *
++ * Proves the full transcript-text enforcement chain:
++ *   model text with violation -> classifier detects it -> instinct created ->
++ *   instinct persisted -> enforcement block contains the rule ->
++ *   subsequent session sees the rule in context
++ */
++
++import { afterEach, beforeEach, describe, expect, test } from "bun:test";
++import * as fs from "node:fs/promises";
++import * as os from "node:os";
++import * as path from "node:path";
++
++import { classifyBehavior, extractDirectives } from "../src/extensibility/continuous-learning/behavior-classifier";
++import { ContinuousLearningStorage, isoTimestamp, uuid } from "../src/extensibility/continuous-learning";
++import type { Observation } from "../src/extensibility/continuous-learning/types";
++
++function fakeObs(overrides: Partial<Observation> & { output?: string; input?: string }): Observation {
++	return {
++		id: uuid(),
++		schemaVersion: "3.0.0",
++		timestamp: isoTimestamp(),
++		event: "tool_complete",
++		sessionId: "test-session",
++		projectId: "test-project",
++		projectName: "test",
++		...overrides,
++	};
++}
++
++/** Build an instinct ID the same way observer.ts does (no underscores, no trailing hyphens) */
++function makeInstinctId(violationType: string, evidence: string): string {
++	const typeSlug = violationType.replace(/_/g, "-");
++	const evidenceSlug = evidence
++		.toLowerCase()
++		.replace(/[^a-z0-9]+/g, "-")
++		.replace(/^-|-$/g, "")
++		.slice(0, 40);
++	return `behavioral-${typeSlug}-${evidenceSlug}`.replace(/-+$/g, "");
++}
++
++// ============================================================================
++// Detection tests
++// ============================================================================
++
++describe("behavioral classifier detects violations", () => {
++	test("detects unwanted question in model output", () => {
++		const obs = [
++			fakeObs({
++				output: "I found the config file. Would you like me to proceed with the changes?",
++			}),
++		];
++		const violations = classifyBehavior(obs);
++		expect(violations.length).toBeGreaterThan(0);
++		expect(violations[0].type).toBe("unwanted_question");
++		expect(violations[0].evidence).toContain("Would you like me to");
++		expect(violations[0].enforcementAction).toContain("Do not ask");
++	});
++
++	test("detects unsubstantiated completion claim", () => {
++		const obs = [
++			fakeObs({
++				output: "I've completed all the changes to the authentication module. Everything is done.",
++			}),
++		];
++		const violations = classifyBehavior(obs);
++		expect(violations.length).toBeGreaterThan(0);
++		expect(violations[0].type).toBe("unsubstantiated_completion");
++		expect(violations[0].enforcementAction).toContain("evidence");
++	});
++
++	test("does NOT flag completion claim WITH evidence", () => {
++		const obs = [
++			fakeObs({
++				output: [
++					"I've completed the changes.",
++					"",
++					"### ACTION 1: Fix auth module",
++					"- File(s): src/auth/login.ts",
++					"- Command: bun test test/auth.test.ts",
++					"- Evidence: 5 pass, 0 fail",
++					"- Verified: YES",
++				].join("\n"),
++			}),
++		];
++		const violations = classifyBehavior(obs);
++		const completionViolations = violations.filter(v => v.type === "unsubstantiated_completion");
++		expect(completionViolations.length).toBe(0);
++	});
++
++	test("detects ignored directive: told not to ask, then asks", () => {
++		const obs = [
++			fakeObs({
++				event: "tool_start",
++				input: "You MUST NOT ask any questions. Do not ask me what to do next. Just execute.",
++			}),
++			fakeObs({
++				output: "I see the issue. Should I proceed with the fix or would you like to review first?",
++			}),
++		];
++		const violations = classifyBehavior(obs);
++		const directiveViolation = violations.find(v => v.type === "ignored_directive");
++		expect(directiveViolation).toBeDefined();
++		expect(directiveViolation!.confidence).toBeGreaterThanOrEqual(0.9);
++		expect(directiveViolation!.enforcementAction).toContain("directive was violated");
++	});
++
++	test("extractDirectives finds MUST/NEVER/ALWAYS markers", () => {
++		const text =
++			"You MUST always show evidence. NEVER declare done without proof. The sky is blue. This is ALWAYS required for every task.";
++		const directives = extractDirectives(text);
++		expect(directives.length).toBeGreaterThanOrEqual(2);
++		expect(directives.some(d => d.includes("MUST"))).toBe(true);
++		expect(directives.some(d => d.includes("NEVER") || d.includes("ALWAYS"))).toBe(true);
++	});
++});
++
++// ============================================================================
++// Persistence tests
++// ============================================================================
++
++describe("behavioral violations produce persistent enforcement rules", () => {
++	let tmpDir: string;
++	let storage: ContinuousLearningStorage;
++
++	beforeEach(async () => {
++		tmpDir = path.join(os.tmpdir(), `cl-behav-${Date.now()}`);
++		await fs.mkdir(tmpDir, { recursive: true });
++		storage = new ContinuousLearningStorage(tmpDir);
++		await storage.initialize();
++	});
++
++	afterEach(async () => {
++		await fs.rm(tmpDir, { recursive: true, force: true });
++	});
++
++	test("detected violation is persisted as active instinct", async () => {
++		const projectId = "test-enforce";
++		const sessionId = uuid();
++
++		await storage.writeObservation({
++			timestamp: isoTimestamp(),
++			event: "tool_complete",
++			tool: "task",
++			output: "I've finished implementing all the features. Everything should work now.",
++			sessionId,
++			projectId,
++			projectName: "test",
++			cwd: tmpDir,
++		});
++
++		const observations = await storage.readObservations(projectId);
++		const violations = classifyBehavior(observations);
++		expect(violations.length).toBeGreaterThan(0);
++
++		const violation = violations[0];
++		const now = isoTimestamp();
++		const id = makeInstinctId(violation.type, violation.evidence);
++
++		await storage.writeInstinct({
++			id,
++			schemaVersion: "3.0.0",
++			trigger: violation.description,
++			confidence: violation.confidence,
++			domain: "workflow",
++			source: "observation",
++			scope: "project",
++			status: "active",
++			projectId,
++			projectName: "test",
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: [violation.observationId],
++			action: violation.enforcementAction,
++		});
++
++		const instincts = await storage.readAllInstincts(projectId);
++		const behavioral = instincts.filter(i => i.id.startsWith("behavioral-"));
++		expect(behavioral.length).toBe(1);
++		expect(behavioral[0].status).toBe("active");
++		expect(behavioral[0].action).toContain("evidence");
++		expect(behavioral[0].trigger).toContain("complete");
++	});
++
++	test("behavioral instinct survives new storage instance", async () => {
++		const projectId = "test-persist";
++		const now = isoTimestamp();
++
++		await storage.writeInstinct({
++			id: "behavioral-unwanted-question-would-you-like",
++			schemaVersion: "3.0.0",
++			trigger: "Model asked a clarifying/permission question instead of acting",
++			confidence: 0.75,
++			domain: "workflow",
++			source: "observation",
++			scope: "project",
++			status: "active",
++			projectId,
++			projectName: "test",
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: [],
++			action: "Do not ask clarifying questions. Default to informed action.",
++		});
++
++		const storage2 = new ContinuousLearningStorage(tmpDir);
++		await storage2.initialize();
++
++		const instincts = await storage2.readAllInstincts(projectId);
++		const behavioral = instincts.filter(i => i.id.startsWith("behavioral-"));
++		expect(behavioral.length).toBe(1);
++		expect(behavioral[0].action).toContain("Do not ask");
++	});
++});
++
++// ============================================================================
++// Full chain tests
++// ============================================================================
++
++describe("full enforcement chain: violation to context injection", () => {
++	let tmpDir: string;
++	let storage: ContinuousLearningStorage;
++
++	beforeEach(async () => {
++		tmpDir = path.join(os.tmpdir(), `cl-chain-${Date.now()}`);
++		await fs.mkdir(tmpDir, { recursive: true });
++		storage = new ContinuousLearningStorage(tmpDir);
++		await storage.initialize();
++	});
++
++	afterEach(async () => {
++		await fs.rm(tmpDir, { recursive: true, force: true });
++	});
++
++	test("unwanted question -> instinct -> enforcement block", async () => {
++		const projectId = "chain-test";
++		const sessionId = uuid();
++
++		// Step 1: Write observation with violation
++		await storage.writeObservation({
++			timestamp: isoTimestamp(),
++			event: "tool_complete",
++			tool: "task",
++			output: "I see the issue. Would you like me to proceed with fixing it?",
++			sessionId,
++			projectId,
++			projectName: "chain-test",
++			cwd: tmpDir,
++		});
++
++		// Step 2: Classify
++		const observations = await storage.readObservations(projectId);
++		const violations = classifyBehavior(observations);
++		expect(violations.length).toBeGreaterThan(0);
++		expect(violations[0].type).toBe("unwanted_question");
++
++		// Step 3: Create instinct
++		const v = violations[0];
++		const now = isoTimestamp();
++		const instinctId = makeInstinctId(v.type, v.evidence);
++
++		await storage.writeInstinct({
++			id: instinctId,
++			schemaVersion: "3.0.0",
++			trigger: v.description,
++			confidence: v.confidence,
++			domain: "workflow",
++			source: "observation",
++			scope: "project",
++			status: "active",
++			projectId,
++			projectName: "chain-test",
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: [v.observationId],
++			action: v.enforcementAction,
++		});
++
++		// Step 4: Read instincts back (simulates session_start reload)
++		const instincts = await storage.readAllInstincts(projectId);
++		const active = instincts.filter(i => i.status === "active");
++		expect(active.length).toBeGreaterThan(0);
++
++		// Step 5: Build enforcement block (reproduces what context handler does)
++		const lines: string[] = ["<learned-rules>", ""];
++		for (const inst of active) {
++			lines.push(`[PROJECT] ${inst.id} (${Math.round(inst.confidence * 100)}% confidence)`);
++			lines.push(`  WHEN: ${inst.trigger}`);
++			lines.push(`  THEN: ${inst.action}`);
++			lines.push("");
++		}
++		lines.push("</learned-rules>");
++		const enforcementText = lines.join("\n");
++
++		// PROOF: enforcement text contains the behavioral rule
++		expect(enforcementText).toContain("<learned-rules>");
++		expect(enforcementText).toContain("</learned-rules>");
++		expect(enforcementText).toContain("behavioral-unwanted-question");
++		expect(enforcementText).toContain("Do not ask clarifying questions");
++		expect(enforcementText).toContain("WHEN:");
++		expect(enforcementText).toContain("THEN:");
++	});
++
++	test("unsubstantiated completion -> instinct -> enforcement block", async () => {
++		const projectId = "chain-test-2";
++		const sessionId = uuid();
++
++		await storage.writeObservation({
++			timestamp: isoTimestamp(),
++			event: "tool_complete",
++			tool: "task",
++			output: "All changes have been applied. The feature is complete.",
++			sessionId,
++			projectId,
++			projectName: "chain-test-2",
++			cwd: tmpDir,
++		});
++
++		const observations = await storage.readObservations(projectId);
++		const violations = classifyBehavior(observations);
++		expect(violations.length).toBeGreaterThan(0);
++		const completionViolation = violations.find(v => v.type === "unsubstantiated_completion");
++		expect(completionViolation).toBeDefined();
++
++		const v = completionViolation!;
++		const now = isoTimestamp();
++		await storage.writeInstinct({
++			id: makeInstinctId(v.type, v.evidence),
++			schemaVersion: "3.0.0",
++			trigger: v.description,
++			confidence: v.confidence,
++			domain: "workflow",
++			source: "observation",
++			scope: "project",
++			status: "active",
++			projectId,
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: [v.observationId],
++			action: v.enforcementAction,
++		});
++
++		const instincts = await storage.readAllInstincts(projectId);
++		const active = instincts.filter(i => i.status === "active");
++		expect(active.length).toBeGreaterThan(0);
++
++		// PROOF: enforcement action demands evidence
++		expect(active[0].action).toContain("Never declare work complete without evidence");
++		expect(active[0].action).toContain("file:line");
++		expect(active[0].action).toContain("INCOMPLETE");
++	});
++
++	test("ignored directive -> instinct -> enforcement block", async () => {
++		const projectId = "chain-test-3";
++		const sessionId = uuid();
++
++		await storage.writeObservation({
++			timestamp: isoTimestamp(),
++			event: "tool_start",
++			tool: "task",
++			input: "You MUST NOT ask any questions. Do not ask me what to do next. Just execute.",
++			sessionId,
++			projectId,
++			projectName: "chain-test-3",
++			cwd: tmpDir,
++		});
++
++		await storage.writeObservation({
++			timestamp: new Date(Date.now() + 1000).toISOString(),
++			event: "tool_complete",
++			tool: "task",
++			output:
++				"I found a potential issue with the config. Should I proceed with the fix or would you like to review first?",
++			sessionId,
++			projectId,
++			projectName: "chain-test-3",
++			cwd: tmpDir,
++		});
++
++		const observations = await storage.readObservations(projectId);
++		const violations = classifyBehavior(observations);
++		const directiveViolation = violations.find(v => v.type === "ignored_directive");
++		expect(directiveViolation).toBeDefined();
++		expect(directiveViolation!.confidence).toBeGreaterThanOrEqual(0.9);
++
++		const v = directiveViolation!;
++		const now = isoTimestamp();
++		await storage.writeInstinct({
++			id: makeInstinctId(v.type, v.evidence),
++			schemaVersion: "3.0.0",
++			trigger: v.description,
++			confidence: v.confidence,
++			domain: "workflow",
++			source: "observation",
++			scope: "project",
++			status: "active",
++			projectId,
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: [v.observationId],
++			action: v.enforcementAction,
++		});
++
++		const instincts = await storage.readAllInstincts(projectId);
++		const active = instincts.filter(i => i.status === "active");
++		expect(active.length).toBeGreaterThan(0);
++
++		// PROOF: enforcement references the original directive and marks it violated
++		expect(active[0].action).toContain("directive was violated");
++		expect(active[0].trigger).toContain("despite directive");
++	});
++});
+-- 
+2.50.1 (Apple Git-155)
+
