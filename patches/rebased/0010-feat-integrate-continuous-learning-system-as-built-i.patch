@@ -1,0 +1,2564 @@
+From 27611f5b0ec5224843b2bcb65b6255750867aa33 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 9 Apr 2026 06:05:04 -0400
+Subject: [PATCH 10/10] feat: integrate continuous learning system as built-in
+ extension
+
+Recovers the continuous learning v3 module from pre-rebase history
+and wires it into the extension system as a built-in factory.
+
+- Registers session_start, tool_call, tool_result, session_shutdown handlers
+- Registers 5 slash commands: /instinct-status, /instinct-analyze,
+  /instinct-health, /instinct-prune, /instinct-promote
+- Replaces console.error with logger.error per AGENTS.md rules
+- Loaded unconditionally in sdk.ts via loadExtensionFromFactory
+---
+ .../continuous-learning/commands.ts           | 302 +++++++
+ .../continuous-learning/index.ts              | 126 +++
+ .../continuous-learning/observer.ts           | 462 ++++++++++
+ .../continuous-learning/pattern-detector.ts   | 435 +++++++++
+ .../continuous-learning/storage.ts            | 822 ++++++++++++++++++
+ .../continuous-learning/types.ts              | 317 +++++++
+ packages/coding-agent/src/sdk.ts              |  13 +
+ 7 files changed, 2477 insertions(+)
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/commands.ts
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/index.ts
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/observer.ts
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/pattern-detector.ts
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/storage.ts
+ create mode 100644 packages/coding-agent/src/extensibility/continuous-learning/types.ts
+
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/commands.ts b/packages/coding-agent/src/extensibility/continuous-learning/commands.ts
+new file mode 100644
+index 000000000..7487637b8
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/commands.ts
+@@ -0,0 +1,302 @@
++/**
++ * Continuous Learning v3 - Slash Commands
++ *
++ * CLI commands for managing instincts and observing learning state.
++ */
++
++import type { HookCommandContext } from "../hooks/types";
++import { getObserverState, getStorage } from "./observer";
++import { analyzeObservations, promoteInstincts, pruneExpiredInstincts } from "./pattern-detector";
++import { ContinuousLearningStorage } from "./storage";
++import type { Instinct } from "./types";
++
++// ============================================================================
++// Command: /instinct-status
++// ============================================================================
++
++export async function instinctStatusCommand(_args: string[], _ctx: HookCommandContext): Promise<string | undefined> {
++	const observerState = getObserverState();
++	let storage = getStorage();
++
++	if (!storage) {
++		storage = new ContinuousLearningStorage();
++		await storage.initialize();
++	}
++
++	const config = storage.getConfig();
++	const projectId = observerState.projectId ?? "global";
++	const instincts = await storage.readAllInstincts(projectId);
++	const observations = await storage.readObservations(projectId);
++	const projects = await storage.readProjectRegistry();
++
++	// Group by scope and status
++	const projectInstincts = instincts.filter(i => i.scope === "project");
++	const globalInstincts = instincts.filter(i => i.scope === "global");
++	const pending = instincts.filter(i => i.status === "pending");
++	const active = instincts.filter(i => i.status === "active");
++
++	// Build report
++	const lines: string[] = [];
++	lines.push("# Continuous Learning Status\n");
++	lines.push(`**Schema Version:** ${config.schemaVersion ?? "3.0.0"}`);
++	lines.push(`**Observer Enabled:** ${observerState.enabled ? "Yes" : "No"}`);
++	lines.push(`**Session ID:** ${observerState.sessionId}`);
++	lines.push(`**Observations This Session:** ${observerState.observationCount}`);
++	lines.push("");
++
++	lines.push("## Project Context");
++	lines.push(`- **Project:** ${observerState.projectName ?? "global"} (${observerState.projectId ?? "global"})`);
++	lines.push(`- **Total Observations:** ${observations.length}`);
++	lines.push(`- **Projects Tracked:** ${Object.keys(projects).length}`);
++	lines.push("");
++
++	lines.push("## Instinct Summary");
++	lines.push(`- **Total Instincts:** ${instincts.length}`);
++	lines.push(`- **Project-Scoped:** ${projectInstincts.length}`);
++	lines.push(`- **Global:** ${globalInstincts.length}`);
++	lines.push(`- **Active:** ${active.length}`);
++	lines.push(`- **Pending Review:** ${pending.length}`);
++	lines.push("");
++
++	// Group by domain
++	const byDomain: Record<string, Instinct[]> = {};
++	for (const instinct of active) {
++		const domain = instinct.domain;
++		byDomain[domain] = byDomain[domain] ?? [];
++		byDomain[domain].push(instinct);
++	}
++
++	if (active.length > 0) {
++		lines.push("## Active Instincts by Domain\n");
++		for (const [domain, domainInstincts] of Object.entries(byDomain).sort()) {
++			lines.push(`### ${domain.toUpperCase()} (${domainInstincts.length})\n`);
++			for (const instinct of domainInstincts.sort((a, b) => b.confidence - a.confidence)) {
++				const bar =
++					"█".repeat(Math.round(instinct.confidence * 10)) + "░".repeat(10 - Math.round(instinct.confidence * 10));
++				const scope = instinct.scope === "global" ? "[G]" : "[P]";
++				lines.push(`${bar} ${Math.round(instinct.confidence * 100)}% ${instinct.id} ${scope}`);
++				lines.push(`    trigger: ${instinct.trigger.slice(0, 60)}${instinct.trigger.length > 60 ? "..." : ""}`);
++				lines.push("");
++			}
++		}
++	}
++
++	if (pending.length > 0) {
++		lines.push("## Pending Review\n");
++		const now = new Date();
++		for (const instinct of pending.slice(0, 10)) {
++			const expiresIn = instinct.expiresAt
++				? Math.ceil((new Date(instinct.expiresAt).getTime() - now.getTime()) / (24 * 60 * 60 * 1000))
++				: "N/A";
++			lines.push(
++				`- **${instinct.id}** (${Math.round(instinct.confidence * 100)}% confidence, expires in ${expiresIn}d)`,
++			);
++			lines.push(`  ${instinct.trigger.slice(0, 80)}`);
++		}
++		if (pending.length > 10) {
++			lines.push(`\n*...and ${pending.length - 10} more*`);
++		}
++	}
++
++	return lines.join("\n");
++}
++
++// ============================================================================
++// Command: /instinct-analyze
++// ============================================================================
++
++export async function instinctAnalyzeCommand(_args: string[], ctx: HookCommandContext): Promise<string | undefined> {
++	const observerState = getObserverState();
++	let storage = getStorage();
++
++	if (!storage) {
++		storage = new ContinuousLearningStorage();
++		await storage.initialize();
++	}
++
++	const config = storage.getConfig();
++	const projectId = observerState.projectId ?? "global";
++
++	ctx.ui.notify("Analyzing observations...", "info");
++
++	const result = await analyzeObservations(storage, projectId, config);
++
++	const lines: string[] = [];
++	lines.push("# Pattern Analysis Results\n");
++	lines.push(`**Timestamp:** ${result.timestamp}`);
++	lines.push(`**Observations Analyzed:** ${result.observationsAnalyzed}`);
++	lines.push(`**Duration:** ${result.durationMs}ms`);
++	lines.push("");
++
++	if (result.patterns.length > 0) {
++		lines.push("## Patterns Detected\n");
++		for (const pattern of result.patterns) {
++			lines.push(`### ${pattern.suggestedId}`);
++			lines.push(`- **Type:** ${pattern.type}`);
++			lines.push(`- **Domain:** ${pattern.domain}`);
++			lines.push(`- **Confidence:** ${Math.round(pattern.confidence * 100)}%`);
++			lines.push(`- **Trigger:** ${pattern.trigger}`);
++			lines.push(`- **Action:** ${pattern.action.slice(0, 200)}`);
++			lines.push("");
++		}
++	} else {
++		lines.push("*No new patterns detected.*");
++	}
++
++	if (result.instinctsCreated.length > 0) {
++		lines.push("\n## Instincts Created");
++		for (const id of result.instinctsCreated) {
++			lines.push(`- ${id}`);
++		}
++	}
++
++	if (result.instinctsUpdated.length > 0) {
++		lines.push("\n## Instincts Updated");
++		for (const id of result.instinctsUpdated) {
++			lines.push(`- ${id}`);
++		}
++	}
++
++	return lines.join("\n");
++}
++
++// ============================================================================
++// Command: /instinct-health
++// ============================================================================
++
++export async function instinctHealthCommand(_args: string[], ctx: HookCommandContext): Promise<string | undefined> {
++	let storage = getStorage();
++
++	if (!storage) {
++		storage = new ContinuousLearningStorage();
++		await storage.initialize();
++	}
++
++	ctx.ui.notify("Running health check...", "info");
++
++	const result = await storage.healthCheck();
++
++	const lines: string[] = [];
++	const statusEmoji = result.status === "healthy" ? "OK" : result.status === "degraded" ? "WARN" : "FAIL";
++	lines.push(`# Health Check: ${statusEmoji}\n`);
++	lines.push(`**Timestamp:** ${result.timestamp}`);
++	lines.push(`**Schema Version:** ${result.schemaVersion}`);
++	lines.push("");
++
++	lines.push("## Checks\n");
++	for (const check of result.checks) {
++		const status = check.status === "pass" ? "[PASS]" : check.status === "warn" ? "[WARN]" : "[FAIL]";
++		lines.push(`${status} ${check.name}`);
++		if (check.message) {
++			lines.push(`    ${check.message}`);
++		}
++	}
++
++	if (result.storage) {
++		lines.push("\n## Storage Statistics");
++		lines.push(`- **Observations:** ${result.storage.observationsCount}`);
++		lines.push(`- **Observations File Size:** ${result.storage.observationsFileSizeMb.toFixed(2)} MB`);
++		lines.push(`- **Instincts:** ${result.storage.instinctsCount}`);
++		lines.push(`- **Projects:** ${result.storage.projectsCount}`);
++		lines.push(`- **Audit Log Entries:** ${result.storage.auditLogEntriesCount}`);
++	}
++
++	return lines.join("\n");
++}
++
++// ============================================================================
++// Command: /instinct-prune
++// ============================================================================
++
++export async function instinctPruneCommand(_args: string[], ctx: HookCommandContext): Promise<string | undefined> {
++	const observerState = getObserverState();
++	let storage = getStorage();
++
++	if (!storage) {
++		storage = new ContinuousLearningStorage();
++		await storage.initialize();
++	}
++
++	const projectId = observerState.projectId ?? "global";
++
++	ctx.ui.notify("Pruning expired instincts...", "info");
++
++	const pruned = await pruneExpiredInstincts(storage, projectId);
++
++	if (pruned.length === 0) {
++		return "No expired instincts to prune.";
++	}
++
++	const lines: string[] = [];
++	lines.push(`# Pruned ${pruned.length} Expired Instincts\n`);
++	for (const id of pruned) {
++		lines.push(`- ${id}`);
++	}
++
++	return lines.join("\n");
++}
++
++// ============================================================================
++// Command: /instinct-promote
++// ============================================================================
++
++export async function instinctPromoteCommand(_args: string[], ctx: HookCommandContext): Promise<string | undefined> {
++	let storage = getStorage();
++
++	if (!storage) {
++		storage = new ContinuousLearningStorage();
++		await storage.initialize();
++	}
++
++	const config = storage.getConfig();
++
++	ctx.ui.notify("Checking for promotion candidates...", "info");
++
++	const promoted = await promoteInstincts(storage, config);
++
++	if (promoted.length === 0) {
++		return `No instincts qualify for promotion.\n\nCriteria:\n- Appears in ${config.promoteMinProjects}+ projects\n- Average confidence >= ${config.promoteMinConfidence * 100}%`;
++	}
++
++	const lines: string[] = [];
++	lines.push(`# Promoted ${promoted.length} Instincts to Global Scope\n`);
++	for (const id of promoted) {
++		lines.push(`- ${id}`);
++	}
++
++	return lines.join("\n");
++}
++
++// ============================================================================
++// Command Registration
++// ============================================================================
++
++export const commands = [
++	{
++		name: "instinct-status",
++		description: "Show continuous learning status and instincts",
++		execute: instinctStatusCommand,
++	},
++	{
++		name: "instinct-analyze",
++		description: "Analyze observations and detect patterns",
++		execute: instinctAnalyzeCommand,
++	},
++	{
++		name: "instinct-health",
++		description: "Run health check on continuous learning storage",
++		execute: instinctHealthCommand,
++	},
++	{
++		name: "instinct-prune",
++		description: "Remove expired pending instincts",
++		execute: instinctPruneCommand,
++	},
++	{
++		name: "instinct-promote",
++		description: "Promote project instincts to global scope",
++		execute: instinctPromoteCommand,
++	},
++];
++
++export default commands;
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/index.ts b/packages/coding-agent/src/extensibility/continuous-learning/index.ts
+new file mode 100644
+index 000000000..1e1363072
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/index.ts
+@@ -0,0 +1,126 @@
++/**
++ * Continuous Learning v3 - Extension Factory
++ *
++ * Registers the continuous learning system as a built-in extension.
++ * Subscribes to session, tool call, and tool result events to record
++ * observations for pattern analysis. Registers slash commands for
++ * instinct management.
++ */
++
++import type { ExtensionAPI } from "../extensions/types";
++import { handleSessionEnd, handleSessionStart, handleToolCall, handleToolResult } from "./observer";
++import {
++	instinctAnalyzeCommand,
++	instinctHealthCommand,
++	instinctPromoteCommand,
++	instinctPruneCommand,
++	instinctStatusCommand,
++} from "./commands";
++
++// Re-export public API for external consumers
++export { disableObserver, enableObserver, getObserverState, getStorage, refreshProjectContext } from "./observer";
++export { analyzeObservations, promoteInstincts, pruneExpiredInstincts } from "./pattern-detector";
++export { ContinuousLearningStorage, computeChecksum, isoTimestamp, redactSecrets, uuid } from "./storage";
++export type {
++	AnalysisResult,
++	AuditLogEntry,
++	AuditOperation,
++	ContinuousLearningConfig,
++	HealthCheckResult,
++	Instinct,
++	InstinctDomain,
++	InstinctScope,
++	InstinctSource,
++	InstinctStatus,
++	Observation,
++	ObservationEvent,
++	PatternCandidate,
++	ProjectContext,
++} from "./types";
++
++/**
++ * Extension factory for the continuous learning system.
++ * Called by the extension loader during session initialization.
++ */
++export function continuousLearningExtension(api: ExtensionAPI): void {
++	// Event subscriptions
++	api.on("session_start", async (_event, ctx) => {
++		await handleSessionStart(ctx);
++	});
++
++	api.on("tool_call", async (event, ctx) => {
++		await handleToolCall(event, ctx);
++	});
++
++	api.on("tool_result", async (event, ctx) => {
++		// Map ToolResultEvent fields to observer's expected shape
++		const textContent = event.content
++			.filter((c): c is { type: "text"; text: string } => c.type === "text")
++			.map(c => c.text)
++			.join("\n");
++		await handleToolResult(
++			{
++				tool: event.toolName,
++				toolUseId: event.toolCallId,
++				output: textContent || undefined,
++				error: event.isError ? textContent : undefined,
++			},
++			ctx,
++		);
++	});
++
++	api.on("session_shutdown", async (_event, ctx) => {
++		await handleSessionEnd(ctx);
++	});
++
++	// Slash commands
++	api.registerCommand("instinct-status", {
++		description: "Show continuous learning status and instincts",
++		handler: async (args, ctx) => {
++			const result = await instinctStatusCommand(args.split(/\s+/).filter(Boolean), ctx);
++			if (result) {
++				ctx.ui.notify(result, "info");
++			}
++		},
++	});
++
++	api.registerCommand("instinct-analyze", {
++		description: "Analyze observations and detect patterns",
++		handler: async (args, ctx) => {
++			const result = await instinctAnalyzeCommand(args.split(/\s+/).filter(Boolean), ctx);
++			if (result) {
++				ctx.ui.notify(result, "info");
++			}
++		},
++	});
++
++	api.registerCommand("instinct-health", {
++		description: "Run health check on continuous learning storage",
++		handler: async (args, ctx) => {
++			const result = await instinctHealthCommand(args.split(/\s+/).filter(Boolean), ctx);
++			if (result) {
++				ctx.ui.notify(result, "info");
++			}
++		},
++	});
++
++	api.registerCommand("instinct-prune", {
++		description: "Remove expired pending instincts",
++		handler: async (args, ctx) => {
++			const result = await instinctPruneCommand(args.split(/\s+/).filter(Boolean), ctx);
++			if (result) {
++				ctx.ui.notify(result, "info");
++			}
++		},
++	});
++
++	api.registerCommand("instinct-promote", {
++		description: "Promote project instincts to global scope",
++		handler: async (args, ctx) => {
++			const result = await instinctPromoteCommand(args.split(/\s+/).filter(Boolean), ctx);
++			if (result) {
++				ctx.ui.notify(result, "info");
++			}
++		},
++	});
++}
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/observer.ts b/packages/coding-agent/src/extensibility/continuous-learning/observer.ts
+new file mode 100644
+index 000000000..357fcb911
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/observer.ts
+@@ -0,0 +1,462 @@
++/**
++ * Continuous Learning v3 - Observer Hook
++ *
++ * TypeScript hook that subscribes to OMP tool events and records observations
++ * for pattern analysis. Implements enterprise-grade features:
++ * - Async non-blocking observation
++ * - Secret redaction
++ * - Project context detection
++ * - Throttled analysis triggers
++ */
++
++import { execSync } from "node:child_process";
++import { createHash } from "node:crypto";
++import { existsSync } from "node:fs";
++import { logger } from "@oh-my-pi/pi-utils";
++import type { HookContext, ToolCallEvent } from "../hooks/types";
++import { ContinuousLearningStorage, isoTimestamp, redactSecrets, uuid } from "./storage";
++import type { Observation, ObservationEvent } from "./types";
++
++// ============================================================================
++// Project Detection
++// ============================================================================
++
++interface DetectedProject {
++	id: string;
++	name: string;
++	root: string;
++	remote?: string;
++	source: "env" | "git" | "path" | "global";
++}
++
++/**
++ * Detect current project context.
++ * Priority: CLAUDE_PROJECT_DIR env > git remote > git root > global
++ */
++function detectProject(cwd?: string): DetectedProject {
++	const workingDir = cwd || process.cwd();
++
++	// 1. Check environment variable
++	const envDir = process.env.CLAUDE_PROJECT_DIR || process.env.OMP_PROJECT_DIR;
++	if (envDir && existsSync(envDir)) {
++		return createProjectContext(envDir, "env");
++	}
++
++	// 2. Try git detection
++	try {
++		const gitRoot = execSync("git rev-parse --show-toplevel", {
++			cwd: workingDir,
++			encoding: "utf8",
++			timeout: 5000,
++			stdio: ["pipe", "pipe", "pipe"],
++		}).trim();
++
++		if (gitRoot) {
++			let remote: string | undefined;
++			try {
++				remote = execSync("git remote get-url origin", {
++					cwd: gitRoot,
++					encoding: "utf8",
++					timeout: 5000,
++					stdio: ["pipe", "pipe", "pipe"],
++				}).trim();
++
++				// Strip credentials from URL
++				if (remote) {
++					remote = remote.replace(/:\/\/[^@]+@/, "://");
++				}
++			} catch {
++				// No remote configured
++			}
++
++			return createProjectContext(gitRoot, "git", remote);
++		}
++	} catch {
++		// Not a git repository
++	}
++
++	// 3. Fallback to global
++	return {
++		id: "global",
++		name: "global",
++		root: "",
++		source: "global",
++	};
++}
++
++/**
++ * Create project context with computed ID.
++ */
++function createProjectContext(root: string, source: "env" | "git" | "path", remote?: string): DetectedProject {
++	const name = root.split("/").pop() || "unknown";
++	const hashInput = remote || root;
++	const id = createHash("sha256").update(hashInput).digest("hex").slice(0, 12);
++
++	return {
++		id,
++		name,
++		root: root.replace(/\/$/, ""), // Normalize trailing slash
++		remote,
++		source,
++	};
++}
++
++// ============================================================================
++// Observer State
++// ============================================================================
++
++interface ObserverState {
++	storage: ContinuousLearningStorage | null;
++	observationCount: number;
++	lastAnalysisTrigger: number;
++	project: DetectedProject | null;
++	sessionId: string;
++	enabled: boolean;
++	initialized: boolean;
++}
++
++const state: ObserverState = {
++	storage: null,
++	observationCount: 0,
++	lastAnalysisTrigger: 0,
++	project: null,
++	sessionId: uuid(),
++	enabled: true,
++	initialized: false,
++};
++
++// Throttle: trigger analysis every N observations
++const ANALYSIS_TRIGGER_INTERVAL = 20;
++
++// ============================================================================
++// Automated Session Guards
++// ============================================================================
++
++/**
++ * Check if this is an automated session that should not be observed.
++ */
++function isAutomatedSession(): boolean {
++	// Layer 1: Entrypoint check
++	const entrypoint = process.env.CLAUDE_CODE_ENTRYPOINT || process.env.OMP_ENTRYPOINT || "cli";
++	if (!["cli", "sdk-ts"].includes(entrypoint)) {
++		return true;
++	}
++
++	// Layer 2: Minimal hook profile
++	const hookProfile = process.env.ECC_HOOK_PROFILE || process.env.OMP_HOOK_PROFILE || "standard";
++	if (hookProfile === "minimal") {
++		return true;
++	}
++
++	// Layer 3: Explicit skip flag
++	if (process.env.ECC_SKIP_OBSERVE === "1" || process.env.OMP_SKIP_OBSERVE === "1") {
++		return true;
++	}
++
++	// Layer 4: Known observer session paths
++	const skipPaths = (
++		process.env.ECC_OBSERVE_SKIP_PATHS ||
++		process.env.OMP_OBSERVE_SKIP_PATHS ||
++		"observer-sessions,.claude-mem"
++	).split(",");
++	const cwd = process.cwd();
++	for (const pattern of skipPaths) {
++		const trimmed = pattern.trim();
++		if (trimmed && cwd.includes(trimmed)) {
++			return true;
++		}
++	}
++
++	return false;
++}
++
++// ============================================================================
++// Observer Initialization
++// ============================================================================
++
++/**
++ * Initialize the observer. Called lazily on first event.
++ */
++async function initializeObserver(cwd?: string): Promise<boolean> {
++	if (state.initialized) {
++		return state.enabled;
++	}
++
++	state.initialized = true;
++
++	// Check if automated session
++	if (isAutomatedSession()) {
++		state.enabled = false;
++		return false;
++	}
++
++	// Initialize storage
++	try {
++		state.storage = new ContinuousLearningStorage();
++		await state.storage.initialize();
++
++		// Load config
++		const config = state.storage.getConfig();
++		state.enabled = config.enabled;
++
++		if (!state.enabled) {
++			return false;
++		}
++
++		// Detect project
++		state.project = detectProject(cwd);
++
++		// Register project in registry
++		if (state.project.id !== "global") {
++			const now = isoTimestamp();
++			await state.storage.updateProjectRegistry({
++				id: state.project.id,
++				name: state.project.name,
++				root: state.project.root,
++				remote: state.project.remote,
++				source: state.project.source,
++				createdAt: now,
++				lastSeen: now,
++			});
++		}
++
++		return true;
++	} catch (error) {
++		logger.error("ContinuousLearning initialization failed", { error });
++		state.enabled = false;
++		return false;
++	}
++}
++
++// ============================================================================
++// Event Handlers
++// ============================================================================
++
++/**
++ * Handle tool_call event (before tool execution).
++ */
++export async function handleToolCall(event: ToolCallEvent, ctx: HookContext): Promise<void> {
++	if (!(await initializeObserver(ctx.cwd))) {
++		return;
++	}
++
++	if (!state.storage || !state.project) {
++		return;
++	}
++
++	try {
++		const config = state.storage.getConfig();
++
++		// Prepare observation
++		const inputStr = JSON.stringify(event.input).slice(0, 5000);
++
++		const observation: Omit<Observation, "id" | "checksum" | "schemaVersion"> = {
++			timestamp: isoTimestamp(),
++			event: "tool_start",
++			tool: event.toolName,
++			input: redactSecrets(inputStr, config.secretPatterns),
++			sessionId: state.sessionId,
++			toolUseId: event.toolCallId,
++			projectId: state.project.id,
++			projectName: state.project.name,
++			cwd: ctx.cwd,
++		};
++
++		// Write asynchronously (fire and forget)
++		state.storage.writeObservation(observation).catch(err => {
++			logger.error("ContinuousLearning: failed to write observation", { error: err });
++		});
++
++		state.observationCount++;
++	} catch (error) {
++		logger.error("ContinuousLearning: error handling tool_call", { error });
++	}
++}
++
++/**
++ * Handle tool_result event (after tool execution).
++ */
++export async function handleToolResult(
++	event: { tool: string; toolUseId?: string; output?: unknown; error?: string },
++	ctx: HookContext,
++): Promise<void> {
++	if (!(await initializeObserver(ctx.cwd))) {
++		return;
++	}
++
++	if (!state.storage || !state.project) {
++		return;
++	}
++
++	try {
++		const config = state.storage.getConfig();
++
++		// Determine event type
++		const eventType: ObservationEvent = event.error ? "tool_error" : "tool_complete";
++
++		// Prepare output
++		let outputStr: string | undefined;
++		if (event.output !== undefined) {
++			outputStr =
++				typeof event.output === "string"
++					? event.output.slice(0, 5000)
++					: JSON.stringify(event.output).slice(0, 5000);
++			outputStr = redactSecrets(outputStr, config.secretPatterns);
++		}
++
++		const observation: Omit<Observation, "id" | "checksum" | "schemaVersion"> = {
++			timestamp: isoTimestamp(),
++			event: eventType,
++			tool: event.tool,
++			output: outputStr,
++			error: event.error,
++			sessionId: state.sessionId,
++			toolUseId: event.toolUseId,
++			projectId: state.project.id,
++			projectName: state.project.name,
++			cwd: ctx.cwd,
++		};
++
++		// Write asynchronously
++		state.storage.writeObservation(observation).catch(err => {
++			logger.error("ContinuousLearning: failed to write observation", { error: err });
++		});
++
++		state.observationCount++;
++
++		// Check if we should trigger analysis
++		if (state.observationCount - state.lastAnalysisTrigger >= ANALYSIS_TRIGGER_INTERVAL) {
++			state.lastAnalysisTrigger = state.observationCount;
++			// Trigger analysis in background (implement in pattern-detector.ts)
++			// triggerAnalysis().catch(() => {});
++		}
++	} catch (error) {
++		logger.error("ContinuousLearning: error handling tool_result", { error });
++	}
++}
++
++/**
++ * Handle session start event.
++ */
++export async function handleSessionStart(ctx: HookContext): Promise<void> {
++	// Reset session ID
++	state.sessionId = uuid();
++	state.observationCount = 0;
++	state.lastAnalysisTrigger = 0;
++
++	if (!(await initializeObserver(ctx.cwd))) {
++		return;
++	}
++
++	if (!state.storage || !state.project) {
++		return;
++	}
++
++	try {
++		const observation: Omit<Observation, "id" | "checksum" | "schemaVersion"> = {
++			timestamp: isoTimestamp(),
++			event: "session_start",
++			sessionId: state.sessionId,
++			projectId: state.project.id,
++			projectName: state.project.name,
++			cwd: ctx.cwd,
++		};
++
++		await state.storage.writeObservation(observation);
++
++		// Purge old archives on session start
++		await state.storage.purgeOldArchives(state.project.id);
++	} catch (error) {
++		logger.error("ContinuousLearning: error handling session_start", { error });
++	}
++}
++
++/**
++ * Handle session end/shutdown event.
++ */
++export async function handleSessionEnd(ctx: HookContext): Promise<void> {
++	if (!state.enabled || !state.storage || !state.project) {
++		return;
++	}
++
++	try {
++		const observation: Omit<Observation, "id" | "checksum" | "schemaVersion"> = {
++			timestamp: isoTimestamp(),
++			event: "session_end",
++			sessionId: state.sessionId,
++			projectId: state.project.id,
++			projectName: state.project.name,
++			cwd: ctx.cwd,
++		};
++
++		await state.storage.writeObservation(observation);
++	} catch (error) {
++		logger.error("ContinuousLearning: error handling session_end", { error });
++	}
++}
++
++// ============================================================================
++// API for External Use
++// ============================================================================
++
++/**
++ * Get the current observer state (for debugging/status).
++ */
++export function getObserverState(): {
++	enabled: boolean;
++	initialized: boolean;
++	projectId: string | null;
++	projectName: string | null;
++	sessionId: string;
++	observationCount: number;
++} {
++	return {
++		enabled: state.enabled,
++		initialized: state.initialized,
++		projectId: state.project?.id ?? null,
++		projectName: state.project?.name ?? null,
++		sessionId: state.sessionId,
++		observationCount: state.observationCount,
++	};
++}
++
++/**
++ * Get the storage instance (for commands/CLI).
++ */
++export function getStorage(): ContinuousLearningStorage | null {
++	return state.storage;
++}
++
++/**
++ * Force re-detection of project context.
++ */
++export async function refreshProjectContext(cwd?: string): Promise<void> {
++	state.project = detectProject(cwd);
++
++	if (state.storage && state.project.id !== "global") {
++		const now = isoTimestamp();
++		await state.storage.updateProjectRegistry({
++			id: state.project.id,
++			name: state.project.name,
++			root: state.project.root,
++			remote: state.project.remote,
++			source: state.project.source,
++			createdAt: now,
++			lastSeen: now,
++		});
++	}
++}
++
++/**
++ * Disable observation for this session.
++ */
++export function disableObserver(): void {
++	state.enabled = false;
++}
++
++/**
++ * Enable observation for this session.
++ */
++export function enableObserver(): void {
++	state.enabled = true;
++}
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/pattern-detector.ts b/packages/coding-agent/src/extensibility/continuous-learning/pattern-detector.ts
+new file mode 100644
+index 000000000..d957eb858
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/pattern-detector.ts
+@@ -0,0 +1,435 @@
++/**
++ * Continuous Learning v3 - Pattern Detection Engine
++ *
++ * Analyzes observations to detect reusable patterns and create instincts.
++ * Pattern types:
++ * - Error resolution: Same error followed by successful resolution
++ * - User correction: Model output corrected by user
++ * - Repeated workflow: Same sequence of tools used multiple times
++ * - Workaround: Non-obvious solution to a common problem
++ */
++import { type ContinuousLearningStorage, isoTimestamp, uuid } from "./storage";
++import type {
++	AnalysisResult,
++	ContinuousLearningConfig,
++	Instinct,
++	InstinctDomain,
++	Observation,
++	PatternCandidate,
++} from "./types";
++
++// ============================================================================
++// Pattern Detection Utilities
++// ============================================================================
++
++/**
++ * Group observations by session.
++ */
++function groupBySession(observations: Observation[]): Map<string, Observation[]> {
++	const groups = new Map<string, Observation[]>();
++	for (const obs of observations) {
++		const existing = groups.get(obs.sessionId) ?? [];
++		existing.push(obs);
++		groups.set(obs.sessionId, existing);
++	}
++	return groups;
++}
++
++/**
++ * Group observations by tool.
++ */
++function _groupByTool(observations: Observation[]): Map<string, Observation[]> {
++	const groups = new Map<string, Observation[]>();
++	for (const obs of observations) {
++		if (!obs.tool) continue;
++		const existing = groups.get(obs.tool) ?? [];
++		existing.push(obs);
++		groups.set(obs.tool, existing);
++	}
++	return groups;
++}
++
++/**
++ * Extract error patterns from observations.
++ */
++function extractErrorPatterns(observations: Observation[]): {
++	error: string;
++	resolution: string;
++	tool: string;
++	count: number;
++	evidence: string[];
++}[] {
++	const patterns: Map<
++		string,
++		{
++			error: string;
++			resolution: string;
++			tool: string;
++			count: number;
++			evidence: string[];
++		}
++	> = new Map();
++
++	// Sort by timestamp
++	const sorted = [...observations].sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
++
++	// Look for error -> success sequences
++	for (let i = 0; i < sorted.length - 1; i++) {
++		const current = sorted[i];
++		const next = sorted[i + 1];
++
++		if (
++			current.event === "tool_error" &&
++			current.error &&
++			next.event === "tool_complete" &&
++			current.tool === next.tool
++		) {
++			// Normalize error message
++			const errorKey = normalizeError(current.error);
++			const key = `${current.tool}:${errorKey}`;
++
++			const existing = patterns.get(key);
++			if (existing) {
++				existing.count++;
++				existing.evidence.push(current.id, next.id);
++			} else {
++				patterns.set(key, {
++					error: current.error.slice(0, 200),
++					resolution: extractResolutionHint(current, next),
++					tool: current.tool ?? "unknown",
++					count: 1,
++					evidence: [current.id, next.id],
++				});
++			}
++		}
++	}
++
++	return Array.from(patterns.values()).filter(p => p.count >= 2);
++}
++
++/**
++ * Normalize error message for pattern matching.
++ */
++function normalizeError(error: string): string {
++	return error
++		.replace(/\d+/g, "N") // Replace numbers
++		.replace(/\/[^\s]+/g, "/PATH") // Replace paths
++		.replace(/"[^"]+"/g, '"VALUE"') // Replace quoted strings
++		.slice(0, 100)
++		.toLowerCase()
++		.trim();
++}
++
++/**
++ * Extract resolution hint from successful tool use.
++ */
++function extractResolutionHint(error: Observation, success: Observation): string {
++	const errorInput = error.input ?? "";
++	const successInput = success.input ?? "";
++
++	if (errorInput !== successInput && successInput.length < 500) {
++		return `Changed input from approximate: "${errorInput.slice(0, 100)}..." to: "${successInput.slice(0, 100)}..."`;
++	}
++
++	return `Retry with ${success.tool} succeeded after error`;
++}
++
++/**
++ * Detect repeated tool workflows.
++ */
++function detectRepeatedWorkflows(sessionGroups: Map<string, Observation[]>): {
++	sequence: string[];
++	count: number;
++	evidence: string[];
++}[] {
++	const sequences: Map<string, { sequence: string[]; count: number; evidence: string[] }> = new Map();
++
++	for (const [_sessionId, observations] of sessionGroups) {
++		// Extract tool sequence
++		const toolSequence = observations
++			.filter(o => o.tool && (o.event === "tool_start" || o.event === "tool_complete"))
++			.map(o => o.tool!);
++
++		// Look for repeated subsequences of length 3-5
++		for (let len = 3; len <= 5; len++) {
++			for (let i = 0; i <= toolSequence.length - len; i++) {
++				const subseq = toolSequence.slice(i, i + len);
++				const key = subseq.join("->");
++
++				// Count occurrences in full sequence
++				let count = 0;
++				for (let j = 0; j <= toolSequence.length - len; j++) {
++					const check = toolSequence.slice(j, j + len).join("->");
++					if (check === key) count++;
++				}
++
++				if (count >= 2) {
++					const existing = sequences.get(key);
++					if (existing) {
++						existing.count++;
++						existing.evidence.push(...observations.slice(i, i + len).map(o => o.id));
++					} else {
++						sequences.set(key, {
++							sequence: subseq,
++							count,
++							evidence: observations.slice(i, i + len).map(o => o.id),
++						});
++					}
++				}
++			}
++		}
++	}
++
++	return Array.from(sequences.values()).filter(s => s.count >= 3);
++}
++
++/**
++ * Infer domain from tool name.
++ */
++function inferDomain(tool: string): InstinctDomain {
++	const toolLower = tool.toLowerCase();
++
++	if (["grep", "find", "read", "lsp"].some(t => toolLower.includes(t))) {
++		return "debugging";
++	}
++	if (["edit", "write", "ast_edit", "ast_grep"].some(t => toolLower.includes(t))) {
++		return "code-style";
++	}
++	if (["bash", "shell", "git"].some(t => toolLower.includes(t))) {
++		return toolLower.includes("git") ? "git" : "workflow";
++	}
++	if (["test", "spec", "jest", "vitest"].some(t => toolLower.includes(t))) {
++		return "testing";
++	}
++
++	return "general";
++}
++
++/**
++ * Generate instinct ID from pattern.
++ */
++function generateInstinctId(pattern: PatternCandidate): string {
++	const base = pattern.trigger
++		.toLowerCase()
++		.replace(/[^a-z0-9]+/g, "-")
++		.replace(/^-|-$/g, "")
++		.slice(0, 50);
++
++	return base || `pattern-${uuid().slice(0, 8)}`;
++}
++
++// ============================================================================
++// Main Analysis Function
++// ============================================================================
++
++/**
++ * Analyze observations and generate pattern candidates.
++ */
++export async function analyzeObservations(
++	storage: ContinuousLearningStorage,
++	projectId: string,
++	config: ContinuousLearningConfig,
++): Promise<AnalysisResult> {
++	const startTime = Date.now();
++	const observations = await storage.readObservations(projectId);
++	const existingInstincts = await storage.readAllInstincts(projectId);
++	const _existingIds = new Set(existingInstincts.map(i => i.id));
++
++	const patterns: PatternCandidate[] = [];
++	const instinctsCreated: string[] = [];
++	const instinctsUpdated: string[] = [];
++
++	// Skip if not enough observations
++	if (observations.length < config.minObservationsForAnalysis) {
++		return {
++			timestamp: isoTimestamp(),
++			observationsAnalyzed: observations.length,
++			patterns: [],
++			instinctsCreated: [],
++			instinctsUpdated: [],
++			durationMs: Date.now() - startTime,
++		};
++	}
++
++	const sessionGroups = groupBySession(observations);
++
++	// 1. Detect error resolution patterns
++	const errorPatterns = extractErrorPatterns(observations);
++	for (const ep of errorPatterns) {
++		if (!config.detectDomains.includes(inferDomain(ep.tool))) continue;
++
++		const confidence = Math.min(0.3 + ep.count * 0.1, 0.9);
++		const candidate: PatternCandidate = {
++			type: "error_resolution",
++			confidence,
++			domain: inferDomain(ep.tool),
++			trigger: `When ${ep.tool} fails with error: ${ep.error}`,
++			action: ep.resolution,
++			evidence: ep.evidence.slice(0, 10),
++			suggestedId: `resolve-${ep.tool}-${normalizeError(ep.error).slice(0, 20).replace(/\s+/g, "-")}`,
++		};
++		patterns.push(candidate);
++	}
++
++	// 2. Detect repeated workflows
++	const workflows = detectRepeatedWorkflows(sessionGroups);
++	for (const wf of workflows) {
++		if (wf.sequence.length < 3) continue;
++
++		const confidence = Math.min(0.3 + wf.count * 0.05, 0.8);
++		const candidate: PatternCandidate = {
++			type: "repeated_workflow",
++			confidence,
++			domain: "workflow",
++			trigger: `When performing a task that requires ${wf.sequence[0]}`,
++			action: `Use the sequence: ${wf.sequence.join(" -> ")}`,
++			evidence: wf.evidence.slice(0, 10),
++			suggestedId: `workflow-${wf.sequence.slice(0, 3).join("-")}`.toLowerCase(),
++		};
++		patterns.push(candidate);
++	}
++
++	// 3. Create or update instincts from high-confidence patterns
++	for (const pattern of patterns) {
++		const id = generateInstinctId(pattern);
++
++		// Skip if already exists with higher confidence
++		const existing = existingInstincts.find(i => i.id === id);
++		if (existing) {
++			if (pattern.confidence > existing.confidence) {
++				// Update existing
++				await storage.updateInstinct(id, {
++					confidence: pattern.confidence,
++					observationCount: existing.observationCount + 1,
++					evidence: [...new Set([...existing.evidence, ...pattern.evidence])].slice(0, 20),
++				});
++				instinctsUpdated.push(id);
++			}
++			continue;
++		}
++
++		// Create new instinct
++		const now = isoTimestamp();
++		const ttlDays = config.pendingTtlDays;
++		const expiresAt = new Date(Date.now() + ttlDays * 24 * 60 * 60 * 1000).toISOString();
++
++		const instinct: Omit<Instinct, "checksum"> = {
++			id,
++			schemaVersion: "3.0.0",
++			trigger: pattern.trigger,
++			confidence: pattern.confidence,
++			domain: pattern.domain,
++			source: "observation",
++			scope: "project",
++			status: pattern.confidence >= config.autoApproveThreshold ? "active" : "pending",
++			projectId,
++			createdAt: now,
++			updatedAt: now,
++			observationCount: 1,
++			evidence: pattern.evidence,
++			action: pattern.action,
++			expiresAt: pattern.confidence < config.autoApproveThreshold ? expiresAt : undefined,
++		};
++
++		await storage.writeInstinct(instinct);
++		instinctsCreated.push(id);
++	}
++
++	return {
++		timestamp: isoTimestamp(),
++		observationsAnalyzed: observations.length,
++		patterns,
++		instinctsCreated,
++		instinctsUpdated,
++		durationMs: Date.now() - startTime,
++	};
++}
++
++/**
++ * Prune expired pending instincts.
++ */
++export async function pruneExpiredInstincts(storage: ContinuousLearningStorage, projectId?: string): Promise<string[]> {
++	const instincts = await storage.readAllInstincts(projectId);
++	const now = new Date();
++	const pruned: string[] = [];
++
++	for (const instinct of instincts) {
++		if (instinct.status === "pending" && instinct.expiresAt && new Date(instinct.expiresAt) < now) {
++			await storage.deleteInstinct(instinct.id, instinct.projectId);
++			pruned.push(instinct.id);
++		}
++	}
++
++	return pruned;
++}
++
++/**
++ * Promote project instincts to global scope if criteria met.
++ */
++export async function promoteInstincts(
++	storage: ContinuousLearningStorage,
++	config: ContinuousLearningConfig,
++): Promise<string[]> {
++	const projects = await storage.readProjectRegistry();
++	const projectIds = Object.keys(projects);
++
++	if (projectIds.length < config.promoteMinProjects) {
++		return [];
++	}
++
++	// Collect all instincts by ID
++	const instinctsByProject: Map<string, Instinct[]> = new Map();
++	for (const projectId of projectIds) {
++		const instincts = await storage.readAllInstincts(projectId);
++		instinctsByProject.set(
++			projectId,
++			instincts.filter(i => i.scope === "project"),
++		);
++	}
++
++	// Find instincts that appear in multiple projects
++	const idCounts: Map<string, { count: number; avgConfidence: number; instincts: Instinct[] }> = new Map();
++
++	for (const [_projectId, instincts] of instinctsByProject) {
++		for (const instinct of instincts) {
++			const existing = idCounts.get(instinct.id);
++			if (existing) {
++				existing.count++;
++				existing.avgConfidence =
++					(existing.avgConfidence * (existing.count - 1) + instinct.confidence) / existing.count;
++				existing.instincts.push(instinct);
++			} else {
++				idCounts.set(instinct.id, {
++					count: 1,
++					avgConfidence: instinct.confidence,
++					instincts: [instinct],
++				});
++			}
++		}
++	}
++
++	// Promote qualifying instincts
++	const promoted: string[] = [];
++	for (const [id, data] of idCounts) {
++		if (data.count >= config.promoteMinProjects && data.avgConfidence >= config.promoteMinConfidence) {
++			// Create global version with highest confidence
++			const best = data.instincts.reduce((a, b) => (a.confidence > b.confidence ? a : b));
++
++			const now = isoTimestamp();
++			const globalInstinct: Omit<Instinct, "checksum"> = {
++				...best,
++				scope: "global",
++				projectId: undefined,
++				projectName: undefined,
++				updatedAt: now,
++				observationCount: data.instincts.reduce((sum, i) => sum + i.observationCount, 0),
++				evidence: [...new Set(data.instincts.flatMap(i => i.evidence))].slice(0, 50),
++			};
++
++			await storage.writeInstinct(globalInstinct);
++			promoted.push(id);
++		}
++	}
++
++	return promoted;
++}
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/storage.ts b/packages/coding-agent/src/extensibility/continuous-learning/storage.ts
+new file mode 100644
+index 000000000..ce4c7cf5d
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/storage.ts
+@@ -0,0 +1,822 @@
++/**
++ * Continuous Learning v3 - Storage Layer
++ *
++ * Enterprise-grade storage with:
++ * - Atomic writes using temp files + rename
++ * - SHA256 checksums for integrity verification
++ * - JSONL for observations (append-only, rotatable)
++ * - YAML for instincts (human-readable)
++ * - File locking for concurrent access safety
++ */
++import { createHash, randomUUID } from "node:crypto";
++import { appendFile, mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
++import { homedir } from "node:os";
++import { dirname, join } from "node:path";
++import {
++	type AuditLogEntry,
++	AuditLogEntrySchema,
++	type AuditOperation,
++	type ContinuousLearningConfig,
++	ContinuousLearningConfigSchema,
++	type HealthCheckResult,
++	type Instinct,
++	InstinctSchema,
++	type Observation,
++	ObservationSchema,
++	type ProjectContext,
++	ProjectContextSchema,
++	SCHEMA_VERSION,
++} from "./types";
++
++// ============================================================================
++// Constants
++// ============================================================================
++
++const OMP_DIR = ".omp";
++const HOMUNCULUS_DIR = "homunculus";
++const PROJECTS_DIR = "projects";
++const INSTINCTS_DIR = "instincts";
++const PERSONAL_DIR = "personal";
++const INHERITED_DIR = "inherited";
++const EVOLVED_DIR = "evolved";
++const OBSERVATIONS_FILE = "observations.jsonl";
++const AUDIT_LOG_FILE = "audit.jsonl";
++const CONFIG_FILE = "config.json";
++const REGISTRY_FILE = "projects.json";
++const _LOCK_SUFFIX = ".lock";
++const TMP_SUFFIX = ".tmp";
++
++// ============================================================================
++// Utility Functions
++// ============================================================================
++
++/**
++ * Compute SHA256 checksum of data.
++ */
++export function computeChecksum(data: string): string {
++	return createHash("sha256").update(data, "utf8").digest("hex");
++}
++
++/**
++ * Generate ISO 8601 timestamp.
++ */
++export function isoTimestamp(): string {
++	return new Date().toISOString();
++}
++
++/**
++ * Generate UUID v4.
++ */
++export function uuid(): string {
++	return randomUUID();
++}
++
++/**
++ * Atomic write: write to temp file, then rename.
++ */
++async function atomicWriteFile(path: string, content: string): Promise<void> {
++	const dir = dirname(path);
++	await mkdir(dir, { recursive: true });
++
++	const tmpPath = `${path}${TMP_SUFFIX}.${process.pid}.${Date.now()}`;
++	try {
++		await writeFile(tmpPath, content, "utf8");
++		await rename(tmpPath, path);
++	} catch (error) {
++		// Clean up temp file on failure
++		try {
++			await rm(tmpPath, { force: true });
++		} catch {
++			// Ignore cleanup errors
++		}
++		throw error;
++	}
++}
++
++/**
++ * Append line to JSONL file with newline.
++ */
++async function appendJsonl(path: string, data: unknown): Promise<void> {
++	const dir = dirname(path);
++	await mkdir(dir, { recursive: true });
++	const line = `${JSON.stringify(data)}\n`;
++	await appendFile(path, line, "utf8");
++}
++
++/**
++ * Read JSONL file and parse each line.
++ */
++async function readJsonl<T>(path: string): Promise<T[]> {
++	try {
++		const content = await readFile(path, "utf8");
++		const lines = content.trim().split("\n").filter(Boolean);
++		return lines.map(line => JSON.parse(line) as T);
++	} catch (error) {
++		if ((error as NodeJS.ErrnoException).code === "ENOENT") {
++			return [];
++		}
++		throw error;
++	}
++}
++
++/**
++ * Get file size in megabytes.
++ */
++async function getFileSizeMb(path: string): Promise<number> {
++	try {
++		const stats = await stat(path);
++		return stats.size / (1024 * 1024);
++	} catch {
++		return 0;
++	}
++}
++
++/**
++ * Redact secrets from a string using configured patterns.
++ */
++export function redactSecrets(value: string, patterns: string[]): string {
++	let result = value;
++	for (const pattern of patterns) {
++		try {
++			const regex = new RegExp(pattern, "gi");
++			result = result.replace(regex, (_match, key, sep) => {
++				// Preserve key and separator, redact the value
++				if (typeof key === "string" && typeof sep === "string") {
++					return `${key}${sep}[REDACTED]`;
++				}
++				return "[REDACTED]";
++			});
++		} catch {
++			// Invalid regex, skip
++		}
++	}
++	return result;
++}
++
++/**
++ * Convert instinct to YAML frontmatter format.
++ */
++function instinctToYaml(instinct: Instinct): string {
++	const lines: string[] = ["---"];
++	lines.push(`id: ${instinct.id}`);
++	lines.push(`schemaVersion: "${instinct.schemaVersion}"`);
++	lines.push(`trigger: "${escapeYamlString(instinct.trigger)}"`);
++	lines.push(`confidence: ${instinct.confidence}`);
++	lines.push(`domain: ${instinct.domain}`);
++	lines.push(`source: ${instinct.source}`);
++	lines.push(`scope: ${instinct.scope}`);
++	lines.push(`status: ${instinct.status}`);
++	if (instinct.projectId) lines.push(`projectId: ${instinct.projectId}`);
++	if (instinct.projectName) lines.push(`projectName: "${escapeYamlString(instinct.projectName)}"`);
++	lines.push(`createdAt: ${instinct.createdAt}`);
++	lines.push(`updatedAt: ${instinct.updatedAt}`);
++	lines.push(`observationCount: ${instinct.observationCount}`);
++	if (instinct.evidence.length > 0) {
++		lines.push("evidence:");
++		for (const id of instinct.evidence) {
++			lines.push(`  - ${id}`);
++		}
++	}
++	if (instinct.importedFrom) lines.push(`importedFrom: "${escapeYamlString(instinct.importedFrom)}"`);
++	if (instinct.expiresAt) lines.push(`expiresAt: ${instinct.expiresAt}`);
++	if (instinct.checksum) lines.push(`checksum: ${instinct.checksum}`);
++	lines.push("---");
++	lines.push("");
++	lines.push(`# ${instinct.id}`);
++	lines.push("");
++	lines.push("## Action");
++	lines.push(instinct.action);
++	if (instinct.examples && instinct.examples.length > 0) {
++		lines.push("");
++		lines.push("## Examples");
++		for (const example of instinct.examples) {
++			lines.push(`- ${example}`);
++		}
++	}
++	lines.push("");
++	return lines.join("\n");
++}
++
++/**
++ * Escape string for YAML double-quoted value.
++ */
++function escapeYamlString(value: string): string {
++	return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
++}
++
++/**
++ * Parse YAML frontmatter instinct file.
++ */
++function parseInstinctYaml(content: string): Instinct | null {
++	const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
++	if (!frontmatterMatch) return null;
++
++	const [, frontmatter, body] = frontmatterMatch;
++	const data: Record<string, unknown> = {};
++
++	// Parse frontmatter
++	for (const line of frontmatter.split("\n")) {
++		const colonIndex = line.indexOf(":");
++		if (colonIndex === -1) continue;
++
++		const key = line.slice(0, colonIndex).trim();
++		let value: unknown = line.slice(colonIndex + 1).trim();
++
++		// Handle quoted strings
++		if (typeof value === "string") {
++			if (value.startsWith('"') && value.endsWith('"')) {
++				value = value.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\");
++			} else if (value === "true") {
++				value = true;
++			} else if (value === "false") {
++				value = false;
++			} else if (!Number.isNaN(Number(value))) {
++				value = Number(value);
++			}
++		}
++
++		data[key] = value;
++	}
++
++	// Parse evidence array if present
++	const evidenceMatch = content.match(/evidence:\n((?: {2}- [^\n]+\n)+)/);
++	if (evidenceMatch) {
++		data.evidence = evidenceMatch[1]
++			.split("\n")
++			.filter(Boolean)
++			.map(line => line.replace(/^\s*-\s*/, "").trim());
++	} else {
++		data.evidence = [];
++	}
++
++	// Extract action from body
++	const actionMatch = body.match(/## Action\n([\s\S]*?)(?:\n## |\n*$)/);
++	data.action = actionMatch ? actionMatch[1].trim() : "";
++
++	// Extract examples
++	const examplesMatch = body.match(/## Examples\n([\s\S]*?)(?:\n## |\n*$)/);
++	if (examplesMatch) {
++		data.examples = examplesMatch[1]
++			.split("\n")
++			.filter(line => line.startsWith("- "))
++			.map(line => line.slice(2).trim());
++	}
++
++	// Validate with Zod
++	const result = InstinctSchema.safeParse(data);
++	if (!result.success) {
++		return null;
++	}
++	return result.data;
++}
++
++// ============================================================================
++// Storage Class
++// ============================================================================
++
++export class ContinuousLearningStorage {
++	private readonly rootDir: string;
++	private config: ContinuousLearningConfig;
++
++	constructor(rootDir?: string) {
++		this.rootDir = rootDir ?? join(homedir(), OMP_DIR, HOMUNCULUS_DIR);
++		this.config = ContinuousLearningConfigSchema.parse({});
++	}
++
++	// -------------------------------------------------------------------------
++	// Initialization
++	// -------------------------------------------------------------------------
++
++	/**
++	 * Initialize storage directories and load config.
++	 */
++	async initialize(): Promise<void> {
++		await mkdir(join(this.rootDir, PROJECTS_DIR), { recursive: true });
++		await mkdir(join(this.rootDir, INSTINCTS_DIR, PERSONAL_DIR), { recursive: true });
++		await mkdir(join(this.rootDir, INSTINCTS_DIR, INHERITED_DIR), { recursive: true });
++		await mkdir(join(this.rootDir, EVOLVED_DIR, "skills"), { recursive: true });
++		await mkdir(join(this.rootDir, EVOLVED_DIR, "commands"), { recursive: true });
++		await mkdir(join(this.rootDir, EVOLVED_DIR, "agents"), { recursive: true });
++
++		// Load config if exists
++		await this.loadConfig();
++	}
++
++	/**
++	 * Get or create project directory.
++	 */
++	async getProjectDir(projectId: string): Promise<string> {
++		if (projectId === "global") {
++			return this.rootDir;
++		}
++		const projectDir = join(this.rootDir, PROJECTS_DIR, projectId);
++		await mkdir(join(projectDir, INSTINCTS_DIR, PERSONAL_DIR), { recursive: true });
++		await mkdir(join(projectDir, INSTINCTS_DIR, INHERITED_DIR), { recursive: true });
++		await mkdir(join(projectDir, "observations.archive"), { recursive: true });
++		return projectDir;
++	}
++
++	// -------------------------------------------------------------------------
++	// Config
++	// -------------------------------------------------------------------------
++
++	async loadConfig(): Promise<ContinuousLearningConfig> {
++		const configPath = join(this.rootDir, CONFIG_FILE);
++		try {
++			const content = await readFile(configPath, "utf8");
++			const parsed = JSON.parse(content);
++			this.config = ContinuousLearningConfigSchema.parse(parsed);
++		} catch {
++			this.config = ContinuousLearningConfigSchema.parse({});
++		}
++		return this.config;
++	}
++
++	async saveConfig(config: ContinuousLearningConfig): Promise<void> {
++		const validated = ContinuousLearningConfigSchema.parse(config);
++		const configPath = join(this.rootDir, CONFIG_FILE);
++		await atomicWriteFile(configPath, `${JSON.stringify(validated, null, 2)}\n`);
++		this.config = validated;
++		await this.audit("config_changed", { type: "config" });
++	}
++
++	getConfig(): ContinuousLearningConfig {
++		return this.config;
++	}
++
++	// -------------------------------------------------------------------------
++	// Observations
++	// -------------------------------------------------------------------------
++
++	/**
++	 * Write an observation to the JSONL file.
++	 * Handles rotation if file exceeds size limit.
++	 */
++	async writeObservation(observation: Omit<Observation, "id" | "checksum" | "schemaVersion">): Promise<string> {
++		const id = uuid();
++		const projectDir = await this.getProjectDir(observation.projectId);
++		const obsPath = join(projectDir, OBSERVATIONS_FILE);
++
++		// Create full observation
++		const fullObs: Observation = {
++			...observation,
++			id,
++			schemaVersion: SCHEMA_VERSION,
++		};
++
++		// Compute checksum
++		const contentForChecksum = JSON.stringify({ ...fullObs, checksum: undefined });
++		fullObs.checksum = computeChecksum(contentForChecksum);
++
++		// Validate
++		const validated = ObservationSchema.parse(fullObs);
++
++		// Check file size and rotate if needed
++		const sizeMb = await getFileSizeMb(obsPath);
++		if (sizeMb >= this.config.maxObservationFileSizeMb) {
++			await this.rotateObservations(projectDir);
++		}
++
++		// Append
++		await appendJsonl(obsPath, validated);
++		await this.audit("observation_created", { id, projectId: observation.projectId }, "observation");
++
++		return id;
++	}
++
++	/**
++	 * Rotate observations file to archive.
++	 */
++	async rotateObservations(projectDir: string): Promise<void> {
++		const obsPath = join(projectDir, OBSERVATIONS_FILE);
++		const archiveDir = join(projectDir, "observations.archive");
++		await mkdir(archiveDir, { recursive: true });
++
++		const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
++		const archivePath = join(archiveDir, `observations-${timestamp}.jsonl`);
++
++		try {
++			await rename(obsPath, archivePath);
++		} catch (error) {
++			if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
++				throw error;
++			}
++		}
++
++		await this.audit("storage_compacted", { archivePath }, "storage");
++	}
++
++	/**
++	 * Read all observations for a project.
++	 */
++	async readObservations(projectId: string): Promise<Observation[]> {
++		const projectDir = await this.getProjectDir(projectId);
++		const obsPath = join(projectDir, OBSERVATIONS_FILE);
++		return readJsonl<Observation>(obsPath);
++	}
++
++	/**
++	 * Purge old archived observations.
++	 */
++	async purgeOldArchives(projectId: string): Promise<number> {
++		const projectDir = await this.getProjectDir(projectId);
++		const archiveDir = join(projectDir, "observations.archive");
++
++		let purged = 0;
++		try {
++			const files = await readdir(archiveDir);
++			const now = Date.now();
++			const maxAge = this.config.archiveRetentionDays * 24 * 60 * 60 * 1000;
++
++			for (const file of files) {
++				const filePath = join(archiveDir, file);
++				const stats = await stat(filePath);
++				if (now - stats.mtimeMs > maxAge) {
++					await rm(filePath);
++					purged++;
++				}
++			}
++		} catch (error) {
++			if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
++				throw error;
++			}
++		}
++
++		if (purged > 0) {
++			await this.audit("storage_purged", { projectId, count: purged }, "storage");
++		}
++
++		return purged;
++	}
++
++	// -------------------------------------------------------------------------
++	// Instincts
++	// -------------------------------------------------------------------------
++
++	/**
++	 * Write an instinct to YAML file.
++	 */
++	async writeInstinct(instinct: Omit<Instinct, "checksum">): Promise<void> {
++		// Compute checksum
++		const fullInstinct: Instinct = {
++			...instinct,
++			checksum: computeChecksum(JSON.stringify({ ...instinct, checksum: undefined })),
++		};
++
++		// Validate
++		const validated = InstinctSchema.parse(fullInstinct);
++
++		// Determine directory
++		const projectDir = await this.getProjectDir(validated.projectId ?? "global");
++		const subDir = validated.source === "imported" ? INHERITED_DIR : PERSONAL_DIR;
++		const instinctDir = validated.projectId
++			? join(projectDir, INSTINCTS_DIR, subDir)
++			: join(this.rootDir, INSTINCTS_DIR, subDir);
++
++		const filePath = join(instinctDir, `${validated.id}.yaml`);
++		const yaml = instinctToYaml(validated);
++		await atomicWriteFile(filePath, yaml);
++
++		await this.audit("instinct_created", { id: validated.id, projectId: validated.projectId }, "instinct");
++	}
++
++	/**
++	 * Update an existing instinct.
++	 */
++	async updateInstinct(id: string, updates: Partial<Instinct>): Promise<Instinct | null> {
++		const existing = await this.readInstinct(id);
++		if (!existing) return null;
++
++		const updated: Instinct = {
++			...existing,
++			...updates,
++			id, // Preserve ID
++			updatedAt: isoTimestamp(),
++		};
++
++		// Recompute checksum
++		updated.checksum = computeChecksum(JSON.stringify({ ...updated, checksum: undefined }));
++
++		await this.writeInstinct(updated);
++		await this.audit("instinct_updated", { id, changes: Object.keys(updates) }, "instinct");
++
++		return updated;
++	}
++
++	/**
++	 * Read a single instinct by ID (searches all locations).
++	 */
++	async readInstinct(id: string, projectId?: string): Promise<Instinct | null> {
++		const searchDirs: string[] = [];
++
++		// Project-scoped locations
++		if (projectId && projectId !== "global") {
++			const projectDir = await this.getProjectDir(projectId);
++			searchDirs.push(join(projectDir, INSTINCTS_DIR, PERSONAL_DIR), join(projectDir, INSTINCTS_DIR, INHERITED_DIR));
++		}
++
++		// Global locations
++		searchDirs.push(
++			join(this.rootDir, INSTINCTS_DIR, PERSONAL_DIR),
++			join(this.rootDir, INSTINCTS_DIR, INHERITED_DIR),
++		);
++
++		for (const dir of searchDirs) {
++			const filePath = join(dir, `${id}.yaml`);
++			try {
++				const content = await readFile(filePath, "utf8");
++				return parseInstinctYaml(content);
++			} catch (error) {
++				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
++					throw error;
++				}
++			}
++		}
++
++		return null;
++	}
++
++	/**
++	 * Read all instincts (project + global).
++	 */
++	async readAllInstincts(projectId?: string): Promise<Instinct[]> {
++		const instincts: Instinct[] = [];
++		const seenIds = new Set<string>();
++
++		// Helper to read instincts from a directory
++		const readFromDir = async (dir: string): Promise<void> => {
++			try {
++				const files = await readdir(dir);
++				for (const file of files) {
++					if (!file.endsWith(".yaml") && !file.endsWith(".yml")) continue;
++
++					const content = await readFile(join(dir, file), "utf8");
++					const instinct = parseInstinctYaml(content);
++					if (instinct && !seenIds.has(instinct.id)) {
++						seenIds.add(instinct.id);
++						instincts.push(instinct);
++					}
++				}
++			} catch (error) {
++				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
++					throw error;
++				}
++			}
++		};
++
++		// Project-scoped instincts (higher priority)
++		if (projectId && projectId !== "global") {
++			const projectDir = await this.getProjectDir(projectId);
++			await readFromDir(join(projectDir, INSTINCTS_DIR, PERSONAL_DIR));
++			await readFromDir(join(projectDir, INSTINCTS_DIR, INHERITED_DIR));
++		}
++
++		// Global instincts
++		await readFromDir(join(this.rootDir, INSTINCTS_DIR, PERSONAL_DIR));
++		await readFromDir(join(this.rootDir, INSTINCTS_DIR, INHERITED_DIR));
++
++		return instincts;
++	}
++
++	/**
++	 * Delete an instinct.
++	 */
++	async deleteInstinct(id: string, projectId?: string): Promise<boolean> {
++		const searchDirs: string[] = [];
++
++		if (projectId && projectId !== "global") {
++			const projectDir = await this.getProjectDir(projectId);
++			searchDirs.push(join(projectDir, INSTINCTS_DIR, PERSONAL_DIR), join(projectDir, INSTINCTS_DIR, INHERITED_DIR));
++		}
++
++		searchDirs.push(
++			join(this.rootDir, INSTINCTS_DIR, PERSONAL_DIR),
++			join(this.rootDir, INSTINCTS_DIR, INHERITED_DIR),
++		);
++
++		for (const dir of searchDirs) {
++			const filePath = join(dir, `${id}.yaml`);
++			try {
++				await rm(filePath);
++				await this.audit("instinct_archived", { id, projectId }, "instinct");
++				return true;
++			} catch (error) {
++				if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
++					throw error;
++				}
++			}
++		}
++
++		return false;
++	}
++
++	// -------------------------------------------------------------------------
++	// Project Registry
++	// -------------------------------------------------------------------------
++
++	async updateProjectRegistry(project: ProjectContext): Promise<void> {
++		const validated = ProjectContextSchema.parse(project);
++		const registryPath = join(this.rootDir, REGISTRY_FILE);
++
++		let registry: Record<string, ProjectContext> = {};
++		try {
++			const content = await readFile(registryPath, "utf8");
++			registry = JSON.parse(content);
++		} catch {
++			// Start fresh
++		}
++
++		registry[project.id] = validated;
++		await atomicWriteFile(registryPath, `${JSON.stringify(registry, null, 2)}\n`);
++	}
++
++	async readProjectRegistry(): Promise<Record<string, ProjectContext>> {
++		const registryPath = join(this.rootDir, REGISTRY_FILE);
++		try {
++			const content = await readFile(registryPath, "utf8");
++			return JSON.parse(content);
++		} catch {
++			return {};
++		}
++	}
++
++	// -------------------------------------------------------------------------
++	// Audit Log
++	// -------------------------------------------------------------------------
++
++	/**
++	 * Write audit log entry.
++	 */
++	async audit(
++		operation: AuditOperation,
++		details?: Record<string, unknown>,
++		targetType?: "observation" | "instinct" | "config" | "storage",
++	): Promise<void> {
++		const entry: AuditLogEntry = {
++			id: uuid(),
++			timestamp: isoTimestamp(),
++			operation,
++			targetType,
++			targetId: details?.id as string | undefined,
++			projectId: details?.projectId as string | undefined,
++			details,
++			status: "success",
++		};
++
++		entry.checksum = computeChecksum(JSON.stringify({ ...entry, checksum: undefined }));
++		const validated = AuditLogEntrySchema.parse(entry);
++
++		const auditPath = join(this.rootDir, AUDIT_LOG_FILE);
++		await appendJsonl(auditPath, validated);
++	}
++
++	/**
++	 * Read audit log entries.
++	 */
++	async readAuditLog(limit?: number): Promise<AuditLogEntry[]> {
++		const auditPath = join(this.rootDir, AUDIT_LOG_FILE);
++		const entries = await readJsonl<AuditLogEntry>(auditPath);
++		if (limit) {
++			return entries.slice(-limit);
++		}
++		return entries;
++	}
++
++	// -------------------------------------------------------------------------
++	// Health Check
++	// -------------------------------------------------------------------------
++
++	/**
++	 * Perform comprehensive health check.
++	 */
++	async healthCheck(): Promise<HealthCheckResult> {
++		const startTime = Date.now();
++		const checks: HealthCheckResult["checks"] = [];
++		let overallStatus: "healthy" | "degraded" | "unhealthy" = "healthy";
++
++		// Check 1: Root directory exists and is writable
++		try {
++			const testFile = join(this.rootDir, `.health-check-${Date.now()}`);
++			await writeFile(testFile, "test");
++			await rm(testFile);
++			checks.push({ name: "storage_writable", status: "pass" });
++		} catch (error) {
++			checks.push({
++				name: "storage_writable",
++				status: "fail",
++				message: `Storage not writable: ${(error as Error).message}`,
++			});
++			overallStatus = "unhealthy";
++		}
++
++		// Check 2: Config is valid
++		try {
++			await this.loadConfig();
++			checks.push({ name: "config_valid", status: "pass" });
++		} catch (error) {
++			checks.push({
++				name: "config_valid",
++				status: "warn",
++				message: `Config parse error: ${(error as Error).message}`,
++			});
++			overallStatus = overallStatus === "healthy" ? "degraded" : overallStatus;
++		}
++
++		// Check 3: Observations file integrity
++		try {
++			const obs = await this.readObservations("global");
++			let valid = 0;
++			let invalid = 0;
++			for (const o of obs.slice(-100)) {
++				const result = ObservationSchema.safeParse(o);
++				if (result.success) valid++;
++				else invalid++;
++			}
++			if (invalid > 0) {
++				checks.push({
++					name: "observations_integrity",
++					status: "warn",
++					message: `${invalid} of ${valid + invalid} recent observations have schema issues`,
++				});
++				overallStatus = overallStatus === "healthy" ? "degraded" : overallStatus;
++			} else {
++				checks.push({ name: "observations_integrity", status: "pass" });
++			}
++		} catch (error) {
++			checks.push({
++				name: "observations_integrity",
++				status: "warn",
++				message: `Cannot read observations: ${(error as Error).message}`,
++			});
++		}
++
++		// Check 4: Instincts integrity
++		try {
++			const instincts = await this.readAllInstincts();
++			let valid = 0;
++			let invalid = 0;
++			for (const i of instincts) {
++				const result = InstinctSchema.safeParse(i);
++				if (result.success) valid++;
++				else invalid++;
++			}
++			if (invalid > 0) {
++				checks.push({
++					name: "instincts_integrity",
++					status: "warn",
++					message: `${invalid} of ${valid + invalid} instincts have schema issues`,
++				});
++				overallStatus = overallStatus === "healthy" ? "degraded" : overallStatus;
++			} else {
++				checks.push({ name: "instincts_integrity", status: "pass" });
++			}
++		} catch (error) {
++			checks.push({
++				name: "instincts_integrity",
++				status: "warn",
++				message: `Cannot read instincts: ${(error as Error).message}`,
++			});
++		}
++
++		// Gather statistics
++		let storage: HealthCheckResult["storage"];
++		try {
++			const obs = await this.readObservations("global");
++			const instincts = await this.readAllInstincts();
++			const projects = await this.readProjectRegistry();
++			const audit = await this.readAuditLog();
++			const obsPath = join(this.rootDir, OBSERVATIONS_FILE);
++
++			storage = {
++				observationsCount: obs.length,
++				observationsFileSizeMb: await getFileSizeMb(obsPath),
++				instinctsCount: instincts.length,
++				projectsCount: Object.keys(projects).length,
++				auditLogEntriesCount: audit.length,
++			};
++		} catch {
++			// Statistics are optional
++		}
++
++		const result: HealthCheckResult = {
++			timestamp: isoTimestamp(),
++			status: overallStatus,
++			checks,
++			storage,
++			schemaVersion: SCHEMA_VERSION,
++		};
++
++		// Log health check
++		await this.audit("health_check", { status: overallStatus, durationMs: Date.now() - startTime });
++
++		return result;
++	}
++
++	// -------------------------------------------------------------------------
++	// Getters
++	// -------------------------------------------------------------------------
++
++	getRootDir(): string {
++		return this.rootDir;
++	}
++}
+diff --git a/packages/coding-agent/src/extensibility/continuous-learning/types.ts b/packages/coding-agent/src/extensibility/continuous-learning/types.ts
+new file mode 100644
+index 000000000..0e60288d5
+--- /dev/null
++++ b/packages/coding-agent/src/extensibility/continuous-learning/types.ts
+@@ -0,0 +1,317 @@
++/**
++ * Continuous Learning v3 - Enterprise Grade
++ *
++ * Type definitions and Zod schemas for the continuous learning system.
++ * All data structures are validated at runtime to ensure integrity.
++ */
++import { z } from "zod";
++
++// ============================================================================
++// Schema Version - Increment on breaking changes for migration support
++// ============================================================================
++
++export const SCHEMA_VERSION = "3.0.0";
++
++// ============================================================================
++// Project Context
++// ============================================================================
++
++export const ProjectContextSchema = z.object({
++	/** Unique project identifier (SHA256 hash of remote URL or path, first 12 chars) */
++	id: z.string().min(1).max(64),
++	/** Human-readable project name (directory basename) */
++	name: z.string().min(1).max(256),
++	/** Absolute path to project root */
++	root: z.string(),
++	/** Git remote URL (if available) */
++	remote: z.string().optional(),
++	/** Project detection source */
++	source: z.enum(["env", "git", "path", "global"]),
++	/** First seen timestamp (ISO 8601) */
++	createdAt: z.string().datetime(),
++	/** Last activity timestamp (ISO 8601) */
++	lastSeen: z.string().datetime(),
++});
++
++export type ProjectContext = z.infer<typeof ProjectContextSchema>;
++
++// ============================================================================
++// Observation - Raw event data from tool calls
++// ============================================================================
++
++export const ObservationEventSchema = z.enum([
++	"tool_start",
++	"tool_complete",
++	"tool_error",
++	"user_correction",
++	"session_start",
++	"session_end",
++]);
++
++export type ObservationEvent = z.infer<typeof ObservationEventSchema>;
++
++export const ObservationSchema = z.object({
++	/** Observation ID (UUID v4) */
++	id: z.string().uuid(),
++	/** Schema version for migration support */
++	schemaVersion: z.string().default(SCHEMA_VERSION),
++	/** ISO 8601 timestamp */
++	timestamp: z.string().datetime(),
++	/** Event type */
++	event: ObservationEventSchema,
++	/** Tool name (if applicable) */
++	tool: z.string().optional(),
++	/** Tool input (truncated, secrets redacted) */
++	input: z.string().max(10000).optional(),
++	/** Tool output (truncated, secrets redacted) */
++	output: z.string().max(10000).optional(),
++	/** Error message (if applicable) */
++	error: z.string().optional(),
++	/** Session ID */
++	sessionId: z.string(),
++	/** Tool use ID (for correlation) */
++	toolUseId: z.string().optional(),
++	/** Project context */
++	projectId: z.string(),
++	projectName: z.string(),
++	/** Working directory at time of observation */
++	cwd: z.string().optional(),
++	/** SHA256 checksum of the observation content (excluding this field) */
++	checksum: z.string().optional(),
++});
++
++export type Observation = z.infer<typeof ObservationSchema>;
++
++// ============================================================================
++// Instinct - Atomic learned behavior
++// ============================================================================
++
++export const InstinctScopeSchema = z.enum(["project", "global"]);
++export type InstinctScope = z.infer<typeof InstinctScopeSchema>;
++
++export const InstinctDomainSchema = z.enum([
++	"code-style",
++	"testing",
++	"git",
++	"debugging",
++	"workflow",
++	"error-handling",
++	"security",
++	"performance",
++	"documentation",
++	"general",
++]);
++export type InstinctDomain = z.infer<typeof InstinctDomainSchema>;
++
++export const InstinctSourceSchema = z.enum(["observation", "correction", "imported", "evolved", "manual"]);
++export type InstinctSource = z.infer<typeof InstinctSourceSchema>;
++
++export const InstinctStatusSchema = z.enum([
++	"pending", // Awaiting review
++	"active", // Approved and in use
++	"archived", // Deprecated but preserved
++	"rejected", // Rejected by user
++]);
++export type InstinctStatus = z.infer<typeof InstinctStatusSchema>;
++
++export const InstinctSchema = z.object({
++	/** Unique instinct identifier (kebab-case) */
++	id: z
++		.string()
++		.regex(/^[a-z][a-z0-9-]*[a-z0-9]$/)
++		.min(3)
++		.max(64),
++	/** Schema version */
++	schemaVersion: z.string().default(SCHEMA_VERSION),
++	/** Human-readable trigger description */
++	trigger: z.string().min(1).max(500),
++	/** Confidence score (0.0 - 1.0) */
++	confidence: z.number().min(0).max(1),
++	/** Domain classification */
++	domain: InstinctDomainSchema,
++	/** How this instinct was created */
++	source: InstinctSourceSchema,
++	/** Scope: project-specific or global */
++	scope: InstinctScopeSchema,
++	/** Current status */
++	status: InstinctStatusSchema.default("pending"),
++	/** Project ID (if project-scoped) */
++	projectId: z.string().optional(),
++	/** Project name (if project-scoped) */
++	projectName: z.string().optional(),
++	/** Creation timestamp (ISO 8601) */
++	createdAt: z.string().datetime(),
++	/** Last update timestamp (ISO 8601) */
++	updatedAt: z.string().datetime(),
++	/** Number of times this pattern was observed */
++	observationCount: z.number().int().min(1).default(1),
++	/** Evidence: observation IDs that contributed to this instinct */
++	evidence: z.array(z.string().uuid()).default([]),
++	/** Action description (what to do when triggered) */
++	action: z.string().min(1).max(2000),
++	/** Optional examples */
++	examples: z.array(z.string()).optional(),
++	/** Import source (if imported) */
++	importedFrom: z.string().optional(),
++	/** Checksum for integrity verification */
++	checksum: z.string().optional(),
++	/** TTL expiration date for pending instincts (ISO 8601) */
++	expiresAt: z.string().datetime().optional(),
++});
++
++export type Instinct = z.infer<typeof InstinctSchema>;
++
++// ============================================================================
++// Audit Log Entry
++// ============================================================================
++
++export const AuditOperationSchema = z.enum([
++	"observation_created",
++	"instinct_created",
++	"instinct_updated",
++	"instinct_promoted",
++	"instinct_archived",
++	"instinct_rejected",
++	"instinct_imported",
++	"instinct_exported",
++	"storage_compacted",
++	"storage_purged",
++	"config_changed",
++	"health_check",
++]);
++
++export type AuditOperation = z.infer<typeof AuditOperationSchema>;
++
++export const AuditLogEntrySchema = z.object({
++	/** Entry ID (UUID v4) */
++	id: z.string().uuid(),
++	/** ISO 8601 timestamp */
++	timestamp: z.string().datetime(),
++	/** Operation type */
++	operation: AuditOperationSchema,
++	/** Target entity ID (observation/instinct ID) */
++	targetId: z.string().optional(),
++	/** Target entity type */
++	targetType: z.enum(["observation", "instinct", "config", "storage"]).optional(),
++	/** Project context */
++	projectId: z.string().optional(),
++	/** Operation details */
++	details: z.record(z.string(), z.unknown()).optional(),
++	/** Result status */
++	status: z.enum(["success", "failure", "skipped"]),
++	/** Error message (if failed) */
++	error: z.string().optional(),
++	/** Checksum of the entry */
++	checksum: z.string().optional(),
++});
++
++export type AuditLogEntry = z.infer<typeof AuditLogEntrySchema>;
++
++// ============================================================================
++// Configuration
++// ============================================================================
++
++export const ContinuousLearningConfigSchema = z.object({
++	/** Schema version */
++	schemaVersion: z.string().default(SCHEMA_VERSION),
++	/** Whether observation is enabled */
++	enabled: z.boolean().default(true),
++	/** Minimum observations before pattern analysis */
++	minObservationsForAnalysis: z.number().int().min(1).default(20),
++	/** Minimum confidence for auto-approval */
++	autoApproveThreshold: z.number().min(0).max(1).default(0.9),
++	/** TTL for pending instincts (days) */
++	pendingTtlDays: z.number().int().min(1).default(30),
++	/** Maximum observation file size before rotation (MB) */
++	maxObservationFileSizeMb: z.number().min(1).default(10),
++	/** Observation archive retention (days) */
++	archiveRetentionDays: z.number().int().min(1).default(30),
++	/** Domains to detect */
++	detectDomains: z
++		.array(InstinctDomainSchema)
++		.default(["code-style", "testing", "debugging", "workflow", "error-handling"]),
++	/** Patterns to ignore */
++	ignorePatterns: z.array(z.string()).default(["simple_typos", "one_time_fixes", "external_api_issues"]),
++	/** Secret patterns to redact (regex strings) */
++	secretPatterns: z
++		.array(z.string())
++		.default([
++			"(?i)(api[_-]?key|token|secret|password|authorization|credentials?|auth)[\"'\\s:=]+([A-Za-z]+\\s+)?[A-Za-z0-9_\\-/.+=]{8,}",
++		]),
++	/** Minimum projects for auto-promotion to global */
++	promoteMinProjects: z.number().int().min(2).default(2),
++	/** Minimum confidence for auto-promotion */
++	promoteMinConfidence: z.number().min(0).max(1).default(0.8),
++});
++
++export type ContinuousLearningConfig = z.infer<typeof ContinuousLearningConfigSchema>;
++
++// ============================================================================
++// Health Check Result
++// ============================================================================
++
++export const HealthCheckResultSchema = z.object({
++	/** Check timestamp (ISO 8601) */
++	timestamp: z.string().datetime(),
++	/** Overall health status */
++	status: z.enum(["healthy", "degraded", "unhealthy"]),
++	/** Individual check results */
++	checks: z.array(
++		z.object({
++			name: z.string(),
++			status: z.enum(["pass", "fail", "warn"]),
++			message: z.string().optional(),
++			durationMs: z.number().optional(),
++		}),
++	),
++	/** Storage statistics */
++	storage: z
++		.object({
++			observationsCount: z.number().int(),
++			observationsFileSizeMb: z.number(),
++			instinctsCount: z.number().int(),
++			projectsCount: z.number().int(),
++			auditLogEntriesCount: z.number().int(),
++		})
++		.optional(),
++	/** Schema version in use */
++	schemaVersion: z.string(),
++});
++
++export type HealthCheckResult = z.infer<typeof HealthCheckResultSchema>;
++
++// ============================================================================
++// Export Types for Pattern Detection
++// ============================================================================
++
++export interface PatternCandidate {
++	/** Pattern type */
++	type: "error_resolution" | "user_correction" | "repeated_workflow" | "workaround";
++	/** Confidence score */
++	confidence: number;
++	/** Domain classification */
++	domain: InstinctDomain;
++	/** Trigger description */
++	trigger: string;
++	/** Action description */
++	action: string;
++	/** Supporting observation IDs */
++	evidence: string[];
++	/** Suggested instinct ID */
++	suggestedId: string;
++}
++
++export interface AnalysisResult {
++	/** Analysis timestamp */
++	timestamp: string;
++	/** Observations analyzed */
++	observationsAnalyzed: number;
++	/** Patterns detected */
++	patterns: PatternCandidate[];
++	/** Instincts created */
++	instinctsCreated: string[];
++	/** Instincts updated */
++	instinctsUpdated: string[];
++	/** Analysis duration (ms) */
++	durationMs: number;
++}
+diff --git a/packages/coding-agent/src/sdk.ts b/packages/coding-agent/src/sdk.ts
+index f35b93c49..096088770 100644
+--- a/packages/coding-agent/src/sdk.ts
++++ b/packages/coding-agent/src/sdk.ts
+@@ -45,6 +45,7 @@ import {
+ import { discoverAndLoadCustomTools } from "./extensibility/custom-tools";
+ import type { CustomTool, CustomToolContext, CustomToolSessionEvent } from "./extensibility/custom-tools/types";
+ import { CustomToolAdapter } from "./extensibility/custom-tools/wrapper";
++import { continuousLearningExtension } from "./extensibility/continuous-learning";
+ import {
+ 	discoverAndLoadExtensions,
+ 	type ExtensionContext,
+@@ -1096,6 +1097,18 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
+ 		}
+ 	}
+ 
++	// Load built-in continuous learning extension
++	{
++		const loaded = await loadExtensionFromFactory(
++			continuousLearningExtension,
++			cwd,
++			eventBus,
++			extensionsResult.runtime,
++			"<continuous-learning>",
++		);
++		extensionsResult.extensions.push(loaded);
++	}
++
+ 	// Load inline extensions from factories
+ 	if (inlineExtensions.length > 0) {
+ 		for (let i = 0; i < inlineExtensions.length; i++) {
+-- 
+2.50.1 (Apple Git-155)
+

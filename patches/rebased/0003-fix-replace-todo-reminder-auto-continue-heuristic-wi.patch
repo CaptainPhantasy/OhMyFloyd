@@ -1,0 +1,349 @@
+From b5ef9375ecba387b3abb1b428c2419c5070e1220 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 26 Mar 2026 00:28:07 -0400
+Subject: [PATCH 03/10] fix: replace todo reminder auto-continue heuristic with
+ progress-based check
+
+- Remove text-parsing #isYieldedToUser heuristic (unreliable, non-deterministic)
+- Add #lastCompletedTodoCount: auto-continue only when agent completed tasks
+  since last check; notification-only when no progress (agent yielding or stuck)
+- Make eager-todo conditional: classify request type before forcing todo_write;
+  advisory/conversational requests skip todos, implementation requests create them
+- Remove toolChoice force from #createEagerTodoPrelude
+- Add yielded field to todo_reminder event across extension/hook/custom-tool types
+- Reset progress counter on new prompt, new session, and handoff
+---
+ .../src/extensibility/custom-tools/types.ts   |  2 +
+ .../src/extensibility/extensions/types.ts     |  3 +
+ .../src/extensibility/hooks/types.ts          |  3 +
+ .../src/prompts/system/eager-todo.md          | 22 +++--
+ packages/coding-agent/src/sdk.ts              |  1 +
+ .../coding-agent/src/session/agent-session.ts | 80 +++++++++++++------
+ ...gent-session-auto-compaction-queue.test.ts |  5 +-
+ .../test/agent-session-eager-todo.test.ts     |  8 +-
+ 8 files changed, 85 insertions(+), 39 deletions(-)
+
+diff --git a/packages/coding-agent/src/extensibility/custom-tools/types.ts b/packages/coding-agent/src/extensibility/custom-tools/types.ts
+index 4ac99f039..fd188bec1 100644
+--- a/packages/coding-agent/src/extensibility/custom-tools/types.ts
++++ b/packages/coding-agent/src/extensibility/custom-tools/types.ts
+@@ -127,6 +127,8 @@ export type CustomToolSessionEvent =
+ 			todos: TodoItem[];
+ 			attempt: number;
+ 			maxAttempts: number;
++			/** True when the agent yielded control to the user; auto-continue is skipped. */
++			yielded: boolean;
+ 	  };
+ 
+ /** Rendering options passed to renderResult */
+diff --git a/packages/coding-agent/src/extensibility/extensions/types.ts b/packages/coding-agent/src/extensibility/extensions/types.ts
+index 4d8c6886a..f757b5d76 100644
+--- a/packages/coding-agent/src/extensibility/extensions/types.ts
++++ b/packages/coding-agent/src/extensibility/extensions/types.ts
+@@ -613,6 +613,9 @@ export interface TodoReminderEvent {
+ 	todos: TodoItem[];
+ 	attempt: number;
+ 	maxAttempts: number;
++	/** True when the agent's last message yielded control to the user (question/decision request).
++	 *  When yielded, the reminder is shown in UI but the agent does NOT auto-continue. */
++	yielded: boolean;
+ }
+ 
+ // ============================================================================
+diff --git a/packages/coding-agent/src/extensibility/hooks/types.ts b/packages/coding-agent/src/extensibility/hooks/types.ts
+index acc629ace..d6471ee28 100644
+--- a/packages/coding-agent/src/extensibility/hooks/types.ts
++++ b/packages/coding-agent/src/extensibility/hooks/types.ts
+@@ -439,6 +439,9 @@ export interface TodoReminderEvent {
+ 	todos: TodoItem[];
+ 	attempt: number;
+ 	maxAttempts: number;
++	/** True when the agent's last message yielded control to the user (question/decision request).
++	 *  When yielded, the reminder is shown in UI but the agent does NOT auto-continue. */
++	yielded: boolean;
+ }
+ 
+ /**
+diff --git a/packages/coding-agent/src/prompts/system/eager-todo.md b/packages/coding-agent/src/prompts/system/eager-todo.md
+index 7209f9d4d..3e4107f9a 100644
+--- a/packages/coding-agent/src/prompts/system/eager-todo.md
++++ b/packages/coding-agent/src/prompts/system/eager-todo.md
+@@ -1,12 +1,18 @@
+ <system-reminder>
+-Before doing substantive work on the upcoming user request, create a comprehensive phased todo first.
+-
+-You **MUST** call `todo_write` first in this turn.
+-You **MUST** initialize the todo list with a single `replace` op.
+-You **MUST** cover the entire request from investigation through implementation and verification — not just the next immediate step.
+-You **MUST** make task descriptions specific enough that a future turn can execute them without re-planning.
+-You **MUST** keep task `content` to a short label (5-10 words). Put file paths, implementation steps, and specifics in `details`.
+-You **MUST** keep exactly one task `in_progress` and all later tasks `pending`.
++Before responding, classify the user's request:
++
++**If the request is conversational, advisory, or informational** — questions, explanations, recommendations, analysis, discussion, opinions, comparisons, or any request where the deliverable is a *response* rather than *changed files*:
++→ Respond directly. Do **NOT** call `todo_write`.
++
++**If the request requires multi-step implementation work** — coding, refactoring, building features, fixing bugs across multiple files, creating new systems, or any request where the deliverable is *changed files*:
++→ Call `todo_write` first with a comprehensive phased plan, then continue working in the same turn.
++
++When creating a todo list:
++- You **MUST** initialize with a single `replace` op.
++- You **MUST** cover the entire request from investigation through implementation and verification — not just the next immediate step.
++- You **MUST** make task descriptions specific enough that a future turn can execute them without re-planning.
++- You **MUST** keep task `content` to a short label (5-10 words). Put file paths, implementation steps, and specifics in `details`.
++- You **MUST** keep exactly one task `in_progress` and all later tasks `pending`.
+ 
+ After the initial `todo_write` call succeeds, continue with the user's request in the same turn.
+ Do not emit another `todo_write` call unless task state materially changed.
+diff --git a/packages/coding-agent/src/sdk.ts b/packages/coding-agent/src/sdk.ts
+index 797065e63..f35b93c49 100644
+--- a/packages/coding-agent/src/sdk.ts
++++ b/packages/coding-agent/src/sdk.ts
+@@ -552,6 +552,7 @@ function createCustomToolsExtension(tools: CustomTool[]): ExtensionFactory {
+ 					todos: event.todos,
+ 					attempt: event.attempt,
+ 					maxAttempts: event.maxAttempts,
++					yielded: event.yielded,
+ 				},
+ 				ctx,
+ 			),
+diff --git a/packages/coding-agent/src/session/agent-session.ts b/packages/coding-agent/src/session/agent-session.ts
+index 93decab9b..8b858cc62 100644
+--- a/packages/coding-agent/src/session/agent-session.ts
++++ b/packages/coding-agent/src/session/agent-session.ts
+@@ -127,7 +127,7 @@ import { clampTimeout } from "../tools/tool-timeouts";
+ import { parseCommandArgs } from "../utils/command-args";
+ import { resolveFileDisplayMode } from "../utils/file-display-mode";
+ import { extractFileMentions, generateFileMentionMessages } from "../utils/file-mentions";
+-import { buildNamedToolChoice } from "../utils/tool-choice";
++
+ import {
+ 	type CompactionResult,
+ 	calculateContextTokens,
+@@ -178,7 +178,7 @@ export type AgentSessionEvent =
+ 	| { type: "retry_fallback_applied"; from: string; to: string; role: string }
+ 	| { type: "retry_fallback_succeeded"; model: string; role: string }
+ 	| { type: "ttsr_triggered"; rules: Rule[] }
+-	| { type: "todo_reminder"; todos: TodoItem[]; attempt: number; maxAttempts: number }
++	| { type: "todo_reminder"; todos: TodoItem[]; attempt: number; maxAttempts: number; yielded: boolean }
+ 	| { type: "todo_auto_clear" };
+ 
+ /** Listener function for agent session events */
+@@ -442,6 +442,7 @@ export class AgentSession {
+ 	#activeRetryFallback: ActiveRetryFallbackState | undefined = undefined;
+ 	// Todo completion reminder state
+ 	#todoReminderCount = 0;
++	#lastCompletedTodoCount = 0;
+ 	#todoPhases: TodoPhase[] = [];
+ 	#todoClearTimers = new Map<string, Timer>();
+ 	#toolChoiceQueue = new ToolChoiceQueue();
+@@ -1740,6 +1741,7 @@ export class AgentSession {
+ 				todos: event.todos,
+ 				attempt: event.attempt,
+ 				maxAttempts: event.maxAttempts,
++				yielded: event.yielded,
+ 			});
+ 		}
+ 	}
+@@ -2469,7 +2471,7 @@ export class AgentSession {
+ 		// Skip eager todo prelude when the user has already queued a directive
+ 		const hasPendingUserDirective = this.#toolChoiceQueue.inspect().includes("user-force");
+ 		const eagerTodoPrelude =
+-			!options?.synthetic && !hasPendingUserDirective ? this.#createEagerTodoPrelude(expandedText) : undefined;
++			!options?.synthetic && !hasPendingUserDirective ? this.#createEagerTodoPrelude() : undefined;
+ 
+ 		const userContent: (TextContent | ImageContent)[] = [{ type: "text", text: expandedText }];
+ 		if (options?.images) {
+@@ -2550,8 +2552,9 @@ export class AgentSession {
+ 			this.#flushPendingBashMessages();
+ 			this.#flushPendingPythonMessages();
+ 
+-			// Reset todo reminder count on new user prompt
++			// Reset todo reminder and progress tracking on new user prompt
+ 			this.#todoReminderCount = 0;
++			this.#lastCompletedTodoCount = 0;
+ 
+ 			await this.#maybeRestoreRetryFallbackPrimary();
+ 
+@@ -3284,6 +3287,7 @@ export class AgentSession {
+ 		);
+ 
+ 		this.#todoReminderCount = 0;
++		this.#lastCompletedTodoCount = 0;
+ 		this.#planReferenceSent = false;
+ 		this.#planReferencePath = "local://PLAN.md";
+ 		this.#reconnectToAgent();
+@@ -4013,6 +4017,7 @@ export class AgentSession {
+ 			this.#pendingNextTurnMessages = [];
+ 			this.#scheduledHiddenNextTurnGeneration = undefined;
+ 			this.#todoReminderCount = 0;
++			this.#lastCompletedTodoCount = 0;
+ 
+ 			// Inject the handoff document as a custom message
+ 			const handoffContent = `<handoff-context>\n${handoffText}\n</handoff-context>\n\nThe above is a handoff document from a previous session. Use this context to continue the work seamlessly.`;
+@@ -4212,7 +4217,7 @@ export class AgentSession {
+ 		});
+ 	}
+ 
+-	#createEagerTodoPrelude(promptText: string): { message: AgentMessage; toolChoice: ToolChoice } | undefined {
++	#createEagerTodoPrelude(): { message: AgentMessage; toolChoice?: ToolChoice } | undefined {
+ 		const eagerTodosEnabled = this.settings.get("todo.eager");
+ 		const todosEnabled = this.settings.get("todo.enabled");
+ 		if (!eagerTodosEnabled || !todosEnabled) {
+@@ -4238,17 +4243,10 @@ export class AgentSession {
+ 			return undefined;
+ 		}
+ 
+-		const todoWriteToolChoice = buildNamedToolChoice("todo_write", this.model);
+-		if (!todoWriteToolChoice) {
+-			logger.warn("Eager todo enforcement skipped because the current model does not support forcing todo_write", {
+-				modelApi: this.model?.api,
+-				modelId: this.model?.id,
+-			});
+-			return undefined;
+-		}
+-
+ 		const eagerTodoReminder = prompt.render(eagerTodoPrompt);
+ 
++		// Deliver the classification instruction but do NOT force toolChoice.
++		// The model decides whether to call todo_write based on request type.
+ 		return {
+ 			message: {
+ 				role: "custom",
+@@ -4258,11 +4256,19 @@ export class AgentSession {
+ 				attribution: "agent",
+ 				timestamp: Date.now(),
+ 			},
+-			toolChoice: todoWriteToolChoice,
+ 		};
+ 	}
+ 	/**
+ 	 * Check if agent stopped with incomplete todos and prompt to continue.
++	 *
++	 * Uses a progress-based check: auto-continue only fires when the agent
++	 * has completed tasks since the last reminder. If no tasks were completed,
++	 * the reminder is shown as a UI notification but the agent does NOT
++	 * auto-continue — the user decides when to respond.
++	 *
++	 * This is deterministic (integer comparison, not text parsing) and gives
++	 * predictable behavior: progress earns continuation, no progress yields
++	 * to the user.
+ 	 */
+ 	async #checkTodoCompletion(): Promise<void> {
+ 		// Skip todo reminders when the most recent turn was driven by an explicit user force —
+@@ -4308,31 +4314,53 @@ export class AgentSession {
+ 			return;
+ 		}
+ 
+-		// Build reminder message
++		// Progress check: did the agent complete any tasks since the last check?
++		const allTasks = phases.flatMap(p => p.tasks);
++		const completedCount = allTasks.filter(t => t.status === "completed").length;
++		const madeProgress = completedCount > this.#lastCompletedTodoCount;
++		this.#lastCompletedTodoCount = completedCount;
++
+ 		this.#todoReminderCount++;
+-		const todoList = incompleteByPhase
+-			.map(phase => `- ${phase.name}\n${phase.tasks.map(task => `  - ${task.content}`).join("\n")}`)
+-			.join("\n");
+-		const reminder =
+-			`<system-reminder>\n` +
+-			`You stopped with ${incomplete.length} incomplete todo item(s):\n${todoList}\n\n` +
+-			`Please continue working on these tasks or mark them complete if finished.\n` +
+-			`(Reminder ${this.#todoReminderCount}/${remindersMax})\n` +
+-			`</system-reminder>`;
++		const yielded = !madeProgress;
+ 
+ 		logger.debug("Todo completion: sending reminder", {
+ 			incomplete: incomplete.length,
+ 			attempt: this.#todoReminderCount,
++			completedCount,
++			madeProgress,
++			yielded,
+ 		});
+ 
+-		// Emit event for UI to render notification
++		const todoList = incompleteByPhase
++			.map(phase => `- ${phase.name}\n${phase.tasks.map(task => `  - ${task.content}`).join("\n")}`)
++			.join("\n");
++
++		// Always emit event for UI to render notification
+ 		await this.#emitSessionEvent({
+ 			type: "todo_reminder",
+ 			todos: incomplete,
+ 			attempt: this.#todoReminderCount,
+ 			maxAttempts: remindersMax,
++			yielded,
+ 		});
+ 
++		// No progress since last check — agent is either yielding to the user or stuck.
++		// Show the notification but do NOT auto-continue. The user decides when to respond.
++		if (yielded) {
++			logger.debug("Todo completion: no progress since last check, skipping auto-continue", {
++				incomplete: incomplete.length,
++				attempt: this.#todoReminderCount,
++			});
++			return;
++		}
++
++		const reminder =
++			`<system-reminder>\n` +
++			`You stopped with ${incomplete.length} incomplete todo item(s):\n${todoList}\n\n` +
++			`Please continue working on these tasks or mark them complete if finished.\n` +
++			`(Reminder ${this.#todoReminderCount}/${remindersMax})\n` +
++			`</system-reminder>`;
++
+ 		// Inject reminder and continue the conversation
+ 		this.agent.appendMessage({
+ 			role: "developer",
+diff --git a/packages/coding-agent/test/agent-session-auto-compaction-queue.test.ts b/packages/coding-agent/test/agent-session-auto-compaction-queue.test.ts
+index ac0d0b5fb..66d5354e2 100644
+--- a/packages/coding-agent/test/agent-session-auto-compaction-queue.test.ts
++++ b/packages/coding-agent/test/agent-session-auto-compaction-queue.test.ts
+@@ -204,7 +204,10 @@ describe("AgentSession auto-compaction queue resume", () => {
+ 			{
+ 				id: "phase-1",
+ 				name: "Execution",
+-				tasks: [{ id: "task-1", content: "Finish pending task", status: "in_progress" }],
++				tasks: [
++					{ id: "task-1", content: "Completed setup task", status: "completed" },
++					{ id: "task-2", content: "Finish pending task", status: "in_progress" },
++				],
+ 			},
+ 		]);
+ 
+diff --git a/packages/coding-agent/test/agent-session-eager-todo.test.ts b/packages/coding-agent/test/agent-session-eager-todo.test.ts
+index 818275270..cc90fd1f5 100644
+--- a/packages/coding-agent/test/agent-session-eager-todo.test.ts
++++ b/packages/coding-agent/test/agent-session-eager-todo.test.ts
+@@ -210,11 +210,11 @@ describe("AgentSession eager todo enforcement", () => {
+ 
+ 		expect(observedCalls).toHaveLength(1);
+ 		expect(observedCalls[0]).toEqual({
+-			toolChoice: "todo_write",
++			toolChoice: undefined,
+ 			toolNames: ["todo_write", "bash"],
+ 			messageRoles: ["user", "user"],
+ 			messageTexts: [
+-				expect.stringContaining("Before doing substantive work on the upcoming user request"),
++				expect.stringContaining("Before responding, classify the user"),
+ 				"list all work trees",
+ 			],
+ 			lastMessageRole: "user",
+@@ -248,11 +248,11 @@ describe("AgentSession eager todo enforcement", () => {
+ 		expect(streamCallCount).toBe(2);
+ 		expect(observedCalls).toHaveLength(2);
+ 		expect(observedCalls[0]).toEqual({
+-			toolChoice: "todo_write",
++			toolChoice: undefined,
+ 			toolNames: ["todo_write", "bash"],
+ 			messageRoles: ["user", "user"],
+ 			messageTexts: [
+-				expect.stringContaining("Before doing substantive work on the upcoming user request"),
++				expect.stringContaining("Before responding, classify the user"),
+ 				"list all work trees",
+ 			],
+ 			lastMessageRole: "user",
+-- 
+2.50.1 (Apple Git-155)
+

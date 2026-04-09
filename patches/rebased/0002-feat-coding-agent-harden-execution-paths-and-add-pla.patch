@@ -1,0 +1,363 @@
+From 957c577997f7a5428e49a7e376cd1571ec9c8c66 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Wed, 25 Mar 2026 01:07:17 -0400
+Subject: [PATCH 02/10] feat(coding-agent): harden execution paths and add
+ planning guards
+
+---
+ .../coding-agent/src/exec/bash-executor.ts    | 15 ++++--
+ .../src/intel/dependency-graph.ts             | 43 +++++++++++++++
+ .../src/intelligence/symbol-index.ts          | 33 ++++++++++++
+ packages/coding-agent/src/mcp/client.ts       |  9 +++-
+ .../coding-agent/src/planning/decomposer.ts   | 49 +++++++++++++++++
+ .../src/security/command-sanitizer.ts         | 53 +++++++++++++++++++
+ .../src/security/path-validator.ts            | 45 ++++++++++++++++
+ packages/coding-agent/src/tools/browser.ts    |  5 +-
+ 8 files changed, 246 insertions(+), 6 deletions(-)
+ create mode 100644 packages/coding-agent/src/intel/dependency-graph.ts
+ create mode 100644 packages/coding-agent/src/intelligence/symbol-index.ts
+ create mode 100644 packages/coding-agent/src/planning/decomposer.ts
+ create mode 100644 packages/coding-agent/src/security/command-sanitizer.ts
+ create mode 100644 packages/coding-agent/src/security/path-validator.ts
+
+diff --git a/packages/coding-agent/src/exec/bash-executor.ts b/packages/coding-agent/src/exec/bash-executor.ts
+index c53b83d88..2534e90a4 100644
+--- a/packages/coding-agent/src/exec/bash-executor.ts
++++ b/packages/coding-agent/src/exec/bash-executor.ts
+@@ -100,15 +100,18 @@ export async function executeBash(command: string, options?: BashExecutorOptions
+ 		shellSession = new Shell({ sessionEnv: shellEnv, snapshotPath: snapshotPath ?? undefined });
+ 		shellSessions.set(sessionKey, shellSession);
+ 	}
++	let abortPromise: Promise<void> | undefined;
++
+ 	const userSignal = options?.signal;
+ 	const runAbortController = new AbortController();
+ 	const abortCurrentExecution = () => {
+ 		if (!runAbortController.signal.aborted) {
+ 			runAbortController.abort();
+ 		}
+-		if (shellSession) {
+-			// Native abort is async; fire-and-forget because the caller races the command separately.
+-			void shellSession.abort();
++		if (shellSession && !abortPromise) {
++			abortPromise = shellSession.abort().catch(() => {
++				resetSession = true;
++			});
+ 		}
+ 	};
+ 	const abortHandler = () => {
+@@ -214,6 +217,9 @@ export async function executeBash(command: string, options?: BashExecutorOptions
+ 		resetSession = true;
+ 		throw err;
+ 	} finally {
++		if (abortPromise) {
++			await abortPromise;
++		}
+ 		if (hardTimeoutTimer) {
+ 			clearTimeout(hardTimeoutTimer);
+ 		}
+@@ -222,6 +228,9 @@ export async function executeBash(command: string, options?: BashExecutorOptions
+ 		}
+ 		if (resetSession) {
+ 			shellSessions.delete(sessionKey);
++			if (shellSession) {
++				await shellSession.abort().catch(() => {});
++			}
+ 		}
+ 	}
+ }
+diff --git a/packages/coding-agent/src/intel/dependency-graph.ts b/packages/coding-agent/src/intel/dependency-graph.ts
+new file mode 100644
+index 000000000..8698eb9b5
+--- /dev/null
++++ b/packages/coding-agent/src/intel/dependency-graph.ts
+@@ -0,0 +1,43 @@
++export interface DependencyNode {
++	id: string;
++	dependsOn: string[];
++}
++
++export interface DependencyGraph {
++	nodes: Map<string, DependencyNode>;
++	reverseEdges: Map<string, Set<string>>;
++}
++
++export function buildDependencyGraph(nodes: DependencyNode[]): DependencyGraph {
++	const nodeMap = new Map<string, DependencyNode>();
++	const reverseEdges = new Map<string, Set<string>>();
++
++	for (const node of nodes) {
++		nodeMap.set(node.id, { id: node.id, dependsOn: [...node.dependsOn] });
++		for (const dependency of node.dependsOn) {
++			const dependents = reverseEdges.get(dependency) ?? new Set<string>();
++			dependents.add(node.id);
++			reverseEdges.set(dependency, dependents);
++		}
++	}
++
++	return { nodes: nodeMap, reverseEdges };
++}
++
++export function getDependents(graph: DependencyGraph, id: string): string[] {
++	return Array.from(graph.reverseEdges.get(id) ?? []).sort((left, right) => left.localeCompare(right));
++}
++
++export function getTransitiveDependents(graph: DependencyGraph, id: string): string[] {
++	const visited = new Set<string>();
++	const queue = [...getDependents(graph, id)];
++
++	while (queue.length > 0) {
++		const current = queue.shift();
++		if (!current || visited.has(current)) continue;
++		visited.add(current);
++		queue.push(...getDependents(graph, current));
++	}
++
++	return Array.from(visited).sort((left, right) => left.localeCompare(right));
++}
+diff --git a/packages/coding-agent/src/intelligence/symbol-index.ts b/packages/coding-agent/src/intelligence/symbol-index.ts
+new file mode 100644
+index 000000000..ee31e42bc
+--- /dev/null
++++ b/packages/coding-agent/src/intelligence/symbol-index.ts
+@@ -0,0 +1,33 @@
++export interface SymbolEntry {
++	name: string;
++	kind: string;
++	filePath: string;
++	line: number;
++}
++
++export class SymbolIndex {
++	readonly #entries = new Map<string, SymbolEntry[]>();
++
++	add(entry: SymbolEntry): void {
++		const bucket = this.#entries.get(entry.name) ?? [];
++		bucket.push(entry);
++		this.#entries.set(entry.name, bucket);
++	}
++
++	addMany(entries: SymbolEntry[]): void {
++		for (const entry of entries) {
++			this.add(entry);
++		}
++	}
++
++	find(name: string): SymbolEntry[] {
++		return [...(this.#entries.get(name) ?? [])].sort((left, right) => {
++			if (left.filePath === right.filePath) return left.line - right.line;
++			return left.filePath.localeCompare(right.filePath);
++		});
++	}
++
++	listNames(): string[] {
++		return Array.from(this.#entries.keys()).sort((left, right) => left.localeCompare(right));
++	}
++}
+diff --git a/packages/coding-agent/src/mcp/client.ts b/packages/coding-agent/src/mcp/client.ts
+index 1fcf1793d..c099b29e7 100644
+--- a/packages/coding-agent/src/mcp/client.ts
++++ b/packages/coding-agent/src/mcp/client.ts
+@@ -190,7 +190,14 @@ export async function connectToServer(
+ 		// If withTimeout rejected (timeout/abort) while connect() was still pending,
+ 		// the transport may be alive with an open SSE listener. Close it.
+ 		if (transport) {
+-			void transport.close().catch(() => {});
++			try {
++				await transport.close();
++			} catch (closeError) {
++				logger.warn("Failed to close MCP transport after connection error", {
++					server: name,
++					error: closeError instanceof Error ? closeError.message : String(closeError),
++				});
++			}
+ 		}
+ 		throw error;
+ 	}
+diff --git a/packages/coding-agent/src/planning/decomposer.ts b/packages/coding-agent/src/planning/decomposer.ts
+new file mode 100644
+index 000000000..6cff46f5e
+--- /dev/null
++++ b/packages/coding-agent/src/planning/decomposer.ts
+@@ -0,0 +1,49 @@
++export interface DecomposeTaskInput {
++	goal: string;
++	constraints?: string[];
++	files?: string[];
++}
++
++export interface DecomposedTask {
++	id: string;
++	description: string;
++	dependsOn: string[];
++}
++
++export function decomposeTask(input: DecomposeTaskInput): DecomposedTask[] {
++	const tasks: DecomposedTask[] = [];
++	const normalizedGoal = input.goal.trim();
++	if (normalizedGoal.length === 0) {
++		return tasks;
++	}
++
++	tasks.push({
++		id: "analyze-scope",
++		description: `Analyze scope for: ${normalizedGoal}`,
++		dependsOn: [],
++	});
++
++	if ((input.files?.length ?? 0) > 0) {
++		tasks.push({
++			id: "inspect-files",
++			description: `Inspect target files: ${input.files?.join(", ")}`,
++			dependsOn: ["analyze-scope"],
++		});
++	}
++
++	if ((input.constraints?.length ?? 0) > 0) {
++		tasks.push({
++			id: "apply-constraints",
++			description: `Apply constraints: ${input.constraints?.join(", ")}`,
++			dependsOn: ["analyze-scope"],
++		});
++	}
++
++	tasks.push({
++		id: "execute-change",
++		description: `Execute work for: ${normalizedGoal}`,
++		dependsOn: tasks.filter(task => task.id !== "execute-change").map(task => task.id),
++	});
++
++	return tasks;
++}
+diff --git a/packages/coding-agent/src/security/command-sanitizer.ts b/packages/coding-agent/src/security/command-sanitizer.ts
+new file mode 100644
+index 000000000..b37cae1fb
+--- /dev/null
++++ b/packages/coding-agent/src/security/command-sanitizer.ts
+@@ -0,0 +1,53 @@
++const DEFAULT_DENY_PATTERNS: ReadonlyArray<RegExp> = [
++	/(^|[;&|()]\s*)(?:bash|sh)\b/,
++	/(^|[;&|()]\s*)(?:python|python3|node|perl|ruby|php)\b/,
++	/(^|[;&|()]\s*)(?:mv|cp|rm|mkdir|touch|chmod|chown|ln|install|patch)\b/,
++	/(^|[;&|()]\s*)sed\s+-i\b/,
++	/(^|[;&|()]\s*)git\s+(?:add|apply|checkout|clean|commit|merge|rebase|reset|restore|revert|stash|switch|worktree)\b/,
++	/(^|[^<])>>?/,
++	/\|\s*tee\b/,
++	/<<<?/,
++];
++
++export interface CommandSanitizerOptions {
++	allowEmpty?: boolean;
++	denyPatterns?: ReadonlyArray<RegExp>;
++}
++
++export interface CommandSanitizationResult {
++	ok: boolean;
++	command: string;
++	reason?: string;
++}
++
++export function sanitizeCommand(
++	command: string,
++	options: CommandSanitizerOptions = {},
++): CommandSanitizationResult {
++	const trimmed = command.trim();
++	if (trimmed.length === 0) {
++		return options.allowEmpty
++			? { ok: true, command: trimmed }
++			: { ok: false, command: trimmed, reason: "Command must not be empty." };
++	}
++
++	const denyPatterns = options.denyPatterns ?? DEFAULT_DENY_PATTERNS;
++	if (denyPatterns.some(pattern => pattern.test(trimmed))) {
++		return {
++			ok: false,
++			command: trimmed,
++			reason:
++				"Command rejected by sanitizer. Use structured file tools for mutations and keep shell commands read-only.",
++		};
++	}
++
++	return { ok: true, command: trimmed };
++}
++
++export function assertSafeCommand(command: string, options?: CommandSanitizerOptions): string {
++	const result = sanitizeCommand(command, options);
++	if (!result.ok) {
++		throw new Error(result.reason ?? "Command rejected by sanitizer.");
++	}
++	return result.command;
++}
+diff --git a/packages/coding-agent/src/security/path-validator.ts b/packages/coding-agent/src/security/path-validator.ts
+new file mode 100644
+index 000000000..5e3e03189
+--- /dev/null
++++ b/packages/coding-agent/src/security/path-validator.ts
+@@ -0,0 +1,45 @@
++import * as path from "node:path";
++import { resolveToCwd } from "../tools/path-utils";
++
++export interface PathValidationOptions {
++	cwd: string;
++	allowOutsideCwd?: boolean;
++}
++
++export interface PathValidationResult {
++	ok: boolean;
++	input: string;
++	resolvedPath?: string;
++	reason?: string;
++}
++
++export function validatePath(input: string, options: PathValidationOptions): PathValidationResult {
++	const trimmed = input.trim();
++	if (trimmed.length === 0) {
++		return { ok: false, input, reason: "Path must not be empty." };
++	}
++
++	const resolvedPath = resolveToCwd(trimmed, options.cwd);
++	const relative = path.relative(options.cwd, resolvedPath);
++	const escapesCwd =
++		relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative);
++
++	if (escapesCwd && !options.allowOutsideCwd) {
++		return {
++			ok: false,
++			input,
++			resolvedPath,
++			reason: "Path escapes the current workspace.",
++		};
++	}
++
++	return { ok: true, input, resolvedPath };
++}
++
++export function assertValidPath(input: string, options: PathValidationOptions): string {
++	const result = validatePath(input, options);
++	if (!result.ok || !result.resolvedPath) {
++		throw new Error(result.reason ?? "Path validation failed.");
++	}
++	return result.resolvedPath;
++}
+diff --git a/packages/coding-agent/src/tools/browser.ts b/packages/coding-agent/src/tools/browser.ts
+index 6469d965e..60b78ea64 100644
+--- a/packages/coding-agent/src/tools/browser.ts
++++ b/packages/coding-agent/src/tools/browser.ts
+@@ -968,11 +968,12 @@ export class BrowserTool implements AgentTool<typeof browserSchema, BrowserToolD
+ 				script => `
+ 		try {
+ 			${script};
+-		} catch (e) {}
++		} catch (e) {
++			console.warn("[omp-browser] stealth script injection failed", e);
++		}
+ 	`,
+ 			)
+ 			.join(";\n");
+-
+ 		await page.evaluateOnNewDocument(`(() => {
+ 				// Native function cache - captured before any tampering
+ 				const iframe = document.createElement("iframe");
+-- 
+2.50.1 (Apple Git-155)
+

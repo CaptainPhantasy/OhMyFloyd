@@ -1,0 +1,34 @@
+From 2369d5ebc509e9d0c139098632fd77dc8c679d48 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 26 Mar 2026 07:25:00 -0400
+Subject: [PATCH 04/10] chore: add VIBEBOX configuration for Debian VM sandbox
+
+- Configure VIBEBOX for isolated development environment
+- Set up 2 CPU cores, 2GB RAM, 5GB disk
+- Add mounts for .codex and .claude directories
+- Enable 20s auto-shutdown for resource management
+---
+ vibebox.toml | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 vibebox.toml
+
+diff --git a/vibebox.toml b/vibebox.toml
+new file mode 100644
+index 000000000..a9c96812b
+--- /dev/null
++++ b/vibebox.toml
+@@ -0,0 +1,11 @@
++[box]
++cpu_count = 2
++ram_mb = 2048
++disk_gb = 5
++mounts = [
++    "~/.codex:~/.codex:read-write",
++    "~/.claude:~/.claude:read-write",
++]
++
++[supervisor]
++auto_shutdown_ms = 20000
+-- 
+2.50.1 (Apple Git-155)
+

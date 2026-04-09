@@ -1,0 +1,323 @@
+From 3e571e4ff46e75073cbdf28eddc97cd373636711 Mon Sep 17 00:00:00 2001
+From: CaptainPhantasy <DouglasTalley1977@gmail.com>
+Date: Thu, 26 Mar 2026 07:27:17 -0400
+Subject: [PATCH 05/10] feat: add VIBEBOX skill for isolated Debian VM sandbox
+
+- Add comprehensive VIBEBOX usage documentation
+- Document SSH access patterns for agents
+- Include troubleshooting guide and best practices
+- Provide example workflows for safe command execution
+- Enable agents to use VIBEBOX for isolated testing
+---
+ .omp/skills/vibebox/SKILL.md | 298 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 298 insertions(+)
+ create mode 100644 .omp/skills/vibebox/SKILL.md
+
+diff --git a/.omp/skills/vibebox/SKILL.md b/.omp/skills/vibebox/SKILL.md
+new file mode 100644
+index 000000000..a1596d82c
+--- /dev/null
++++ b/.omp/skills/vibebox/SKILL.md
+@@ -0,0 +1,298 @@
++# VIBEBOX - macOS Sandbox for Agents
++
++## What is VIBEBOX?
++
++VIBEBOX is a per-project micro-VM sandbox for running coding agents on macOS using Apple's Virtualization Framework. It provides a **Debian Linux VM** with fast warm-up times (<5s), explicit mount allowlists, and reusable sessions.
++
++**Key Benefits:**
++- ✅ **Real isolation**: Linux guest VM with hard boundary from host
++- ✅ **Fast re-entry**: <5s warm-up time after first run
++- ✅ **Project-scoped**: Explicit mounts, repo-contained changes
++- ✅ **Safe by default**: Host system sealed off from VM
++
++## When to Use VIBEBOX
++
++Use VIBEBOX when you need to:
++- Execute **untrusted or dangerous commands** safely
++- Test **destructive operations** without risking host files
++- Run **build processes** that might modify the system
++- Isolate **network operations** or external tool execution
++- Test **agent workflows** in a controlled environment
++
++## How to Start VIBEBOX
++
++### Starting the VM
++
++From any project directory:
++
++```bash
++cd /path/to/project
++vibebox
++```
++
++**What happens:**
++1. First run: Downloads and provisions Debian base image (~1-2 minutes)
++2. Subsequent runs: <5s warm-up using cached image
++3. Creates `vibebox.toml` and `.vibebox/` directory automatically
++4. Drops you into shell: `vibecoder@vibebox:~/<project>$`
++
++### Keeping VIBEBOX Running
++
++**Important:** VIBEBOX has an **auto-shutdown timer** (default: 20 seconds of inactivity).
++
++To keep it running for extended testing:
++- Run `vibebox` in a separate terminal
++- Keep the terminal open
++- The VM stays running as long as the session is active
++
++To exit: Type `:exit` inside the VIBEBOX shell
++
++## VIBEBOX Environment
++
++### VM Specifications
++
++- **OS**: Debian GNU/Linux with kernel 6.12.63+
++- **Architecture**: ARM64 (Apple Silicon)
++- **Resources**: 2 CPU cores, 2GB RAM, 5GB disk
++- **Auto-shutdown**: 20 seconds (configurable in `vibebox.toml`)
++
++### Available Tools
++
++- ✅ **Git**: `/usr/bin/git`
++- ✅ **Python**: `/usr/bin/python3` (Python 3.13.5)
++- ✅ **Build tools**: gcc, make, cmake
++- ✅ **Network tools**: curl, wget, ssh
++- ❌ **Node.js**: Not installed by default
++- ❌ **Bun**: Not installed by default
++
++### Project Mounting
++
++Your project is mounted at **`~/<project-name>`** inside the VM:
++- Host: `/Volumes/SanDisk1gb/OhMyFloyd`
++- Guest: `/home/vibecoder/OhMyFloyd`
++
++**Security features:**
++- `.git` directory is **masked** (tmpfs mount) - prevents accidental git operations
++- `.vibebox` directory is **masked** (tmpfs mount)
++- All other files are accessible read-write
++
++## Using VIBEBOX from Agents
++
++### SSH Access Pattern
++
++To execute commands inside VIBEBOX from agents:
++
++```bash
++# SSH into the running VM
++ssh -i /path/to/project/.vibebox/ssh_key \
++    -o StrictHostKeyChecking=no \
++    -o UserKnownHostsFile=/dev/null \
++    vibecoder@<VM_IP> "<command>"
++```
++
++**Example:**
++```bash
++# Get VM IP from instance config
++VM_IP=$(grep vm_ipv4 /path/to/project/.vibebox/instance.toml | cut -d'"' -f2)
++
++# Execute command inside VM
++ssh -i /path/to/project/.vibebox/ssh_key \
++    -o StrictHostKeyChecking=no \
++    -o UserKnownHostsFile=/dev/null \
++    vibecoder@$VM_IP "cd ~/project-name && ls -la"
++```
++
++### Finding VM IP Address
++
++The VM IP is stored in `.vibebox/instance.toml`:
++
++```bash
++# Get current VM IP
++grep vm_ipv4 .vibebox/instance.toml
++# Output: vm_ipv4 = "192.168.64.7"
++```
++
++### Common Operations
++
++**Execute single command:**
++```bash
++ssh -i .vibebox/ssh_key -o StrictHostKeyChecking=no \
++    vibecoder@192.168.64.7 "python3 --version"
++```
++
++**Execute multiple commands:**
++```bash
++ssh -i .vibebox/ssh_key -o StrictHostKeyChecking=no \
++    vibecoder@192.168.64.7 "cd ~/project && pwd && ls -la"
++```
++
++**Copy files from VM to host:**
++```bash
++scp -i .vibebox/ssh_key -o StrictHostKeyChecking=no \
++    vibecoder@192.168.64.7:/tmp/result.txt ./
++```
++
++**Copy files from host to VM:**
++```bash
++scp -i .vibebox/ssh_key -o StrictHostKeyChecking=no \
++    local-file.txt vibecoder@192.168.64.7:/tmp/
++```
++
++## VIBEBOX CLI Commands
++
++```bash
++vibebox              # Start or attach to current project VM
++vibebox list         # List all known project sessions
++vibebox explain      # Show mounts and network info
++vibebox reset        # Delete .vibebox and recreate on next run
++vibebox purge-cache  # Delete global cache (~/.cache/vibebox)
++```
++
++## Configuration (vibebox.toml)
++
++The `vibebox.toml` file is auto-created in your project root:
++
++```toml
++[box]
++cpu_count = 2
++ram_mb = 2048
++disk_gb = 5
++mounts = [
++    "~/.codex:~/.codex:read-write",
++    "~/.claude:~/.claude:read-write",
++]
++
++[supervisor]
++auto_shutdown_ms = 20000  # Auto-shutdown after 20s inactivity
++```
++
++**Customization:**
++- Adjust `cpu_count`, `ram_mb`, `disk_gb` for performance
++- Add extra mounts in `mounts` array
++- Increase `auto_shutdown_ms` for longer sessions
++- Run `vibebox reset` after changing `disk_gb`
++
++## Important Notes
++
++### Security Model
++
++- **Hard VM boundary**: Linux guest is isolated from macOS host
++- **Explicit mounts**: Only specified directories are accessible
++- **Repo-first**: Project files mounted by default, everything else opt-in
++- **Masked directories**: `.git` and `.vibebox` are read-only tmpfs
++
++### Limitations
++
++- **No Node.js/Bun**: Install inside VM if needed: `curl -fsSL https://bun.sh/install | bash`
++- **Git operations**: `.git` is masked - use git from host instead
++- **Auto-shutdown**: VM shuts down after 20s of inactivity (configurable)
++- **Apple Silicon only**: Requires Apple Silicon Mac (M1/M2/M3/M4)
++
++### Performance
++
++- **First run**: ~1-2 minutes (downloads Debian base image)
++- **Subsequent runs**: <5s warm-up (uses cached image)
++- **Disk usage**: 5GB per project instance
++- **Network**: NAT mode with SSH port 22
++
++## Troubleshooting
++
++### SSH Connection Timeout
++
++**Problem**: `ssh: connect to host <IP> port 22: Operation timed out`
++
++**Solution**: VM may have shut down. Restart VIBEBOX:
++```bash
++vibebox  # This will start/attach to the VM
++```
++
++### VM IP Changed
++
++**Problem**: Old VM IP no longer works
++
++**Solution**: Get new IP from instance config:
++```bash
++grep vm_ipv4 .vibebox/instance.toml
++```
++
++### Permission Denied
++
++**Problem**: `Permission denied (publickey)`
++
++**Solution**: Ensure you're using the correct SSH key:
++```bash
++ssh -i .vibebox/ssh_key vibecoder@<VM_IP>
++```
++
++### Disk Full
++
++**Problem**: VM disk is full
++
++**Solution**: Increase disk size in `vibebox.toml` and reset:
++```bash
++# Edit vibebox.toml: disk_gb = 10
++vibebox reset  # Recreates VM with new disk size
++```
++
++### Need to Install Tools
++
++**Problem**: Required tool (Node.js, Bun, etc.) not available
++
++**Solution**: Install inside VM:
++```bash
++# Install Node.js
++curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
++apt-get install -y nodejs
++
++# Install Bun
++curl -fsSL https://bun.sh/install | bash
++```
++
++## Best Practices
++
++1. **Keep VIBEBOX running** in separate terminal for extended work
++2. **Use for testing** destructive operations before running on host
++3. **Install tools** inside VM once and reuse across sessions
++4. **Monitor disk space** - VM has limited 5GB by default
++5. **Use host for git** operations - `.git` is masked inside VM
++6. **Leverage Python** - pre-installed and ready to use
++7. **Test agent workflows** in isolation before host execution
++
++## Example Workflows
++
++### Safe Command Execution
++
++```bash
++# Test dangerous command in VIBEBOX first
++ssh -i .vibebox/ssh_key vibecoder@192.168.64.7 \
++    "cd ~/project && rm -rf test-dir"
++```
++
++### Python Development
++
++```bash
++# Run Python script in isolated environment
++ssh -i .vibebox/ssh_key vibecoder@192.168.64.7 \
++    "cd ~/project && python3 script.py"
++```
++
++### Build Testing
++
++```bash
++# Test build process in VM
++ssh -i .vibebox/ssh_key vibecoder@192.168.64.7 \
++    "cd ~/project && make clean && make"
++```
++
++### File Operations
++
++```bash
++# Copy test results from VM to host
++scp -i .vibebox/ssh_key vibecoder@192.168.64.7:/tmp/results.txt ./
++```
++
++## Summary
++
++VIBEBOX provides a **fast, isolated Debian VM** for safe agent operations on macOS. Start with `vibebox`, execute commands via SSH, and exit with `:exit`. Perfect for testing, development, and running untrusted code safely.
++
++**Remember**: Keep VIBEBOX running in a separate terminal to avoid auto-shutdown during extended work!
+\ No newline at end of file
+-- 
+2.50.1 (Apple Git-155)
+
