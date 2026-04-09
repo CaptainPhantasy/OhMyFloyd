@@ -2,8 +2,9 @@ import * as fs from "node:fs";
 import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
 import type { Component } from "@oh-my-pi/pi-tui";
 import { ImageProtocol, TERMINAL, Text } from "@oh-my-pi/pi-tui";
-import { $env, getProjectDir, isEnoent, prompt } from "@oh-my-pi/pi-utils";
+import { $env, getProjectDir, isEnoent, logger, prompt } from "@oh-my-pi/pi-utils";
 import { Type } from "@sinclair/typebox";
+import { hookLoader } from "../config/hook-loader";
 import { type BashResult, executeBash } from "../exec/bash-executor";
 import type { RenderResultOptions } from "../extensibility/custom-tools/types";
 import { truncateToVisualLines } from "../modes/components/visual-truncate";
@@ -294,6 +295,23 @@ export class BashTool implements AgentTool<BashToolSchema, BashToolDetails> {
 			const interception = checkBashInterception(command, ctx?.toolNames ?? [], rules);
 			if (interception.block) {
 				throw new ToolError(interception.message ?? "Command blocked");
+			}
+		}
+
+		// Check hook rules for destructive operations (PEBKAC enforcement)
+		const hookCheck = hookLoader.checkBashCommand(command);
+		if (hookCheck.matched && hookCheck.rule) {
+			const rule = hookCheck.rule;
+			if (rule.action === "block") {
+				const message = rule.message
+					? rule.message.replace("{{ command }}", command)
+					: `Command blocked by hook rule: ${rule.hook_name}`;
+				throw new ToolError(message);
+			} else if (rule.action === "warn") {
+				const message = rule.message
+					? rule.message.replace("{{ command }}", command)
+					: `Warning: ${rule.hook_name}`;
+				logger.warn(message, { hook_name: rule.hook_name, command });
 			}
 		}
 

@@ -42,12 +42,20 @@ packages/ai/test/.temp-images/
 # Project specific
 !.omp/
 .omp/plugins/
+.omp/extensions/
+.omp/hooks/
+.omp/mcp.json
 .pi_config/
+.pi/
 .opencode/
 .worktrees/
 compaction-results/
 changes/
 __pycache__/
+.claude/
+.harness/
+.vibebox/
+relay/
 
 # Scratch files
 syntax.jsonl
@@ -58,3 +66,6 @@ pi-*.html
 # Generated files
 packages/coding-agent/src/internal-urls/docs-index.generated.ts
 packages/typescript-edit-benchmark/runs/
+
+# Draft documentation
+*-DRAFT.md
