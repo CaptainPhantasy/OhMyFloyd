@@ -45,6 +45,7 @@ import {
 import { discoverAndLoadCustomTools } from "./extensibility/custom-tools";
 import type { CustomTool, CustomToolContext, CustomToolSessionEvent } from "./extensibility/custom-tools/types";
 import { CustomToolAdapter } from "./extensibility/custom-tools/wrapper";
+import { continuousLearningExtension } from "./extensibility/continuous-learning";
 import {
 	discoverAndLoadExtensions,
 	type ExtensionContext,
@@ -1094,6 +1095,18 @@ export async function createAgentSession(options: CreateAgentSessionOptions = {}
 		for (const { path, error } of extensionsResult.errors) {
 			logger.error("Failed to load extension", { path, error });
 		}
+	}
+
+	// Load built-in continuous learning extension
+	{
+		const loaded = await loadExtensionFromFactory(
+			continuousLearningExtension,
+			cwd,
+			eventBus,
+			extensionsResult.runtime,
+			"<continuous-learning>",
+		);
+		extensionsResult.extensions.push(loaded);
 	}
 
 	// Load inline extensions from factories
