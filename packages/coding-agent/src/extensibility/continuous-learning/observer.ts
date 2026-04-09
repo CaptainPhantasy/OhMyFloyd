@@ -14,6 +14,7 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { logger } from "@oh-my-pi/pi-utils";
 import type { HookContext, ToolCallEvent } from "../hooks/types";
+import { analyzeObservations } from "./pattern-detector";
 import { ContinuousLearningStorage, isoTimestamp, redactSecrets, uuid } from "./storage";
 import type { Observation, ObservationEvent } from "./types";
 
@@ -113,6 +114,10 @@ interface ObserverState {
 	sessionId: string;
 	enabled: boolean;
 	initialized: boolean;
+	/** Cached active instincts loaded at session start, refreshed after analysis */
+	activeInstincts: import("./types").Instinct[];
+	/** Whether an analysis is currently in progress (prevents overlapping runs) */
+	analysisInFlight: boolean;
 }
 
 const state: ObserverState = {
@@ -123,10 +128,69 @@ const state: ObserverState = {
 	sessionId: uuid(),
 	enabled: true,
 	initialized: false,
+	activeInstincts: [],
+	analysisInFlight: false,
 };
 
 // Throttle: trigger analysis every N observations
 const ANALYSIS_TRIGGER_INTERVAL = 20;
+
+/**
+ * Run pattern analysis in background after enough observations accumulate.
+ * Non-blocking: errors are logged, never thrown to the caller.
+ */
+function triggerBackgroundAnalysis(): void {
+	if (state.analysisInFlight || !state.storage || !state.project) return;
+	state.analysisInFlight = true;
+
+	const storage = state.storage;
+	const projectId = state.project.id;
+
+	(async () => {
+		try {
+			const config = storage.getConfig();
+			const result = await analyzeObservations(storage, projectId, config);
+			if (result.instinctsCreated.length > 0 || result.instinctsUpdated.length > 0) {
+				// Refresh the active instincts cache so enforcement sees new patterns immediately
+				await reloadActiveInstincts();
+				logger.debug("ContinuousLearning: analysis complete", {
+					created: result.instinctsCreated.length,
+					updated: result.instinctsUpdated.length,
+				});
+			}
+		} catch (err) {
+			logger.error("ContinuousLearning: background analysis failed", { error: err });
+		} finally {
+			state.analysisInFlight = false;
+		}
+	})();
+}
+
+/**
+ * Reload active instincts from storage into the in-memory cache.
+ * Called at session start and after each analysis run.
+ */
+export async function reloadActiveInstincts(): Promise<void> {
+	if (!state.storage || !state.project) {
+		state.activeInstincts = [];
+		return;
+	}
+	try {
+		const projectInstincts = await state.storage.readAllInstincts(state.project.id);
+		const globalInstincts = await state.storage.readAllInstincts("global");
+		state.activeInstincts = [...projectInstincts, ...globalInstincts].filter(i => i.status === "active");
+	} catch (err) {
+		logger.error("ContinuousLearning: failed to reload instincts", { error: err });
+		state.activeInstincts = [];
+	}
+}
+
+/**
+ * Get the current cached active instincts for enforcement injection.
+ */
+export function getActiveInstincts(): import("./types").Instinct[] {
+	return state.activeInstincts;
+}
 
 // ============================================================================
 // Automated Session Guards
@@ -324,11 +388,10 @@ export async function handleToolResult(
 
 		state.observationCount++;
 
-		// Check if we should trigger analysis
+		// Trigger analysis after enough observations accumulate
 		if (state.observationCount - state.lastAnalysisTrigger >= ANALYSIS_TRIGGER_INTERVAL) {
 			state.lastAnalysisTrigger = state.observationCount;
-			// Trigger analysis in background (implement in pattern-detector.ts)
-			// triggerAnalysis().catch(() => {});
+			triggerBackgroundAnalysis();
 		}
 	} catch (error) {
 		logger.error("ContinuousLearning: error handling tool_result", { error });
