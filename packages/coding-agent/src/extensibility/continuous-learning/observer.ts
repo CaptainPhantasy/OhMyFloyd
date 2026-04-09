@@ -14,9 +14,10 @@ import { createHash } from "node:crypto";
 import { existsSync } from "node:fs";
 import { logger } from "@oh-my-pi/pi-utils";
 import type { HookContext, ToolCallEvent } from "../hooks/types";
+import { classifyBehavior } from "./behavior-classifier";
 import { analyzeObservations } from "./pattern-detector";
 import { ContinuousLearningStorage, isoTimestamp, redactSecrets, uuid } from "./storage";
-import type { Observation, ObservationEvent } from "./types";
+import type { Instinct, Observation, ObservationEvent } from "./types";
 
 // ============================================================================
 // Project Detection
@@ -436,6 +437,7 @@ export async function handleSessionStart(ctx: HookContext): Promise<void> {
 
 /**
  * Handle session end/shutdown event.
+ * Runs behavioral analysis on all session observations before shutdown.
  */
 export async function handleSessionEnd(ctx: HookContext): Promise<void> {
 	if (!state.enabled || !state.storage || !state.project) {
@@ -453,8 +455,81 @@ export async function handleSessionEnd(ctx: HookContext): Promise<void> {
 		};
 
 		await state.storage.writeObservation(observation);
+
+		// Run behavioral analysis on this session's observations
+		await runBehavioralAnalysis();
 	} catch (error) {
 		logger.error("ContinuousLearning: error handling session_end", { error });
+	}
+}
+
+/**
+ * Run behavioral classifier on the current session's observations.
+ * Creates instincts from detected violations so they are enforced
+ * in all subsequent sessions via the context event handler.
+ */
+async function runBehavioralAnalysis(): Promise<void> {
+	if (!state.storage || !state.project) return;
+
+	try {
+		const allObservations = await state.storage.readObservations(state.project.id);
+		// Filter to current session only
+		const sessionObs = allObservations.filter(o => o.sessionId === state.sessionId);
+		if (sessionObs.length === 0) return;
+
+		const violations = classifyBehavior(sessionObs);
+		if (violations.length === 0) return;
+
+		const now = isoTimestamp();
+		let created = 0;
+
+		for (const violation of violations) {
+			// Deduplicate: generate a stable ID from the violation type + evidence.
+			// Zod schema requires /^[a-z][a-z0-9-]*[a-z0-9]$/ — no underscores.
+			const typeSlug = violation.type.replace(/_/g, "-");
+			const evidenceSlug = violation.evidence
+				.toLowerCase()
+				.replace(/[^a-z0-9]+/g, "-")
+				.replace(/^-|-$/g, "")
+				.slice(0, 40);
+			const id = `behavioral-${typeSlug}-${evidenceSlug}`.replace(/-+$/g, "");
+
+			// Skip if this exact instinct already exists
+			const existing = await state.storage.readAllInstincts(state.project!.id);
+			if (existing.some(i => i.id === id)) continue;
+
+			const instinct: Omit<Instinct, "checksum"> = {
+				id,
+				schemaVersion: "3.0.0",
+				trigger: violation.description,
+				confidence: violation.confidence,
+				domain: "workflow",
+				source: "observation",
+				scope: "project",
+				// High-confidence behavioral violations auto-activate
+				status: violation.confidence >= 0.7 ? "active" : "pending",
+				projectId: state.project!.id,
+				projectName: state.project!.name,
+				createdAt: now,
+				updatedAt: now,
+				observationCount: 1,
+				evidence: [violation.observationId],
+				action: violation.enforcementAction,
+			};
+
+			await state.storage.writeInstinct(instinct);
+			created++;
+		}
+
+		if (created > 0) {
+			await reloadActiveInstincts();
+			logger.debug("ContinuousLearning: behavioral analysis complete", {
+				violations: violations.length,
+				instinctsCreated: created,
+			});
+		}
+	} catch (err) {
+		logger.error("ContinuousLearning: behavioral analysis failed", { error: err });
 	}
 }
 
