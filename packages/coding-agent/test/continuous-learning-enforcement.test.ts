@@ -16,11 +16,9 @@ import * as path from "node:path";
 
 // Direct imports from the module under test — no mocks
 import {
-	ContinuousLearningStorage,
 	analyzeObservations,
-	getActiveInstincts,
+	ContinuousLearningStorage,
 	isoTimestamp,
-	reloadActiveInstincts,
 	uuid,
 } from "../src/extensibility/continuous-learning";
 

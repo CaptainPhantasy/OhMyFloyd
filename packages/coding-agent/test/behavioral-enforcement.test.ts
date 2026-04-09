@@ -11,9 +11,8 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import * as fs from "node:fs/promises";
 import * as os from "node:os";
 import * as path from "node:path";
-
-import { classifyBehavior, extractDirectives } from "../src/extensibility/continuous-learning/behavior-classifier";
 import { ContinuousLearningStorage, isoTimestamp, uuid } from "../src/extensibility/continuous-learning";
+import { classifyBehavior, extractDirectives } from "../src/extensibility/continuous-learning/behavior-classifier";
 import type { Observation } from "../src/extensibility/continuous-learning/types";
 
 function fakeObs(overrides: Partial<Observation> & { output?: string; input?: string }): Observation {

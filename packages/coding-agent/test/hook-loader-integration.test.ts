@@ -12,8 +12,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { HookLoader, type HookRule } from "../src/config/hook-loader";
 import { TempDir } from "@oh-my-pi/pi-utils";
+import { HookLoader, type HookRule } from "../src/config/hook-loader";
 
 describe("HookLoader Integration Tests", () => {
 	let tempDir: TempDir;
@@ -109,7 +109,7 @@ describe("HookLoader Integration Tests", () => {
 			await hookLoader.initialize();
 
 			expect(hookLoader.getRulesCount()).toBe(2);
-			const ruleNames = hookLoader.getRules().map((r) => r.hook_name);
+			const ruleNames = hookLoader.getRules().map(r => r.hook_name);
 			expect(ruleNames).toContain("rule-1");
 			expect(ruleNames).toContain("rule-2");
 		});

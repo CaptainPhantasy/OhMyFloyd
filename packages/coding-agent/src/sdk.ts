@@ -37,6 +37,7 @@ import "./discovery";
 import { resolveConfigValue } from "./config/resolve-config-value";
 import { initializeWithSettings } from "./discovery";
 import { TtsrManager } from "./export/ttsr";
+import { continuousLearningExtension } from "./extensibility/continuous-learning";
 import {
 	type CustomCommandsLoadResult,
 	type LoadedCustomCommand,
@@ -45,7 +46,6 @@ import {
 import { discoverAndLoadCustomTools } from "./extensibility/custom-tools";
 import type { CustomTool, CustomToolContext, CustomToolSessionEvent } from "./extensibility/custom-tools/types";
 import { CustomToolAdapter } from "./extensibility/custom-tools/wrapper";
-import { continuousLearningExtension } from "./extensibility/continuous-learning";
 import {
 	discoverAndLoadExtensions,
 	type ExtensionContext,

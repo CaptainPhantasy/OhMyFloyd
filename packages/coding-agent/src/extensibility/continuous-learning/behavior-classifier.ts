@@ -72,7 +72,7 @@ const COMPLETION_CLAIM_PATTERNS = [
  */
 const EVIDENCE_MARKERS = [
 	/^#{1,3}\s*ACTION\s+\d/m,
-	/\bFile\(?s?\)?:\s*[`"']?[\w/.\-]+/i,
+	/\bFile\(?s?\)?:\s*[`"']?[\w/.-]+/i,
 	/\bCommand:\s*[`"']?.+/i,
 	/\bEvidence:\s*.+/i,
 	/\bVerified:\s*YES/i,

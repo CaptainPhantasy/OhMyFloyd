@@ -23,6 +23,7 @@ import { isLightTheme, setAutoThemeMapping, setColorBlindMode, setSymbolPreset }
 import { AgentStorage } from "../session/agent-storage";
 import { type EditMode, normalizeEditMode } from "../utils/edit-mode";
 import { withFileLock } from "./file-lock";
+import { hookLoader } from "./hook-loader";
 import {
 	type BashInterceptorRule,
 	type GroupPrefix,
@@ -404,6 +405,9 @@ export class Settings {
 
 		// Load project settings
 		this.#project = await this.#loadProjectSettings();
+
+		// Initialize hook loader (loads ~/.omp/hooks/*.json rules)
+		await hookLoader.initialize();
 
 		// Build merged view
 		this.#rebuildMerged();
