@@ -2,7 +2,7 @@ import * as fs from "node:fs/promises";
 import { type AgentMessage, ThinkingLevel } from "@oh-my-pi/pi-agent-core";
 import { sanitizeText } from "@oh-my-pi/pi-natives";
 import type { AutocompleteProvider, SlashCommand } from "@oh-my-pi/pi-tui";
-import { $env } from "@oh-my-pi/pi-utils";
+import { $env, logger } from "@oh-my-pi/pi-utils";
 import { settings } from "../../config/settings";
 import { createPromptActionAutocompleteProvider } from "../../modes/prompt-action-autocomplete";
 import { theme } from "../../modes/theme/theme";
@@ -125,7 +125,10 @@ export class InputController {
 		);
 		this.ctx.editor.onCopyPrompt = () => this.handleCopyPrompt();
 		this.ctx.editor.setActionKeys("app.tools.expand", this.ctx.keybindings.getKeys("app.tools.expand"));
-		this.ctx.editor.onExpandTools = () => this.toggleToolOutputExpansion();
+		this.ctx.editor.onExpandTools = () => {
+			this.toggleToolOutputExpansion();
+			logger.debug("[CL_MARKER] TOOL_OUTPUT_EXPANSION_TOGGLED");
+		};
 		this.ctx.editor.setActionKeys("app.message.dequeue", this.ctx.keybindings.getKeys("app.message.dequeue"));
 		this.ctx.editor.onDequeue = () => this.handleDequeue();
 
@@ -657,12 +660,33 @@ export class InputController {
 
 	setToolsExpanded(expanded: boolean): void {
 		this.ctx.toolOutputExpanded = expanded;
+
+		// Guard against invalid chat container state
+		if (!this.ctx.chatContainer || !Array.isArray(this.ctx.chatContainer.children)) {
+			logger.warn("Chat container not initialized or invalid");
+			return;
+		}
+
+		// Apply expansion state to all expandable children with error handling
 		for (const child of this.ctx.chatContainer.children) {
 			if (isExpandable(child)) {
-				child.setExpanded(expanded);
+				try {
+					child.setExpanded(expanded);
+				} catch (error) {
+					logger.error("Failed to set expansion state on component", {
+						expanded,
+						componentType: child.constructor.name,
+						error: String(error),
+					});
+				}
 			}
 		}
+
 		this.ctx.ui.requestRender();
+		logger.debug("Tool output expansion toggled", {
+			expanded,
+			componentCount: this.ctx.chatContainer.children.length,
+		});
 	}
 
 	toggleThinkingBlockVisibility(): void {
