@@ -257,8 +257,9 @@ For `SYSTEM.md` and `AGENTS.md`, native provider uses nearest-ancestor project `
 
 ## Hooks subsystem
 
-- `discoverAndLoadHooks()` resolves hook paths from hook capability + explicit configured paths.
-- Then loads modules via Bun import.
+- Hook paths are resolved via the hook capability (from discovery providers) plus explicit `--hook` CLI paths.
+- All hook loading now goes through the extension system (`loadExtensions()` in `extensibility/extensions/loader.ts`).
+- `--hook` is a compatibility alias for `--extension`; both merge into `additionalExtensionPaths`.
 
 ## Tools subsystem
 

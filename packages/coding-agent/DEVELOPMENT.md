@@ -579,28 +579,6 @@ Module loading:
 - Runs factory with `ConcreteExtensionAPI`, collecting handlers/tools/commands/flags/shortcuts/renderers.
 - Returns `{ extensions, errors, runtime }` from `loadExtensions`.
 
-### Hook loading (`src/extensibility/hooks/loader.ts`)
-
-Key entrypoint: `discoverAndLoadHooks(configuredPaths, cwd)`.
-
-Flow:
-
-1. Discover hook candidates via capability API:
-   `loadCapability<Hook>(hookCapability.id, { cwd })`.
-2. Add explicit configured paths (resolved through `resolveHookPath`).
-3. De-duplicate by absolute resolved path (`path.resolve(...)`).
-4. Load each hook with `loadHooks` / `loadHook`.
-
-`loadHook` specifics:
-
-- Uses dynamic `import(resolvedPath)`.
-- Requires a **default export function** (`HookFactory`); otherwise returns error.
-- Builds API via `createHookAPI(...)`, then calls `factory(api)` to register:
-  - event handlers (`api.on`),
-  - message renderers (`registerMessageRenderer`),
-  - commands (`registerCommand`).
-- Exposes deferred runtime wiring via `setSendMessageHandler` / `setAppendEntryHandler` on `LoadedHook`.
-
 ### Skills loading points (`src/extensibility/skills.ts`)
 
 Primary entrypoint: `loadSkills(options)`.

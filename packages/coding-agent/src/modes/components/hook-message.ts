@@ -1,9 +1,9 @@
 import type { TextContent } from "@oh-my-pi/pi-ai";
 import type { Component } from "@oh-my-pi/pi-tui";
 import { Box, Container, Markdown, Spacer, Text } from "@oh-my-pi/pi-tui";
-import type { HookMessageRenderer } from "../../extensibility/hooks/types";
+import type { MessageRenderer } from "../../extensibility/extensions/types";
 import { getMarkdownTheme, theme } from "../../modes/theme/theme";
-import type { HookMessage } from "../../session/messages";
+import type { CustomMessage } from "../../session/messages";
 
 /**
  * Component that renders a custom message entry from hooks.
@@ -15,8 +15,8 @@ export class HookMessageComponent extends Container {
 	#expanded = false;
 
 	constructor(
-		private readonly message: HookMessage<unknown>,
-		private readonly customRenderer?: HookMessageRenderer,
+		private readonly message: CustomMessage<unknown>,
+		private readonly customRenderer?: MessageRenderer<unknown>,
 	) {
 		super();
 

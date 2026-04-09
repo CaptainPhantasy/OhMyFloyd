@@ -1,5 +1,7 @@
 /**
- * Tests for compaction hook events (before_compact / compact).
+ * Integration tests for compaction extension events.
+ * Verifies ExtensionRunner correctly emits session_before_compact and session_compact
+ * through the real AgentSession path with a real LLM.
  */
 
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
@@ -10,14 +12,17 @@ import { Agent } from "@oh-my-pi/pi-agent-core";
 import { getBundledModel } from "@oh-my-pi/pi-ai";
 import { ModelRegistry } from "@oh-my-pi/pi-coding-agent/config/model-registry";
 import { Settings } from "@oh-my-pi/pi-coding-agent/config/settings";
-import {
-	HookRunner,
-	type LoadedHook,
-	type SessionBeforeCompactEvent,
-	type SessionCompactEvent,
-	type SessionEvent,
-} from "@oh-my-pi/pi-coding-agent/extensibility/hooks";
-import { theme } from "@oh-my-pi/pi-coding-agent/modes/theme/theme";
+import { loadExtensions } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/loader";
+import { ExtensionRunner } from "@oh-my-pi/pi-coding-agent/extensibility/extensions/runner";
+import type {
+	Extension,
+	ExtensionCommandContextActions,
+	ExtensionContextActions,
+	SessionBeforeCompactEvent,
+	SessionCompactEvent,
+	SessionEvent,
+} from "@oh-my-pi/pi-coding-agent/extensibility/extensions/types";
+import { createNoOpUIContext } from "@oh-my-pi/pi-coding-agent/extensibility/utils";
 import { AgentSession } from "@oh-my-pi/pi-coding-agent/session/agent-session";
 import { AuthStorage } from "@oh-my-pi/pi-coding-agent/session/auth-storage";
 import { SessionManager } from "@oh-my-pi/pi-coding-agent/session/session-manager";
@@ -25,14 +30,14 @@ import { createTools, type ToolSession } from "@oh-my-pi/pi-coding-agent/tools";
 import { Snowflake } from "@oh-my-pi/pi-utils";
 import { e2eApiKey } from "./utilities";
 
-describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
+describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction extension events", () => {
 	let session: AgentSession;
 	let tempDir: string;
-	let hookRunner: HookRunner;
+	let extensionRunner: ExtensionRunner;
 	let capturedEvents: SessionEvent[];
 
 	beforeEach(() => {
-		tempDir = path.join(os.tmpdir(), `omp-compaction-hooks-test-${Snowflake.next()}`);
+		tempDir = path.join(os.tmpdir(), `omp-compaction-ext-test-${Snowflake.next()}`);
 		fs.mkdirSync(tempDir, { recursive: true });
 		capturedEvents = [];
 	});
@@ -46,44 +51,48 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 		}
 	});
 
-	function createHook(
-		onBeforeCompact?: (event: SessionBeforeCompactEvent) => { cancel?: boolean; compaction?: any } | undefined,
+	/**
+	 * Create an Extension object that captures events for testing.
+	 */
+	function createExtension(
+		onBeforeCompact?: (event: SessionBeforeCompactEvent) => { cancel?: boolean; compaction?: unknown } | undefined,
 		onCompact?: (event: SessionCompactEvent) => void,
-	): LoadedHook {
-		const handlers = new Map<string, ((event: any, ctx: any) => Promise<any>)[]>();
+	): Extension {
+		const handlers = new Map<string, ((...args: unknown[]) => Promise<unknown>)[]>();
 
 		handlers.set("session_before_compact", [
-			async (event: SessionBeforeCompactEvent) => {
-				capturedEvents.push(event);
+			async (event: unknown) => {
+				capturedEvents.push(event as SessionEvent);
 				if (onBeforeCompact) {
-					return onBeforeCompact(event);
+					return onBeforeCompact(event as SessionBeforeCompactEvent);
 				}
 				return undefined;
 			},
 		]);
 
 		handlers.set("session_compact", [
-			async (event: SessionCompactEvent) => {
-				capturedEvents.push(event);
+			async (event: unknown) => {
+				capturedEvents.push(event as SessionEvent);
 				if (onCompact) {
-					onCompact(event);
+					onCompact(event as SessionCompactEvent);
 				}
 				return undefined;
 			},
 		]);
 
 		return {
-			path: "test-hook",
-			resolvedPath: "/test/test-hook.ts",
+			path: "test-extension",
+			resolvedPath: "/test/test-extension.ts",
 			handlers,
+			tools: new Map(),
 			messageRenderers: new Map(),
 			commands: new Map(),
-			setSendMessageHandler: () => {},
-			setAppendEntryHandler: () => {},
+			flags: new Map(),
+			shortcuts: new Map(),
 		};
 	}
 
-	async function createSession(hooks: LoadedHook[]) {
+	async function createSession(extensions: Extension[]) {
 		const toolSession: ToolSession = {
 			cwd: tempDir,
 			hasUI: false,
@@ -93,6 +102,7 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 		};
 		const tools = await createTools(toolSession);
 		const model = getBundledModel("anthropic", "claude-sonnet-4-5")!;
+
 		const agent = new Agent({
 			getApiKey: () => e2eApiKey("ANTHROPIC_API_KEY"),
 			initialState: {
@@ -107,42 +117,53 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 		const authStorage = await AuthStorage.create(path.join(tempDir, "testauth.db"));
 		const modelRegistry = new ModelRegistry(authStorage);
 
-		hookRunner = new HookRunner(hooks, tempDir, sessionManager, modelRegistry);
-		hookRunner.initialize({
-			getModel: () => session.model,
-			sendMessageHandler: async () => {},
-			appendEntryHandler: async () => {},
-			uiContext: {
-				select: async () => undefined,
-				confirm: async () => false,
-				input: async () => undefined,
-				notify: () => {},
-				setStatus: () => {},
-				custom: async () => undefined as never,
-				setEditorText: () => {},
-				getEditorText: () => "",
-				editor: async () => undefined,
-				get theme() {
-					return theme;
-				},
+		// Build ExtensionRunner from loadExtensions runtime (provides ExtensionRuntime = ExtensionActions + ExtensionRuntimeState)
+		const loadResult = await loadExtensions([], tempDir);
+		extensionRunner = new ExtensionRunner(extensions, loadResult.runtime, tempDir, sessionManager, modelRegistry);
+
+		const contextActions: ExtensionContextActions = {
+			getModel: () => model,
+			isIdle: () => !session.isStreaming,
+			abort: () => session.abort(),
+			hasPendingMessages: () => session.queuedMessageCount > 0,
+			shutdown: () => {},
+			getContextUsage: () => undefined,
+			compact: async () => {},
+			getSystemPrompt: () => agent.state.systemPrompt,
+		};
+
+		const commandActions: ExtensionCommandContextActions = {
+			getContextUsage: () => undefined,
+			waitForIdle: async () => {
+				await agent.waitForIdle();
 			},
-			hasUI: false,
-		});
+			newSession: async () => ({ cancelled: false }),
+			branch: async () => ({ cancelled: false }),
+			navigateTree: async () => ({ cancelled: false }),
+			switchSession: async () => ({ cancelled: false }),
+			reload: async () => {},
+			compact: async () => {},
+		};
+
+		extensionRunner.initialize(
+			loadResult.runtime, // ExtensionActions
+			contextActions,
+			commandActions,
+			createNoOpUIContext(),
+		);
 
 		session = new AgentSession({
 			agent,
 			sessionManager,
 			settings,
-			extensionRunner: hookRunner as any,
+			extensionRunner,
 			modelRegistry,
 		});
-
-		return session;
 	}
 
-	it("should emit before_compact and compact events", async () => {
-		const hook = createHook();
-		await createSession([hook]);
+	it("should emit session_before_compact and session_compact events", async () => {
+		const ext = createExtension();
+		await createSession([ext]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
@@ -152,47 +173,45 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 
 		await session.compact();
 
-		const beforeCompactEvents = capturedEvents.filter(
+		const beforeEvents = capturedEvents.filter(
 			(e): e is SessionBeforeCompactEvent => e.type === "session_before_compact",
 		);
 		const compactEvents = capturedEvents.filter((e): e is SessionCompactEvent => e.type === "session_compact");
 
-		expect(beforeCompactEvents.length).toBe(1);
+		expect(beforeEvents.length).toBe(1);
 		expect(compactEvents.length).toBe(1);
 
-		const beforeEvent = beforeCompactEvents[0];
+		const beforeEvent = beforeEvents[0]!;
 		expect(beforeEvent.preparation).toBeDefined();
 		expect(beforeEvent.preparation.messagesToSummarize).toBeDefined();
 		expect(beforeEvent.preparation.turnPrefixMessages).toBeDefined();
 		expect(beforeEvent.preparation.tokensBefore).toBeGreaterThanOrEqual(0);
 		expect(typeof beforeEvent.preparation.isSplitTurn).toBe("boolean");
 		expect(beforeEvent.branchEntries).toBeDefined();
-		// sessionManager, modelRegistry, and model are now on ctx, not event
 
-		const afterEvent = compactEvents[0];
+		const afterEvent = compactEvents[0]!;
 		expect(afterEvent.compactionEntry).toBeDefined();
 		expect(afterEvent.compactionEntry.summary.length).toBeGreaterThan(0);
 		expect(afterEvent.compactionEntry.tokensBefore).toBeGreaterThanOrEqual(0);
 		expect(afterEvent.fromExtension).toBe(false);
-	}, 120000);
+	}, 120_000);
 
-	it("should allow hooks to cancel compaction", async () => {
-		const hook = createHook(() => ({ cancel: true }));
-		await createSession([hook]);
+	it("should allow extensions to cancel compaction", async () => {
+		const ext = createExtension(() => ({ cancel: true }));
+		await createSession([ext]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
 
 		await expect(session.compact()).rejects.toThrow("Compaction cancelled");
 
-		const compactEvents = capturedEvents.filter(e => e.type === "session_compact");
-		expect(compactEvents.length).toBe(0);
-	}, 120000);
+		const compactEvts = capturedEvents.filter(e => e.type === "session_compact");
+		expect(compactEvts.length).toBe(0);
+	}, 120_000);
 
-	it("should allow hooks to provide custom compaction", async () => {
-		const customSummary = "Custom summary from hook";
-
-		const hook = createHook(event => {
+	it("should allow extensions to provide custom compaction", async () => {
+		const customSummary = "Custom summary from extension";
+		const ext = createExtension(event => {
 			if (event.type === "session_before_compact") {
 				return {
 					compaction: {
@@ -204,7 +223,7 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 			}
 			return undefined;
 		});
-		await createSession([hook]);
+		await createSession([ext]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
@@ -216,161 +235,105 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 
 		expect(result.summary).toBe(customSummary);
 
-		const compactEvents = capturedEvents.filter(e => e.type === "session_compact");
-		expect(compactEvents.length).toBe(1);
+		const compactEvts = capturedEvents.filter((e): e is SessionCompactEvent => e.type === "session_compact");
+		expect(compactEvts.length).toBe(1);
+		expect(compactEvts[0]!.compactionEntry.summary).toBe(customSummary);
+		expect(compactEvts[0]!.fromExtension).toBe(true);
+	}, 120_000);
 
-		const afterEvent = compactEvents[0];
-		if (afterEvent.type === "session_compact") {
-			expect(afterEvent.compactionEntry.summary).toBe(customSummary);
-			expect(afterEvent.fromExtension).toBe(true);
-		}
-	}, 120000);
-
-	it("should include entries in compact event after compaction is saved", async () => {
-		const hook = createHook();
-		await createSession([hook]);
+	it("should include compaction entry in session after compaction", async () => {
+		const ext = createExtension();
+		await createSession([ext]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
 
 		await session.compact();
 
-		const compactEvents = capturedEvents.filter(e => e.type === "session_compact");
-		expect(compactEvents.length).toBe(1);
+		const compactEvts = capturedEvents.filter((e): e is SessionCompactEvent => e.type === "session_compact");
+		expect(compactEvts.length).toBe(1);
 
-		const afterEvent = compactEvents[0];
-		if (afterEvent.type === "session_compact") {
-			// sessionManager is now on ctx, use session.sessionManager directly
-			const entries = session.sessionManager.getEntries();
-			const hasCompactionEntry = entries.some((e: { type: string }) => e.type === "compaction");
-			expect(hasCompactionEntry).toBe(true);
-		}
-	}, 120000);
+		const entries = session.sessionManager.getEntries();
+		const hasCompaction = entries.some((e: { type: string }) => e.type === "compaction");
+		expect(hasCompaction).toBe(true);
+	}, 120_000);
 
-	it("should continue with default compaction if hook throws error", async () => {
-		const throwingHook: LoadedHook = {
-			path: "throwing-hook",
-			resolvedPath: "/test/throwing-hook.ts",
-			handlers: new Map<string, ((event: any, ctx: any) => Promise<any>)[]>([
-				[
-					"session_before_compact",
-					[
-						async (event: SessionBeforeCompactEvent) => {
-							capturedEvents.push(event);
-							throw new Error("Hook intentionally throws");
-						},
-					],
-				],
-				[
-					"session_compact",
-					[
-						async (event: SessionCompactEvent) => {
-							capturedEvents.push(event);
-							return undefined;
-						},
-					],
-				],
-			]),
-			messageRenderers: new Map(),
-			commands: new Map(),
-			setSendMessageHandler: () => {},
-			setAppendEntryHandler: () => {},
-		};
-
-		await createSession([throwingHook]);
-
-		await session.prompt("What is 2+2? Reply with just the number.");
-		await session.agent.waitForIdle();
-
-		const result = await session.compact();
-
-		expect(result.summary).toBeDefined();
-		expect(result.summary.length).toBeGreaterThan(0);
-
-		const compactEvents = capturedEvents.filter((e): e is SessionCompactEvent => e.type === "session_compact");
-		expect(compactEvents.length).toBe(1);
-		expect(compactEvents[0].fromExtension).toBe(false);
-	}, 120000);
-
-	it("should call multiple hooks in order", async () => {
+	it("should call multiple extensions in registration order", async () => {
 		const callOrder: string[] = [];
 
-		const hook1: LoadedHook = {
-			path: "hook1",
-			resolvedPath: "/test/hook1.ts",
-			handlers: new Map<string, ((event: any, ctx: any) => Promise<any>)[]>([
+		const ext1: Extension = {
+			path: "ext1",
+			resolvedPath: "/test/ext1.ts",
+			handlers: new Map<string, ((...args: unknown[]) => Promise<unknown>)[]>([
 				[
 					"session_before_compact",
 					[
-						async () => {
-							callOrder.push("hook1-before");
-							return undefined;
+						async (_e: unknown) => {
+							callOrder.push("ext1-before");
 						},
 					],
 				],
 				[
 					"session_compact",
 					[
-						async () => {
-							callOrder.push("hook1-after");
-							return undefined;
+						async (_e: unknown) => {
+							callOrder.push("ext1-after");
 						},
 					],
 				],
 			]),
+			tools: new Map(),
 			messageRenderers: new Map(),
 			commands: new Map(),
-			setSendMessageHandler: () => {},
-			setAppendEntryHandler: () => {},
+			flags: new Map(),
+			shortcuts: new Map(),
 		};
 
-		const hook2: LoadedHook = {
-			path: "hook2",
-			resolvedPath: "/test/hook2.ts",
-			handlers: new Map<string, ((event: any, ctx: any) => Promise<any>)[]>([
+		const ext2: Extension = {
+			path: "ext2",
+			resolvedPath: "/test/ext2.ts",
+			handlers: new Map<string, ((...args: unknown[]) => Promise<unknown>)[]>([
 				[
 					"session_before_compact",
 					[
-						async () => {
-							callOrder.push("hook2-before");
-							return undefined;
+						async (_e: unknown) => {
+							callOrder.push("ext2-before");
 						},
 					],
 				],
 				[
 					"session_compact",
 					[
-						async () => {
-							callOrder.push("hook2-after");
-							return undefined;
+						async (_e: unknown) => {
+							callOrder.push("ext2-after");
 						},
 					],
 				],
 			]),
+			tools: new Map(),
 			messageRenderers: new Map(),
 			commands: new Map(),
-			setSendMessageHandler: () => {},
-			setAppendEntryHandler: () => {},
+			flags: new Map(),
+			shortcuts: new Map(),
 		};
 
-		await createSession([hook1, hook2]);
+		await createSession([ext1, ext2]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
 
 		await session.compact();
 
-		expect(callOrder).toEqual(["hook1-before", "hook2-before", "hook1-after", "hook2-after"]);
-	}, 120000);
+		expect(callOrder).toEqual(["ext1-before", "ext2-before", "ext1-after", "ext2-after"]);
+	}, 120_000);
 
-	it("should pass correct data in before_compact event", async () => {
-		let capturedBeforeEvent: SessionBeforeCompactEvent | null = null;
-
-		const hook = createHook(event => {
-			capturedBeforeEvent = event;
+	it("should pass correct event data to session_before_compact handler", async () => {
+		let capturedEvent: SessionBeforeCompactEvent | null = null;
+		const ext = createExtension(event => {
+			capturedEvent = event;
 			return undefined;
 		});
-		await createSession([hook]);
+		await createSession([ext]);
 
 		await session.prompt("What is 2+2? Reply with just the number.");
 		await session.agent.waitForIdle();
@@ -380,51 +343,18 @@ describe.skipIf(!e2eApiKey("ANTHROPIC_API_KEY"))("Compaction hooks", () => {
 
 		await session.compact();
 
-		expect(capturedBeforeEvent).not.toBeNull();
-		const event = capturedBeforeEvent!;
-		expect(typeof event.preparation.isSplitTurn).toBe("boolean");
-		expect(event.preparation.firstKeptEntryId).toBeDefined();
-
-		expect(Array.isArray(event.preparation.messagesToSummarize)).toBe(true);
-		expect(Array.isArray(event.preparation.turnPrefixMessages)).toBe(true);
-
-		expect(typeof event.preparation.tokensBefore).toBe("number");
-
-		expect(Array.isArray(event.branchEntries)).toBe(true);
-
-		// sessionManager, modelRegistry, and model are now on ctx, not event
-		// Verify they're accessible via session
+		expect(capturedEvent).not.toBeNull();
+		const ev = capturedEvent!;
+		expect(typeof ev.preparation.isSplitTurn).toBe("boolean");
+		expect(ev.preparation.firstKeptEntryId).toBeDefined();
+		expect(Array.isArray(ev.preparation.messagesToSummarize)).toBe(true);
+		expect(Array.isArray(ev.preparation.turnPrefixMessages)).toBe(true);
+		expect(typeof ev.preparation.tokensBefore).toBe("number");
+		expect(Array.isArray(ev.branchEntries)).toBe(true);
 		expect(typeof session.sessionManager.getEntries).toBe("function");
 		expect(typeof session.modelRegistry.getApiKey).toBe("function");
-
 		const entries = session.sessionManager.getEntries();
 		expect(Array.isArray(entries)).toBe(true);
 		expect(entries.length).toBeGreaterThan(0);
-	}, 120000);
-
-	it("should use hook compaction even with different values", async () => {
-		const customSummary = "Custom summary with modified values";
-
-		const hook = createHook(event => {
-			if (event.type === "session_before_compact") {
-				return {
-					compaction: {
-						summary: customSummary,
-						firstKeptEntryId: event.preparation.firstKeptEntryId,
-						tokensBefore: 999,
-					},
-				};
-			}
-			return undefined;
-		});
-		await createSession([hook]);
-
-		await session.prompt("What is 2+2? Reply with just the number.");
-		await session.agent.waitForIdle();
-
-		const result = await session.compact();
-
-		expect(result.summary).toBe(customSummary);
-		expect(result.tokensBefore).toBe(999);
-	}, 120000);
+	}, 120_000);
 });

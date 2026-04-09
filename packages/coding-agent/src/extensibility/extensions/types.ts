@@ -351,23 +351,6 @@ export interface ToolDefinition<TParams extends TSchema = TSchema, TDetails = un
 }
 
 // ============================================================================
-// Resource Events
-// ============================================================================
-
-/** Fired after session_start to allow extensions to provide additional resource paths. */
-export interface ResourcesDiscoverEvent {
-	type: "resources_discover";
-	cwd: string;
-	reason: "startup" | "reload";
-}
-
-/** Result from resources_discover event handler */
-export interface ResourcesDiscoverResult {
-	skillPaths?: string[];
-	promptPaths?: string[];
-	themePaths?: string[];
-}
-
 // ============================================================================
 // Session Events
 // ============================================================================
@@ -803,7 +786,6 @@ export function isToolCallEventType(toolName: string, event: ToolCallEvent): boo
 
 /** Union of all event types */
 export type ExtensionEvent =
-	| ResourcesDiscoverEvent
 	| SessionEvent
 	| ContextEvent
 	| BeforeProviderRequestEvent
@@ -961,7 +943,6 @@ export interface ExtensionAPI {
 	// Event Subscription
 	// =========================================================================
 
-	on(event: "resources_discover", handler: ExtensionHandler<ResourcesDiscoverEvent, ResourcesDiscoverResult>): void;
 	on(event: "session_start", handler: ExtensionHandler<SessionStartEvent>): void;
 	on(
 		event: "session_before_switch",

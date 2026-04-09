@@ -212,11 +212,6 @@ Cancelable pre-events:
 - `user_bash` (override with `{ result }`)
 - `user_python` (override with `{ result }`)
 
-### `resources_discover`
-
-`resources_discover` exists in extension types and `ExtensionRunner`.
-Current runtime note: `ExtensionRunner.emitResourcesDiscover(...)` is implemented, but there are no `AgentSession` callsites invoking it in the current codebase.
-
 ## Tool authoring details
 
 `registerTool` uses `ToolDefinition` from `types.ts`.
