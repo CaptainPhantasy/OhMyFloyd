@@ -1,5 +1,5 @@
+import * as os from "node:os";
 import { type Component, padding, truncateToWidth, visibleWidth } from "@oh-my-pi/pi-tui";
-import { APP_NAME } from "@oh-my-pi/pi-utils";
 import { theme } from "../../modes/theme/theme";
 
 export interface RecentSession {
@@ -13,10 +13,28 @@ export interface LspServerInfo {
 	fileTypes: string[];
 }
 
+interface StorageEntry {
+	label: string;
+	name: string;
+	usedPct: number;
+}
+
+interface SystemTelemetry {
+	cpuPct: number;
+	ramPct: number;
+	storage: StorageEntry[];
+	localIp: string;
+	cwd: string;
+	bunVersion: string;
+}
+
 /**
- * Premium welcome screen with block-based OMP logo and two-column layout.
+ * Mission Control welcome dashboard for OhMyFloyd.
+ * Two-column layout: Floyd branding (left) + system telemetry (right).
  */
 export class WelcomeComponent implements Component {
+	#telemetry: SystemTelemetry | null = null;
+
 	constructor(
 		private readonly version: string,
 		private modelName: string,
@@ -25,7 +43,9 @@ export class WelcomeComponent implements Component {
 		private lspServers: LspServerInfo[] = [],
 	) {}
 
-	invalidate(): void {}
+	invalidate(): void {
+		this.#telemetry = null;
+	}
 
 	setModel(modelName: string, providerName: string): void {
 		this.modelName = modelName;
@@ -41,23 +61,24 @@ export class WelcomeComponent implements Component {
 	}
 
 	render(termWidth: number): string[] {
-		// Box dimensions - responsive with max width and small-terminal support
-		const maxWidth = 100;
+		const telemetry = this.#gatherTelemetry();
+
+		// Box dimensions - responsive with max width for mission control layout
+		const maxWidth = 110;
 		const boxWidth = Math.min(maxWidth, Math.max(0, termWidth - 2));
-		if (boxWidth < 4) {
-			return [];
-		}
+		if (boxWidth < 4) return [];
+
 		const dualContentWidth = boxWidth - 3; // 3 = │ + │ + │
-		const preferredLeftCol = 26;
-		const minLeftCol = 14; // logo width
-		const minRightCol = 20;
+		const preferredLeftCol = 30;
+		const minLeftCol = 28; // Floyd ASCII art width
+		const minRightCol = 30;
 		const leftMinContentWidth = Math.max(
 			minLeftCol,
-			visibleWidth("Welcome back!"),
+			visibleWidth("Legacy AI  &  Floyd's Labs"),
 			visibleWidth(this.modelName),
 			visibleWidth(this.providerName),
 		);
-		const desiredLeftCol = Math.min(preferredLeftCol, Math.max(minLeftCol, Math.floor(dualContentWidth * 0.35)));
+		const desiredLeftCol = Math.min(preferredLeftCol, Math.max(minLeftCol, Math.floor(dualContentWidth * 0.3)));
 		const dualLeftCol =
 			dualContentWidth >= minRightCol + 1
 				? Math.min(desiredLeftCol, dualContentWidth - minRightCol)
@@ -67,75 +88,99 @@ export class WelcomeComponent implements Component {
 		const leftCol = showRightColumn ? dualLeftCol : boxWidth - 2;
 		const rightCol = showRightColumn ? dualRightCol : 0;
 
-		// Block-based OMP logo (gradient: magenta → cyan)
+		// Floyd ASCII logo (neon blue shadows, hot pink letters, dark purple bg)
 		// biome-ignore format: preserve ASCII art layout
-		const piLogo = ["▀████████████▀", " ╘███    ███  ", "  ███    ███  ", "  ███    ███  ", " ▄███▄  ▄███▄ "];
+		const floydLogo = [
+			"░█▀▀░█░░░█▀█░█░█░█▀▄░░░░░░",
+			"░█▀▀░█░░░█░█░░█░░█░█░░░░░░",
+			"░▀░░░▀▀▀░▀▀▀░░▀░░▀▀░░░░░░░",
+			"░█▀▀░█▀█░█▀▄░█▀▀░░░░░░░░░░",
+			"░█░░░█░█░█░█░█▀▀░░░░░░░░░░",
+			"░▀▀▀░▀▀▀░▀▀░░▀▀▀░░░░░░░░░░",
+		];
+		const logoColored = floydLogo.map((line, idx) => this.#colorLogoLine(line, idx, floydLogo.length));
 
-		// Apply gradient to logo
-		const logoColored = piLogo.map(line => this.#gradientLine(line));
-
-		// Left column - centered content
+		// Left column - branding
 		const leftLines = [
 			"",
-			this.#centerText(theme.bold("Welcome back!"), leftCol),
+			this.#centerText(theme.bold("Legacy AI  &"), leftCol),
+			this.#centerText(theme.bold("Floyd's Labs"), leftCol),
 			"",
 			...logoColored.map(l => this.#centerText(l, leftCol)),
 			"",
 			this.#centerText(theme.fg("muted", this.modelName), leftCol),
 			this.#centerText(theme.fg("borderMuted", this.providerName), leftCol),
+			"",
 		];
 
 		// Right column separator
-		const separatorWidth = Math.max(0, rightCol - 2); // padding on each side
+		const separatorWidth = Math.max(0, rightCol - 2);
 		const separator = ` ${theme.fg("dim", theme.boxRound.horizontal.repeat(separatorWidth))}`;
 
-		// Recent sessions content
+		// --- Right column: Mission Control telemetry ---
+		const cpuBar = this.#usageBar(telemetry.cpuPct);
+		const ramBar = this.#usageBar(telemetry.ramPct);
+		const cpuLabel = `CPU ${cpuBar} ${String(telemetry.cpuPct).padStart(3)}%`;
+		const ramLabel = `RAM ${ramBar} ${String(telemetry.ramPct).padStart(3)}%`;
+
+		// Storage entries
+		const storageLines: string[] = [];
+		for (const entry of telemetry.storage.slice(0, 4)) {
+			const bar = this.#usageBar(entry.usedPct);
+			const pctStr = `${String(entry.usedPct).padStart(3)}%`;
+			storageLines.push(
+				` ${theme.fg("muted", entry.label)} ${bar} ${theme.fg("dim", pctStr)} ${theme.fg("dim", entry.name)}`,
+			);
+		}
+		if (storageLines.length === 0) {
+			storageLines.push(` ${theme.fg("dim", "No drives detected")}`);
+		}
+		while (storageLines.length < 4) {
+			storageLines.push("");
+		}
+
+		// Dev telemetry
+		const cwdShort = this.#shortenPath(telemetry.cwd, 22);
+		const netLabel = telemetry.localIp;
+
+		// LSP summary
+		const lspReady = this.lspServers.filter(s => s.status === "ready").length;
+		const lspTotal = this.lspServers.length;
+		const lspStatus = lspTotal > 0 ? `${lspReady}/${lspTotal} ready` : "None";
+		const lspDot =
+			lspTotal > 0
+				? lspReady === lspTotal
+					? "\x1b[38;5;46m\u25CF\x1b[0m"
+					: "\x1b[38;5;208m\u25CF\x1b[0m"
+				: "\x1b[38;5;240m\u25CF\x1b[0m";
+
+		// Recent sessions
 		const sessionLines: string[] = [];
 		if (this.recentSessions.length === 0) {
 			sessionLines.push(` ${theme.fg("dim", "No recent sessions")}`);
 		} else {
-			for (const session of this.recentSessions.slice(0, 3)) {
+			for (const session of this.recentSessions.slice(0, 2)) {
 				sessionLines.push(
-					` ${theme.fg("dim", `${theme.md.bullet} `)}${theme.fg("muted", session.name)}${theme.fg("dim", ` (${session.timeAgo})`)}`,
+					` ${theme.fg("dim", "\u2022")} ${theme.fg("muted", session.name)} ${theme.fg("dim", `(${session.timeAgo})`)}`,
 				);
 			}
 		}
 
-		// LSP servers content
-		const lspLines: string[] = [];
-		if (this.lspServers.length === 0) {
-			lspLines.push(` ${theme.fg("dim", "No LSP servers")}`);
-		} else {
-			for (const server of this.lspServers) {
-				const icon =
-					server.status === "ready"
-						? theme.styledSymbol("status.success", "success")
-						: server.status === "connecting"
-							? theme.styledSymbol("status.pending", "muted")
-							: theme.styledSymbol("status.error", "error");
-				const exts = server.fileTypes.slice(0, 3).join(" ");
-				lspLines.push(` ${icon} ${theme.fg("muted", server.name)} ${theme.fg("dim", exts)}`);
-			}
-		}
-
-		// Right column
 		const rightLines = [
-			` ${theme.bold(theme.fg("accent", "Tips"))}`,
-			` ${theme.fg("dim", "?")}${theme.fg("muted", " for keyboard shortcuts")}`,
-			` ${theme.fg("dim", "#")}${theme.fg("muted", " for prompt actions")}`,
-			` ${theme.fg("dim", "/")}${theme.fg("muted", " for commands")}`,
-			` ${theme.fg("dim", "!")}${theme.fg("muted", " to run bash")}`,
-			` ${theme.fg("dim", "$")}${theme.fg("muted", " to run python")}`,
+			` ${theme.bold(theme.fg("accent", "SYSTEM STATUS"))}`,
+			` ${theme.fg("muted", cpuLabel)}  ${theme.fg("dim", "|")}  ${theme.fg("muted", ramLabel)}`,
 			separator,
-			` ${theme.bold(theme.fg("accent", "LSP Servers"))}`,
-			...lspLines,
+			` ${theme.bold(theme.fg("accent", "STORAGE ARRAY"))}`,
+			...storageLines,
 			separator,
-			` ${theme.bold(theme.fg("accent", "Recent sessions"))}`,
+			` ${theme.fg("dim", "DIR:")} ${theme.fg("muted", cwdShort)}  ${theme.fg("dim", "|")}  ${theme.fg("dim", "NET:")} ${theme.fg("muted", netLabel)}`,
+			` ${theme.fg("dim", "LSP:")} ${lspDot} ${theme.fg("muted", lspStatus)}  ${theme.fg("dim", "|")}  ${theme.fg("dim", "BUN:")} ${theme.fg("muted", telemetry.bunVersion)}`,
+			separator,
+			` ${theme.bold(theme.fg("accent", "Recent Sessions"))}`,
 			...sessionLines,
-			"",
 		];
 
-		// Border characters (dim)
+		// Border characters
 		const hChar = theme.boxRound.horizontal;
 		const h = theme.fg("dim", hChar);
 		const v = theme.fg("dim", theme.boxRound.vertical);
@@ -146,8 +191,8 @@ export class WelcomeComponent implements Component {
 
 		const lines: string[] = [];
 
-		// Top border with embedded title
-		const title = ` ${APP_NAME} v${this.version} `;
+		// Top border with OMF branding
+		const title = ` omf v${this.version} \u2500 LegacyAI.space / FloydsLabs.com \u2500 \u00A92026 `;
 		const titlePrefixRaw = hChar.repeat(3);
 		const titleStyled = theme.fg("dim", titlePrefixRaw) + theme.fg("muted", title);
 		const titleVisLen = visibleWidth(titlePrefixRaw) + visibleWidth(title);
@@ -170,6 +215,7 @@ export class WelcomeComponent implements Component {
 				lines.push(v + left + v);
 			}
 		}
+
 		// Bottom border
 		if (showRightColumn) {
 			lines.push(bl + h.repeat(leftCol) + theme.fg("dim", theme.boxSharp.teeUp) + h.repeat(rightCol) + br);
@@ -180,44 +226,159 @@ export class WelcomeComponent implements Component {
 		return lines;
 	}
 
+	// ── Telemetry gathering ─────────────────────────────────────────
+
+	#gatherTelemetry(): SystemTelemetry {
+		if (this.#telemetry) return this.#telemetry;
+
+		const loadAvg = os.loadavg()[0] ?? 0;
+		const cpuCount = os.cpus().length || 1;
+		const cpuPct = Math.min(100, Math.round((loadAvg / cpuCount) * 100));
+
+		const totalMem = os.totalmem();
+		const freeMem = os.freemem();
+		const ramPct = Math.round(((totalMem - freeMem) / totalMem) * 100);
+
+		const storage = this.#detectStorage();
+		const localIp = this.#getLocalIp();
+		const cwd = process.cwd();
+		const bunVersion = typeof Bun !== "undefined" ? Bun.version : process.version;
+
+		this.#telemetry = { cpuPct, ramPct, storage, localIp, cwd, bunVersion };
+		return this.#telemetry;
+	}
+
+	#detectStorage(): StorageEntry[] {
+		try {
+			const result = Bun.spawnSync(["df", "-h"], { stdout: "pipe", stderr: "pipe" });
+			const output = result.stdout.toString();
+			const dfLines = output.split("\n").slice(1);
+			const entries: StorageEntry[] = [];
+
+			for (const line of dfLines) {
+				if (!line.trim()) continue;
+				// macOS df -h: Filesystem Size Used Avail Capacity iused ifree %iused Mounted_on
+				const parts = line.trim().split(/\s+/);
+				if (parts.length < 9) continue;
+
+				const sizeStr = parts[1] ?? "";
+				const capStr = parts[4] ?? "";
+				const mountPoint = parts.slice(8).join(" ");
+
+				const capacity = parseInt(capStr, 10);
+				if (Number.isNaN(capacity)) continue;
+				const sizeGb = this.#parseSizeGb(sizeStr);
+
+				if (mountPoint === "/") {
+					const label = sizeGb >= 900 ? "INT 1TB " : sizeGb >= 400 ? "INT 500G" : `INT ${Math.round(sizeGb)}G `;
+					entries.push({ label, name: "System", usedPct: capacity });
+				} else if (
+					mountPoint.startsWith("/Volumes/") &&
+					!mountPoint.includes("com.apple") &&
+					!mountPoint.includes("CoreSimulator") &&
+					!mountPoint.includes("/Volumes/Update") &&
+					sizeGb >= 100
+				) {
+					const volName = mountPoint.replace("/Volumes/", "");
+					const sizeLabel =
+						sizeGb >= 900 ? "EXT 1TB " : sizeGb >= 400 ? "EXT 500G" : `EXT ${Math.round(sizeGb)}G `;
+					entries.push({ label: sizeLabel, name: volName, usedPct: capacity });
+				}
+			}
+
+			return entries;
+		} catch {
+			return [];
+		}
+	}
+
+	#parseSizeGb(s: string): number {
+		const m = s.match(/^([\d.]+)([KMGTP])i?$/i);
+		if (!m) return 0;
+		const v = parseFloat(m[1] ?? "0");
+		switch ((m[2] ?? "").toUpperCase()) {
+			case "T":
+				return v * 1024;
+			case "G":
+				return v;
+			case "M":
+				return v / 1024;
+			case "K":
+				return v / (1024 * 1024);
+			default:
+				return 0;
+		}
+	}
+
+	#getLocalIp(): string {
+		const interfaces = os.networkInterfaces();
+		for (const addrs of Object.values(interfaces)) {
+			for (const addr of addrs ?? []) {
+				if (addr.family === "IPv4" && !addr.internal) {
+					return addr.address;
+				}
+			}
+		}
+		return "127.0.0.1";
+	}
+
+	// ── Rendering helpers ───────────────────────────────────────────
+
+	#usageBar(pct: number, ticks = 10): string {
+		const filled = Math.round((pct / 100) * ticks);
+		const empty = ticks - filled;
+		const color = pct >= 90 ? "\x1b[38;5;196m" : pct >= 70 ? "\x1b[38;5;208m" : "\x1b[38;5;46m";
+		const dim = "\x1b[38;5;240m";
+		const reset = "\x1b[0m";
+		return `${dim}[${reset}${color}${"|".repeat(filled)}${reset}${dim}${".".repeat(empty)}]${reset}`;
+	}
+
+	#shortenPath(fullPath: string, maxLen: number): string {
+		if (fullPath.length <= maxLen) return fullPath;
+		const parts = fullPath.split("/").filter(Boolean);
+		if (parts.length <= 2) return fullPath;
+		return `.../${parts.slice(-2).join("/")}`;
+	}
+
 	/** Center text within a given width */
 	#centerText(text: string, width: number): string {
 		const visLen = visibleWidth(text);
-		if (visLen >= width) {
-			return truncateToWidth(text, width);
-		}
+		if (visLen >= width) return truncateToWidth(text, width);
 		const leftPad = Math.floor((width - visLen) / 2);
 		const rightPad = width - visLen - leftPad;
 		return padding(leftPad) + text + padding(rightPad);
 	}
 
-	/** Apply magenta→cyan gradient to a string */
-	#gradientLine(line: string): string {
-		const colors = [
-			"\x1b[38;5;199m", // bright magenta
-			"\x1b[38;5;171m", // magenta-purple
-			"\x1b[38;5;135m", // purple
-			"\x1b[38;5;99m", // purple-blue
-			"\x1b[38;5;75m", // cyan-blue
-			"\x1b[38;5;51m", // bright cyan
+	/** Apply neon styling to Floyd logo line */
+	#colorLogoLine(line: string, lineIndex: number, totalLines: number): string {
+		const neonBlue = "\x1b[38;5;45m";
+		const hotPink = "\x1b[38;5;199m";
+		const bgColors = [
+			"\x1b[48;5;54m", // dark purple (top)
+			"\x1b[48;5;53m",
+			"\x1b[48;5;55m",
+			"\x1b[48;5;234m", // very dark purple-gray
+			"\x1b[48;5;235m",
+			"\x1b[48;5;233m", // almost black (bottom)
 		];
 		const reset = "\x1b[0m";
 
-		let result = "";
-		let colorIdx = 0;
-		const step = Math.max(1, Math.floor(line.length / colors.length));
+		const bgIdx = Math.min(Math.floor((lineIndex / totalLines) * bgColors.length), bgColors.length - 1);
+		const bg = bgColors[bgIdx] ?? "";
 
-		for (let i = 0; i < line.length; i++) {
-			if (i > 0 && i % step === 0 && colorIdx < colors.length - 1) {
-				colorIdx++;
-			}
-			const char = line[i];
-			if (char !== " ") {
-				result += colors[colorIdx] + char + reset;
+		let result = bg;
+		for (const char of line) {
+			if (char === "\u2591") {
+				result += neonBlue + char + reset + bg;
+			} else if (char === "\u2588" || char === "\u2580" || char === "\u2584") {
+				result += hotPink + char + reset + bg;
+			} else if (char === " ") {
+				result += char;
 			} else {
 				result += char;
 			}
 		}
+		result += reset;
 		return result;
 	}
 
@@ -225,7 +386,7 @@ export class WelcomeComponent implements Component {
 	#fitToWidth(str: string, width: number): string {
 		const visLen = visibleWidth(str);
 		if (visLen > width) {
-			const ellipsis = "…";
+			const ellipsis = "\u2026";
 			const ellipsisWidth = visibleWidth(ellipsis);
 			const maxWidth = Math.max(0, width - ellipsisWidth);
 			let truncated = "";
