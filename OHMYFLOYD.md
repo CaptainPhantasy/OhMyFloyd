@@ -219,3 +219,44 @@ If the repository enters a state where the customization commits are lost, mixed
 3. The patches in `patches/rebased/` reconstruct the exact customization state.
 
 This is the disaster recovery path. The patches exist for this purpose. They are tested against fresh upstream clones as part of every rebase cycle.
+
+---
+
+## 11. Automated Workflow Triggers
+
+This section defines when to activate the **mega-skills**, **metacognitive workflows**, and **general rules** distilled from the project's skills.
+
+### 11.1 Mega-Skills Triggers
+| Workflow | Trigger | Scope |
+|----------|---------|-------|
+| **Change Impact Analyzer** | After every `edit`/`write` tool call | All packages |
+| **Error Resolution Engine** | After build/test errors (e.g., `bun check:ts` failure) | All packages |
+| **Dependency Health Check** | After adding/removing imports (e.g., `import { foo } from "bar"`) | All packages |
+| **Pre-Edit Intelligence** | Before refactoring 3+ files | `packages/coding-agent/`, `packages/agent/` |
+| **Schema Fortress** | Before editing schema files (e.g., `prisma/schema.prisma`) | `packages/stats/`, `packages/natives/` |
+| **Task Calibrator** | When a new implementation task is created | All packages |
+| **Completion Fortress** | Before marking a task as "completed" | All packages |
+| **Architectural Guardian** | Before editing files imported by 5+ modules | `packages/coding-agent/`, `packages/utils/` |
+| **Learning Engine** | After completing all tasks in a session | All packages |
+| **Predictive Analyzer** | After writing new functions | `packages/coding-agent/`, `packages/ai/` |
+
+### 11.2 Metacognitive Workflow Triggers
+| Workflow | Trigger | Scope |
+|----------|---------|-------|
+| **Crystallize Patterns** | After task completion | All packages |
+| **Store Task Context** | After task completion | All packages |
+| **Update Knowledge Graph** | After task completion | All packages |
+| **Prioritize Knowledge** | After task completion | All packages |
+| **Analyze Skill Effectiveness** | After every task | All packages |
+| **Gap Analysis for Skills** | After every task | All packages |
+| **20% Improvement Loop** | After skill effectiveness analysis | All packages |
+| **Fine-Tune Skill Parameters** | After skill effectiveness analysis | All packages |
+
+### 11.3 General Rules Triggers
+| Rule | Trigger | Scope |
+|------|---------|-------|
+| **DRY at 2** | After detecting duplicate code | All packages |
+| **No `any` Types** | During type checking (e.g., `bun check:ts`) | All packages |
+| **Prefer ES Native `#` for Privacy** | During code review | All packages |
+| **Ban `ReturnType<>`** | During type checking | All packages |
+| **Semantic Diff + Blast Radius** | After every edit | All packages |

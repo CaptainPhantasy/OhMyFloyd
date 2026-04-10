@@ -5,13 +5,15 @@ import type { Component } from "../tui";
 import { applyBackgroundToLine, padding, replaceTabs, visibleWidth, wrapTextWithAnsi } from "../utils";
 
 /**
- * Default text styling for markdown content.
+ // Default text styling for markdown content.
+ // Applied to all text unless overridden by markdown formatting.
+ // Ensure color contrast meets WCAG 2.2 AA standards.
  * Applied to all text unless overridden by markdown formatting.
  */
 export interface DefaultTextStyle {
-	/** Foreground color function */
+        /** Foreground color function (must meet contrast requirements) */
 	color?: (text: string) => string;
-	/** Background color function */
+        /** Background color function (must meet contrast requirements) */
 	bgColor?: (text: string) => string;
 	/** Bold text */
 	bold?: boolean;

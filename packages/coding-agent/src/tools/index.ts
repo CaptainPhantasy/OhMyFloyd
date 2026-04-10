@@ -25,6 +25,15 @@ import { AstGrepTool } from "./ast-grep";
 import { AwaitTool } from "./await-tool";
 import { BashTool } from "./bash";
 import { BrowserTool } from "./browser";
+import {
+	EditorOpenTool,
+	EditorSaveTool,
+	EditorFormatTool,
+	EditorCloseTool,
+	ExplorerNavigateTool,
+	ExplorerSearchTool,
+	ExplorerSelectTool,
+} from "./editor";
 
 import { CalculatorTool } from "./calculator";
 import { CancelJobTool } from "./cancel-job";
@@ -96,6 +105,7 @@ export * from "./ssh";
 export * from "./submit-result";
 export * from "./todo-write";
 export * from "./write";
+export * from "./editor";
 
 /** Tool type (AgentTool from pi-ai) */
 export type Tool = AgentTool<any, any, any>;
@@ -237,6 +247,13 @@ export const BUILTIN_TOOLS: Record<string, ToolFactory> = {
 	web_search: s => new SearchTool(s),
 	search_tool_bm25: SearchToolBm25Tool.createIf,
 	write: s => new WriteTool(s),
+	editor_open: s => new EditorOpenTool(s),
+	editor_save: s => new EditorSaveTool(s),
+	editor_format: s => new EditorFormatTool(s),
+	editor_close: s => new EditorCloseTool(s),
+	explorer_navigate: s => new ExplorerNavigateTool(s),
+	explorer_search: s => new ExplorerSearchTool(s),
+	explorer_select: s => new ExplorerSelectTool(s),
 };
 
 export const HIDDEN_TOOLS: Record<string, ToolFactory> = {

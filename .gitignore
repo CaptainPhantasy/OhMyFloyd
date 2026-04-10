@@ -69,3 +69,8 @@ packages/typescript-edit-benchmark/runs/
 
 # Draft documentation
 *-DRAFT.md
+
+# Editor stub files (quarantined)
+*.DELETE
+*-stub.*
+*.old.*

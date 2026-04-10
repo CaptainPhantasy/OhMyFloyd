@@ -464,6 +464,33 @@ When adding or changing tests, test the contract the system exposes — not the 
 - Do not add tests for tiny, low-risk changes unless the change affects a real contract, fixes a regression-prone edge case, or would otherwise be easy to break silently.
 - When trimming or adding tests, prefer focused package-local verification for the changed area so the surviving suite proves the contract it claims to protect.
 
+## Evidence Contract
+
+### Per-Item Evidence Requirements
+For EACH requested item, you MUST provide:
+1. **Exact action taken** - file:line or command used
+2. **Direct evidence** - file:line reference, command output, test results
+3. **Verification result** - pass/fail with proof
+4. **Status marking** - DONE only after proof obtained
+
+### Forbidden Behaviors
+- Declaring "done" without evidence
+- Collapsing multiple items into vague summaries
+- Skipping failed steps without explicit blocker report
+- Creating scaffolds that don't work
+
+### Required Output Structure
+A) Requested items checklist
+B) Per-item evidence ledger (item → action → evidence → verification)
+C) Verification receipts (test outputs, command outputs)
+D) Completeness matrix (item → done/blocked → evidence)
+
+### Hard Gate
+**If any item has no evidence row, final status MUST be INCOMPLETE.**
+
+### Subagent Requirements
+When spawning subagents for delegated tasks, you **MUST** include this Evidence Contract in the task context. Subagents are equally bound by these requirements and must provide the same evidence for each completed item.
+
 ## GitHub Issues
 
 When reading issues:

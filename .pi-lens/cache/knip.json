@@ -1,0 +1,1274 @@
+{
+  "success": true,
+  "issues": [
+    {
+      "type": "file",
+      "name": "scripts/skill-health/dashboard.ts",
+      "file": "scripts/skill-health/dashboard.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/integrations.ts",
+      "file": "scripts/skill-health/integrations.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/tracker.ts",
+      "file": "scripts/skill-health/tracker.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/wrapper.ts",
+      "file": "scripts/skill-health/wrapper.ts"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/writing-skills/render-graphs.js",
+      "file": ".crush/skills/writing-skills/render-graphs.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/writing-skills/render-graphs.js",
+      "file": ".floyd/skills/writing-skills/render-graphs.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/algorithmic-art/templates/generator_template.js",
+      "file": ".crush/skills/algorithmic-art/templates/generator_template.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/chart-visualization/scripts/generate.js",
+      "file": ".crush/skills/chart-visualization/scripts/generate.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "file": ".crush/skills/develop-web-game/scripts/web_game_playwright_client.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/document-creator/scripts/docx_create.ts",
+      "file": ".crush/skills/document-creator/scripts/docx_create.ts"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/pptx/scripts/html2pptx.js",
+      "file": ".crush/skills/pptx/scripts/html2pptx.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/algorithmic-art/templates/generator_template.js",
+      "file": ".floyd/skills/algorithmic-art/templates/generator_template.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/chart-visualization/scripts/generate.js",
+      "file": ".floyd/skills/chart-visualization/scripts/generate.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "file": ".floyd/skills/develop-web-game/scripts/web_game_playwright_client.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "file": ".floyd/skills/document-creator/scripts/docx_create.ts"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/pptx/scripts/html2pptx.js",
+      "file": ".floyd/skills/pptx/scripts/html2pptx.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/swarm-extension/src/extension.ts",
+      "file": "packages/swarm-extension/src/extension.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/bench/rendering.ts",
+      "file": "packages/coding-agent/bench/rendering.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/scripts/verify-cl-loop.ts",
+      "file": "packages/coding-agent/scripts/verify-cl-loop.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/checkpoint-rpc-qa.ts",
+      "file": "packages/coding-agent/test/checkpoint-rpc-qa.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/rpc-example.ts",
+      "file": "packages/coding-agent/test/rpc-example.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/streaming-render-debug.ts",
+      "file": "packages/coding-agent/test/streaming-render-debug.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/test-theme-colors.ts",
+      "file": "packages/coding-agent/test/test-theme-colors.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/api-demo.ts",
+      "file": "packages/coding-agent/examples/extensions/api-demo.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/chalk-logger.ts",
+      "file": "packages/coding-agent/examples/extensions/chalk-logger.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/hello.ts",
+      "file": "packages/coding-agent/examples/extensions/hello.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/pirate.ts",
+      "file": "packages/coding-agent/examples/extensions/pirate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/plan-mode.ts",
+      "file": "packages/coding-agent/examples/extensions/plan-mode.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/reload-runtime.ts",
+      "file": "packages/coding-agent/examples/extensions/reload-runtime.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/todo.ts",
+      "file": "packages/coding-agent/examples/extensions/todo.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/tools.ts",
+      "file": "packages/coding-agent/examples/extensions/tools.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/auto-commit-on-exit.ts",
+      "file": "packages/coding-agent/examples/hooks/auto-commit-on-exit.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/confirm-destructive.ts",
+      "file": "packages/coding-agent/examples/hooks/confirm-destructive.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/custom-compaction.ts",
+      "file": "packages/coding-agent/examples/hooks/custom-compaction.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/dirty-repo-guard.ts",
+      "file": "packages/coding-agent/examples/hooks/dirty-repo-guard.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/file-trigger.ts",
+      "file": "packages/coding-agent/examples/hooks/file-trigger.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/git-checkpoint.ts",
+      "file": "packages/coding-agent/examples/hooks/git-checkpoint.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/handoff.ts",
+      "file": "packages/coding-agent/examples/hooks/handoff.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/permission-gate.ts",
+      "file": "packages/coding-agent/examples/hooks/permission-gate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/protected-paths.ts",
+      "file": "packages/coding-agent/examples/hooks/protected-paths.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/qna.ts",
+      "file": "packages/coding-agent/examples/hooks/qna.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/status-line.ts",
+      "file": "packages/coding-agent/examples/hooks/status-line.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/01-minimal.ts",
+      "file": "packages/coding-agent/examples/sdk/01-minimal.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/02-custom-model.ts",
+      "file": "packages/coding-agent/examples/sdk/02-custom-model.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/03-custom-prompt.ts",
+      "file": "packages/coding-agent/examples/sdk/03-custom-prompt.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/04-skills.ts",
+      "file": "packages/coding-agent/examples/sdk/04-skills.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/06-extensions.ts",
+      "file": "packages/coding-agent/examples/sdk/06-extensions.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/06-hooks.ts",
+      "file": "packages/coding-agent/examples/sdk/06-hooks.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/07-context-files.ts",
+      "file": "packages/coding-agent/examples/sdk/07-context-files.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/08-prompt-templates.ts",
+      "file": "packages/coding-agent/examples/sdk/08-prompt-templates.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/08-slash-commands.ts",
+      "file": "packages/coding-agent/examples/sdk/08-slash-commands.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts",
+      "file": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/11-sessions.ts",
+      "file": "packages/coding-agent/examples/sdk/11-sessions.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/template.js",
+      "file": "packages/coding-agent/src/export/html/template.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/custom-tools/hello/index.ts",
+      "file": "packages/coding-agent/examples/custom-tools/hello/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "file": "packages/coding-agent/examples/custom-tools/todo/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/with-deps/index.ts",
+      "file": "packages/coding-agent/examples/extensions/with-deps/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/vendor/highlight.min.js",
+      "file": "packages/coding-agent/src/export/html/vendor/highlight.min.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/vendor/marked.min.js",
+      "file": "packages/coding-agent/src/export/html/vendor/marked.min.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/agent/test/utils/calculate.ts",
+      "file": "packages/agent/test/utils/calculate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/agent/test/utils/get-current-time.ts",
+      "file": "packages/agent/test/utils/get-current-time.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/_jskey.ts",
+      "file": "packages/tui/bench/_jskey.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/kitty-sequence.ts",
+      "file": "packages/tui/bench/kitty-sequence.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/parse-key.ts",
+      "file": "packages/tui/bench/parse-key.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/sanitize.ts",
+      "file": "packages/tui/bench/sanitize.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/text-layout.ts",
+      "file": "packages/tui/bench/text-layout.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/width.ts",
+      "file": "packages/tui/bench/width.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/chat-simple.ts",
+      "file": "packages/tui/test/chat-simple.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/image-test.ts",
+      "file": "packages/tui/test/image-test.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/key-tester.ts",
+      "file": "packages/tui/test/key-tester.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/natives/scripts/gen-enums.ts",
+      "file": "packages/natives/scripts/gen-enums.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/natives/test/native.test.ts",
+      "file": "packages/natives/test/native.test.ts"
+    },
+    {
+      "type": "devDependency",
+      "name": "@bufbuild/protoc-gen-es",
+      "file": "package.json",
+      "line": 68
+    },
+    {
+      "type": "devDependency",
+      "name": "lint-staged",
+      "file": "package.json",
+      "line": 71
+    },
+    {
+      "type": "devDependency",
+      "name": "prettier",
+      "file": "package.json",
+      "line": 72
+    },
+    {
+      "type": "devDependency",
+      "name": "postcss",
+      "file": "packages/stats/package.json",
+      "line": 54
+    },
+    {
+      "type": "devDependency",
+      "name": "@napi-rs/cli",
+      "file": "packages/natives/package.json",
+      "line": 43
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-file-operations.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-editor-state.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-directory-tree.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/file-explorer.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/file-explorer.ts",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/editor.tsx",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/editor.tsx",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/integration.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/file-type-icon.tsx",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/file-type-icon.tsx",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/VirtualizedList.tsx",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/VirtualizedList.tsx",
+      "line": 2
+    },
+    {
+      "type": "unlisted",
+      "name": "@jest/globals",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "ink-testing-library",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 2
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "@jest/globals",
+      "file": "packages/tui/test/ai-assistant.test.ts",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "@testing-library/react",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 6
+    },
+    {
+      "type": "export",
+      "name": "PRETTIER_OPTIONS",
+      "file": "packages/typescript-edit-benchmark/src/formatter.ts",
+      "line": 8
+    },
+    {
+      "type": "export",
+      "name": "FormatResult",
+      "file": "packages/typescript-edit-benchmark/src/formatter.ts",
+      "line": 55
+    },
+    {
+      "type": "export",
+      "name": "runTask",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 1888
+    },
+    {
+      "type": "export",
+      "name": "PromptTurnLimitTelemetry",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 319
+    },
+    {
+      "type": "export",
+      "name": "MutationIntentValidation",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 340
+    },
+    {
+      "type": "export",
+      "name": "DEFAULT_TARBALL_PATH",
+      "file": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "line": 35
+    },
+    {
+      "type": "export",
+      "name": "FixtureValidationIssue",
+      "file": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "line": 111
+    },
+    {
+      "type": "export",
+      "name": "buildTestTree",
+      "file": "packages/coding-agent/test/utilities.ts",
+      "line": 136
+    },
+    {
+      "type": "export",
+      "name": "TestSessionOptions",
+      "file": "packages/coding-agent/test/utilities.ts",
+      "line": 53
+    },
+    {
+      "type": "export",
+      "name": "defaultSelectListTheme",
+      "file": "packages/tui/test/test-themes.ts",
+      "line": 51
+    },
+    {
+      "type": "export",
+      "name": "E2E_ENABLED",
+      "file": "packages/ai/test/oauth.ts",
+      "line": 19
+    },
+    {
+      "type": "export",
+      "name": "embeddedAddon",
+      "file": "packages/natives/native/embedded-addon.js",
+      "line": 22
+    },
+    {
+      "type": "export",
+      "name": "VerificationResult",
+      "file": "packages/typescript-edit-benchmark/src/verify.ts",
+      "line": 11
+    },
+    {
+      "type": "export",
+      "name": "DiffStats",
+      "file": "packages/typescript-edit-benchmark/src/verify.ts",
+      "line": 21
+    },
+    {
+      "type": "export",
+      "name": "PipelineOptions",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 18
+    },
+    {
+      "type": "export",
+      "name": "PipelineProgress",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 27
+    },
+    {
+      "type": "export",
+      "name": "PipelineResult",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 35
+    },
+    {
+      "type": "export",
+      "name": "InProcessEventListener",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 20
+    },
+    {
+      "type": "export",
+      "name": "InProcessClientOptions",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 22
+    },
+    {
+      "type": "export",
+      "name": "DiscoverSharedInfraOptions",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 43
+    },
+    {
+      "type": "export",
+      "name": "SwarmExecutorOptions",
+      "file": "packages/swarm-extension/src/swarm/executor.ts",
+      "line": 21
+    }
+  ],
+  "unusedExports": [
+    {
+      "type": "export",
+      "name": "PRETTIER_OPTIONS",
+      "file": "packages/typescript-edit-benchmark/src/formatter.ts",
+      "line": 8
+    },
+    {
+      "type": "export",
+      "name": "FormatResult",
+      "file": "packages/typescript-edit-benchmark/src/formatter.ts",
+      "line": 55
+    },
+    {
+      "type": "export",
+      "name": "runTask",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 1888
+    },
+    {
+      "type": "export",
+      "name": "PromptTurnLimitTelemetry",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 319
+    },
+    {
+      "type": "export",
+      "name": "MutationIntentValidation",
+      "file": "packages/typescript-edit-benchmark/src/runner.ts",
+      "line": 340
+    },
+    {
+      "type": "export",
+      "name": "DEFAULT_TARBALL_PATH",
+      "file": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "line": 35
+    },
+    {
+      "type": "export",
+      "name": "FixtureValidationIssue",
+      "file": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "line": 111
+    },
+    {
+      "type": "export",
+      "name": "buildTestTree",
+      "file": "packages/coding-agent/test/utilities.ts",
+      "line": 136
+    },
+    {
+      "type": "export",
+      "name": "TestSessionOptions",
+      "file": "packages/coding-agent/test/utilities.ts",
+      "line": 53
+    },
+    {
+      "type": "export",
+      "name": "defaultSelectListTheme",
+      "file": "packages/tui/test/test-themes.ts",
+      "line": 51
+    },
+    {
+      "type": "export",
+      "name": "E2E_ENABLED",
+      "file": "packages/ai/test/oauth.ts",
+      "line": 19
+    },
+    {
+      "type": "export",
+      "name": "embeddedAddon",
+      "file": "packages/natives/native/embedded-addon.js",
+      "line": 22
+    },
+    {
+      "type": "export",
+      "name": "VerificationResult",
+      "file": "packages/typescript-edit-benchmark/src/verify.ts",
+      "line": 11
+    },
+    {
+      "type": "export",
+      "name": "DiffStats",
+      "file": "packages/typescript-edit-benchmark/src/verify.ts",
+      "line": 21
+    },
+    {
+      "type": "export",
+      "name": "PipelineOptions",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 18
+    },
+    {
+      "type": "export",
+      "name": "PipelineProgress",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 27
+    },
+    {
+      "type": "export",
+      "name": "PipelineResult",
+      "file": "packages/swarm-extension/src/swarm/pipeline.ts",
+      "line": 35
+    },
+    {
+      "type": "export",
+      "name": "InProcessEventListener",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 20
+    },
+    {
+      "type": "export",
+      "name": "InProcessClientOptions",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 22
+    },
+    {
+      "type": "export",
+      "name": "DiscoverSharedInfraOptions",
+      "file": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "line": 43
+    },
+    {
+      "type": "export",
+      "name": "SwarmExecutorOptions",
+      "file": "packages/swarm-extension/src/swarm/executor.ts",
+      "line": 21
+    }
+  ],
+  "unusedFiles": [
+    {
+      "type": "file",
+      "name": "scripts/skill-health/dashboard.ts",
+      "file": "scripts/skill-health/dashboard.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/integrations.ts",
+      "file": "scripts/skill-health/integrations.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/tracker.ts",
+      "file": "scripts/skill-health/tracker.ts"
+    },
+    {
+      "type": "file",
+      "name": "scripts/skill-health/wrapper.ts",
+      "file": "scripts/skill-health/wrapper.ts"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/writing-skills/render-graphs.js",
+      "file": ".crush/skills/writing-skills/render-graphs.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/writing-skills/render-graphs.js",
+      "file": ".floyd/skills/writing-skills/render-graphs.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/algorithmic-art/templates/generator_template.js",
+      "file": ".crush/skills/algorithmic-art/templates/generator_template.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/chart-visualization/scripts/generate.js",
+      "file": ".crush/skills/chart-visualization/scripts/generate.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "file": ".crush/skills/develop-web-game/scripts/web_game_playwright_client.js"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/document-creator/scripts/docx_create.ts",
+      "file": ".crush/skills/document-creator/scripts/docx_create.ts"
+    },
+    {
+      "type": "file",
+      "name": ".crush/skills/pptx/scripts/html2pptx.js",
+      "file": ".crush/skills/pptx/scripts/html2pptx.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/algorithmic-art/templates/generator_template.js",
+      "file": ".floyd/skills/algorithmic-art/templates/generator_template.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/chart-visualization/scripts/generate.js",
+      "file": ".floyd/skills/chart-visualization/scripts/generate.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "file": ".floyd/skills/develop-web-game/scripts/web_game_playwright_client.js"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "file": ".floyd/skills/document-creator/scripts/docx_create.ts"
+    },
+    {
+      "type": "file",
+      "name": ".floyd/skills/pptx/scripts/html2pptx.js",
+      "file": ".floyd/skills/pptx/scripts/html2pptx.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/swarm-extension/src/extension.ts",
+      "file": "packages/swarm-extension/src/extension.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/bench/rendering.ts",
+      "file": "packages/coding-agent/bench/rendering.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/scripts/verify-cl-loop.ts",
+      "file": "packages/coding-agent/scripts/verify-cl-loop.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/checkpoint-rpc-qa.ts",
+      "file": "packages/coding-agent/test/checkpoint-rpc-qa.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/rpc-example.ts",
+      "file": "packages/coding-agent/test/rpc-example.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/streaming-render-debug.ts",
+      "file": "packages/coding-agent/test/streaming-render-debug.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/test/test-theme-colors.ts",
+      "file": "packages/coding-agent/test/test-theme-colors.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/api-demo.ts",
+      "file": "packages/coding-agent/examples/extensions/api-demo.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/chalk-logger.ts",
+      "file": "packages/coding-agent/examples/extensions/chalk-logger.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/hello.ts",
+      "file": "packages/coding-agent/examples/extensions/hello.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/pirate.ts",
+      "file": "packages/coding-agent/examples/extensions/pirate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/plan-mode.ts",
+      "file": "packages/coding-agent/examples/extensions/plan-mode.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/reload-runtime.ts",
+      "file": "packages/coding-agent/examples/extensions/reload-runtime.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/todo.ts",
+      "file": "packages/coding-agent/examples/extensions/todo.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/tools.ts",
+      "file": "packages/coding-agent/examples/extensions/tools.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/auto-commit-on-exit.ts",
+      "file": "packages/coding-agent/examples/hooks/auto-commit-on-exit.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/confirm-destructive.ts",
+      "file": "packages/coding-agent/examples/hooks/confirm-destructive.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/custom-compaction.ts",
+      "file": "packages/coding-agent/examples/hooks/custom-compaction.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/dirty-repo-guard.ts",
+      "file": "packages/coding-agent/examples/hooks/dirty-repo-guard.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/file-trigger.ts",
+      "file": "packages/coding-agent/examples/hooks/file-trigger.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/git-checkpoint.ts",
+      "file": "packages/coding-agent/examples/hooks/git-checkpoint.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/handoff.ts",
+      "file": "packages/coding-agent/examples/hooks/handoff.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/permission-gate.ts",
+      "file": "packages/coding-agent/examples/hooks/permission-gate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/protected-paths.ts",
+      "file": "packages/coding-agent/examples/hooks/protected-paths.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/qna.ts",
+      "file": "packages/coding-agent/examples/hooks/qna.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/hooks/status-line.ts",
+      "file": "packages/coding-agent/examples/hooks/status-line.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/01-minimal.ts",
+      "file": "packages/coding-agent/examples/sdk/01-minimal.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/02-custom-model.ts",
+      "file": "packages/coding-agent/examples/sdk/02-custom-model.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/03-custom-prompt.ts",
+      "file": "packages/coding-agent/examples/sdk/03-custom-prompt.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/04-skills.ts",
+      "file": "packages/coding-agent/examples/sdk/04-skills.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/06-extensions.ts",
+      "file": "packages/coding-agent/examples/sdk/06-extensions.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/06-hooks.ts",
+      "file": "packages/coding-agent/examples/sdk/06-hooks.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/07-context-files.ts",
+      "file": "packages/coding-agent/examples/sdk/07-context-files.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/08-prompt-templates.ts",
+      "file": "packages/coding-agent/examples/sdk/08-prompt-templates.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/08-slash-commands.ts",
+      "file": "packages/coding-agent/examples/sdk/08-slash-commands.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts",
+      "file": "packages/coding-agent/examples/sdk/09-api-keys-and-oauth.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/sdk/11-sessions.ts",
+      "file": "packages/coding-agent/examples/sdk/11-sessions.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/template.js",
+      "file": "packages/coding-agent/src/export/html/template.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/custom-tools/hello/index.ts",
+      "file": "packages/coding-agent/examples/custom-tools/hello/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "file": "packages/coding-agent/examples/custom-tools/todo/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/examples/extensions/with-deps/index.ts",
+      "file": "packages/coding-agent/examples/extensions/with-deps/index.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/vendor/highlight.min.js",
+      "file": "packages/coding-agent/src/export/html/vendor/highlight.min.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/coding-agent/src/export/html/vendor/marked.min.js",
+      "file": "packages/coding-agent/src/export/html/vendor/marked.min.js"
+    },
+    {
+      "type": "file",
+      "name": "packages/agent/test/utils/calculate.ts",
+      "file": "packages/agent/test/utils/calculate.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/agent/test/utils/get-current-time.ts",
+      "file": "packages/agent/test/utils/get-current-time.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/_jskey.ts",
+      "file": "packages/tui/bench/_jskey.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/kitty-sequence.ts",
+      "file": "packages/tui/bench/kitty-sequence.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/parse-key.ts",
+      "file": "packages/tui/bench/parse-key.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/sanitize.ts",
+      "file": "packages/tui/bench/sanitize.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/text-layout.ts",
+      "file": "packages/tui/bench/text-layout.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/bench/width.ts",
+      "file": "packages/tui/bench/width.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/chat-simple.ts",
+      "file": "packages/tui/test/chat-simple.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/image-test.ts",
+      "file": "packages/tui/test/image-test.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/tui/test/key-tester.ts",
+      "file": "packages/tui/test/key-tester.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/natives/scripts/gen-enums.ts",
+      "file": "packages/natives/scripts/gen-enums.ts"
+    },
+    {
+      "type": "file",
+      "name": "packages/natives/test/native.test.ts",
+      "file": "packages/natives/test/native.test.ts"
+    }
+  ],
+  "unusedDeps": [
+    {
+      "type": "devDependency",
+      "name": "@bufbuild/protoc-gen-es",
+      "file": "package.json",
+      "line": 68
+    },
+    {
+      "type": "devDependency",
+      "name": "lint-staged",
+      "file": "package.json",
+      "line": 71
+    },
+    {
+      "type": "devDependency",
+      "name": "prettier",
+      "file": "package.json",
+      "line": 72
+    },
+    {
+      "type": "devDependency",
+      "name": "postcss",
+      "file": "packages/stats/package.json",
+      "line": 54
+    },
+    {
+      "type": "devDependency",
+      "name": "@napi-rs/cli",
+      "file": "packages/natives/package.json",
+      "line": 43
+    }
+  ],
+  "unlistedDeps": [
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-file-operations.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-editor-state.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/hooks/use-directory-tree.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/file-explorer.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/file-explorer.ts",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/editor.tsx",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/editor.tsx",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/integration.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/file-type-icon.tsx",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/file-type-icon.tsx",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/src/editor/VirtualizedList.tsx",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/src/editor/VirtualizedList.tsx",
+      "line": 2
+    },
+    {
+      "type": "unlisted",
+      "name": "@jest/globals",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "ink-testing-library",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 2
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/test/VirtualizedList.test.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "@jest/globals",
+      "file": "packages/tui/test/ai-assistant.test.ts",
+      "line": 1
+    },
+    {
+      "type": "unlisted",
+      "name": "react",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 3
+    },
+    {
+      "type": "unlisted",
+      "name": "@testing-library/react",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 4
+    },
+    {
+      "type": "unlisted",
+      "name": "ink",
+      "file": "packages/tui/test/editor-integration.test.ts",
+      "line": 6
+    }
+  ],
+  "summary": "Found 117 issues"
+}

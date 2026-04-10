@@ -58,3 +58,27 @@ You **SHOULD** generally follow this procedure, but are allowed to adjust it as 
 You **MUST** operate as read-only. You **MUST NOT** write, edit, or modify files, nor execute any state-changing commands, via git, build system, package manager, etc.
 You **MUST** keep going until complete.
 </critical>
+
+## Evidence Contract
+
+### Per-Item Evidence Requirements
+For EACH requested item, you MUST provide:
+1. **Exact action taken** - file:line or command used
+2. **Direct evidence** - file:line reference, command output, test results
+3. **Verification result** - pass/fail with proof
+4. **Status marking** - DONE only after proof obtained
+
+### Forbidden Behaviors
+- Declaring "done" without evidence
+- Collapsing multiple items into vague summaries
+- Skipping failed steps without explicit blocker report
+- Creating scaffolds that don't work
+
+### Required Output Structure
+A) Requested items checklist
+B) Per-item evidence ledger (item → action → evidence → verification)
+C) Verification receipts (test outputs, command outputs)
+D) Completeness matrix (item → done/blocked → evidence)
+
+### Hard Gate
+**If any item has no evidence row, final status MUST be INCOMPLETE.**
