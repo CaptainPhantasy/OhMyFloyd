@@ -1,7 +1,6064 @@
 {
   "success": true,
-  "clones": [],
-  "duplicatedLines": 0,
-  "totalLines": 0,
-  "percentage": 0
+  "clones": [
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startB": 1,
+      "lines": 75,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startB": 1,
+      "lines": 80,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/search/providers/kimi.ts",
+      "startA": 8,
+      "fileB": "packages/coding-agent/src/web/search/providers/tavily.ts",
+      "startB": 7,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/search/providers/kagi.ts",
+      "startA": 31,
+      "fileB": "packages/coding-agent/src/web/search/providers/parallel.ts",
+      "startB": 26,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startA": 155,
+      "fileB": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startB": 70,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startA": 215,
+      "fileB": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startB": 150,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startA": 260,
+      "fileB": "packages/coding-agent/src/modes/components/extensions/state-manager.ts",
+      "startB": 150,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/extensions/extension-list.ts",
+      "startA": 436,
+      "fileB": "packages/coding-agent/src/modes/components/extensions/extension-list.ts",
+      "startB": 420,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 423,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 307,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 480,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 385,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 494,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 399,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 605,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 385,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 635,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 599,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startA": 701,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/marketplace/manager.ts",
+      "startB": 307,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/agentic/tools/propose-commit.ts",
+      "startA": 35,
+      "fileB": "packages/coding-agent/src/commit/agentic/tools/split-commit.ts",
+      "startB": 49,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/agentic/tools/propose-commit.ts",
+      "startA": 101,
+      "fileB": "packages/coding-agent/src/commit/agentic/tools/split-commit.ts",
+      "startB": 175,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/validation/redlining.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/redlining.py",
+      "startB": 1,
+      "lines": 279,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/validation/pptx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/pptx.py",
+      "startB": 1,
+      "lines": 315,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/validation/docx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/docx.py",
+      "startB": 1,
+      "lines": 274,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/validation/base.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/base.py",
+      "startB": 1,
+      "lines": 951,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/spreadsheet/references/examples/openpyxl/styling_spreadsheet.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/spreadsheet/references/examples/openpyxl/styling_spreadsheet.py",
+      "startB": 1,
+      "lines": 79,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/spreadsheet/references/examples/openpyxl/read_existing_spreadsheet.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/spreadsheet/references/examples/openpyxl/read_existing_spreadsheet.py",
+      "startB": 1,
+      "lines": 59,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/spreadsheet/references/examples/openpyxl/create_spreadsheet_with_styling.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/spreadsheet/references/examples/openpyxl/create_spreadsheet_with_styling.py",
+      "startB": 1,
+      "lines": 96,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/spreadsheet/references/examples/openpyxl/create_basic_spreadsheet.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/spreadsheet/references/examples/openpyxl/create_basic_spreadsheet.py",
+      "startB": 1,
+      "lines": 51,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/validation/redlining.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/redlining.py",
+      "startB": 1,
+      "lines": 279,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/validation/pptx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/pptx.py",
+      "startB": 1,
+      "lines": 315,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/validation/docx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/docx.py",
+      "startB": 1,
+      "lines": 274,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/validation/base.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/base.py",
+      "startB": 1,
+      "lines": 951,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.sh",
+      "startB": 1,
+      "lines": 90,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.ps1",
+      "startB": 1,
+      "lines": 73,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/validation/redlining.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/redlining.py",
+      "startB": 1,
+      "lines": 279,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/validation/pptx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/pptx.py",
+      "startB": 1,
+      "lines": 315,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/validation/docx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/docx.py",
+      "startB": 1,
+      "lines": 274,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/validation/base.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validation/base.py",
+      "startB": 1,
+      "lines": 951,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/vscode-marketplace.ts",
+      "startA": 87,
+      "fileB": "packages/coding-agent/src/web/scrapers/vscode-marketplace.ts",
+      "startB": 80,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/snapcraft.ts",
+      "startA": 49,
+      "fileB": "packages/coding-agent/src/web/scrapers/snapcraft.ts",
+      "startB": 36,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/sec-edgar.ts",
+      "startA": 244,
+      "fileB": "packages/coding-agent/src/web/scrapers/sec-edgar.ts",
+      "startB": 229,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/npm.ts",
+      "startA": 36,
+      "fileB": "packages/coding-agent/src/web/scrapers/pypi.ts",
+      "startB": 29,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/metacpan.ts",
+      "startA": 188,
+      "fileB": "packages/coding-agent/src/web/scrapers/metacpan.ts",
+      "startB": 138,
+      "lines": 32,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/jetbrains-marketplace.ts",
+      "startA": 77,
+      "fileB": "packages/coding-agent/src/web/scrapers/vscode-marketplace.ts",
+      "startB": 100,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startA": 23,
+      "fileB": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startB": 8,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startA": 173,
+      "fileB": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startB": 121,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startA": 224,
+      "fileB": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startB": 121,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startA": 271,
+      "fileB": "packages/coding-agent/src/web/scrapers/huggingface.ts",
+      "startB": 131,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/gitlab.ts",
+      "startA": 110,
+      "fileB": "packages/coding-agent/src/web/scrapers/gitlab.ts",
+      "startB": 91,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/github.ts",
+      "startA": 320,
+      "fileB": "packages/coding-agent/src/web/scrapers/github.ts",
+      "startB": 251,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/docs-rs.ts",
+      "startA": 389,
+      "fileB": "packages/coding-agent/src/web/scrapers/types.ts",
+      "startB": 117,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/docs-rs.ts",
+      "startA": 421,
+      "fileB": "packages/coding-agent/src/web/scrapers/docs-rs.ts",
+      "startB": 338,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/docs-rs.ts",
+      "startA": 488,
+      "fileB": "packages/coding-agent/src/web/scrapers/docs-rs.ts",
+      "startB": 469,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startA": 77,
+      "fileB": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startB": 44,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startA": 85,
+      "fileB": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startB": 52,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startA": 95,
+      "fileB": "packages/coding-agent/src/web/scrapers/devto.ts",
+      "startB": 63,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/biorxiv.ts",
+      "startA": 31,
+      "fileB": "packages/coding-agent/src/web/scrapers/cisa-kev.ts",
+      "startB": 30,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/scrapers/arxiv.ts",
+      "startA": 63,
+      "fileB": "packages/coding-agent/src/web/scrapers/iacr.ts",
+      "startB": 70,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startA": 87,
+      "fileB": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startB": 76,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startA": 571,
+      "fileB": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startB": 532,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startA": 266,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startB": 230,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/ssh-command-controller.ts",
+      "startA": 373,
+      "fileB": "packages/coding-agent/src/modes/controllers/ssh-command-controller.ts",
+      "startB": 169,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startA": 135,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 113,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startA": 511,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 474,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/input-controller.ts",
+      "startA": 595,
+      "fileB": "packages/coding-agent/src/modes/controllers/input-controller.ts",
+      "startB": 578,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 181,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 730,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 215,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 651,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 337,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 78,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 357,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 95,
+      "lines": 27,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 383,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 121,
+      "lines": 26,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 411,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 146,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 421,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 153,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 441,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 180,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 462,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 198,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 480,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 213,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 515,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 246,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 571,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 132,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 733,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 640,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 764,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 691,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 800,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 640,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startA": 829,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 691,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startA": 202,
+      "fileB": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startB": 288,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startA": 297,
+      "fileB": "packages/coding-agent/src/modes/utils/ui-helpers.ts",
+      "startB": 291,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startA": 381,
+      "fileB": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startB": 362,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startA": 530,
+      "fileB": "packages/coding-agent/src/modes/controllers/event-controller.ts",
+      "startB": 107,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startA": 438,
+      "fileB": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startB": 431,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startA": 454,
+      "fileB": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startB": 392,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startA": 480,
+      "fileB": "packages/coding-agent/src/modes/components/tool-execution.ts",
+      "startB": 423,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/status-line.ts",
+      "startA": 74,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 346,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/show-images-selector.ts",
+      "startA": 29,
+      "fileB": "packages/coding-agent/src/modes/components/thinking-selector.ts",
+      "startB": 36,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/settings-defs.ts",
+      "startA": 207,
+      "fileB": "packages/coding-agent/src/modes/components/settings-defs.ts",
+      "startB": 200,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/settings-defs.ts",
+      "startA": 256,
+      "fileB": "packages/coding-agent/src/modes/components/settings-defs.ts",
+      "startB": 242,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/queue-mode-selector.ts",
+      "startA": 40,
+      "fileB": "packages/coding-agent/src/modes/components/thinking-selector.ts",
+      "startB": 36,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/plugin-settings.ts",
+      "startA": 304,
+      "fileB": "packages/coding-agent/src/modes/components/settings-selector.ts",
+      "startB": 51,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/hook-message.ts",
+      "startA": 26,
+      "fileB": "packages/coding-agent/src/modes/components/skill-message.ts",
+      "startB": 16,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/hook-input.ts",
+      "startA": 35,
+      "fileB": "packages/coding-agent/src/modes/components/hook-selector.ts",
+      "startB": 89,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/custom-message.ts",
+      "startA": 1,
+      "fileB": "packages/coding-agent/src/modes/components/hook-message.ts",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/custom-message.ts",
+      "startA": 26,
+      "fileB": "packages/coding-agent/src/modes/components/skill-message.ts",
+      "startB": 16,
+      "lines": 31,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/custom-message.ts",
+      "startA": 56,
+      "fileB": "packages/coding-agent/src/modes/components/hook-message.ts",
+      "startB": 57,
+      "lines": 30,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/branch-summary-message.ts",
+      "startA": 12,
+      "fileB": "packages/coding-agent/src/modes/components/compaction-summary-message.ts",
+      "startB": 12,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/branch-summary-message.ts",
+      "startA": 35,
+      "fileB": "packages/coding-agent/src/modes/components/compaction-summary-message.ts",
+      "startB": 36,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/bash-execution.ts",
+      "startA": 59,
+      "fileB": "packages/coding-agent/src/modes/components/python-execution.ts",
+      "startB": 52,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/bash-execution.ts",
+      "startA": 113,
+      "fileB": "packages/coding-agent/src/modes/components/python-execution.ts",
+      "startB": 86,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/bash-execution.ts",
+      "startA": 173,
+      "fileB": "packages/coding-agent/src/modes/components/python-execution.ts",
+      "startB": 124,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/components/bash-execution.ts",
+      "startA": 192,
+      "fileB": "packages/coding-agent/src/modes/components/python-execution.ts",
+      "startB": 141,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/transports/http.ts",
+      "startA": 27,
+      "fileB": "packages/coding-agent/src/mcp/transports/stdio.ts",
+      "startB": 35,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/transports/http.ts",
+      "startA": 257,
+      "fileB": "packages/coding-agent/src/mcp/transports/http.ts",
+      "startB": 184,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/transports/http.ts",
+      "startA": 378,
+      "fileB": "packages/coding-agent/src/mcp/transports/http.ts",
+      "startB": 168,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/lsp/clients/biome-client.ts",
+      "startA": 82,
+      "fileB": "packages/coding-agent/src/lsp/clients/swiftlint-client.ts",
+      "startB": 34,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/loader.ts",
+      "startA": 20,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/manager.ts",
+      "startB": 63,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/loader.ts",
+      "startA": 163,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/loader.ts",
+      "startB": 149,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/installer.ts",
+      "startA": 49,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/manager.ts",
+      "startB": 160,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/git-url.ts",
+      "startA": 114,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/git-url.ts",
+      "startB": 99,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/plugins/git-url.ts",
+      "startA": 137,
+      "fileB": "packages/coding-agent/src/extensibility/plugins/git-url.ts",
+      "startB": 114,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/hooks/types.ts",
+      "startA": 91,
+      "fileB": "packages/coding-agent/src/extensibility/hooks/types.ts",
+      "startB": 30,
+      "lines": 31,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 140,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 534,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 500,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 458,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 570,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 458,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 599,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 458,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 683,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 458,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 717,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 458,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startA": 766,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 539,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/custom-tools/loader.ts",
+      "startA": 163,
+      "fileB": "packages/coding-agent/src/extensibility/custom-tools/loader.ts",
+      "startB": 88,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/custom-tools/loader.ts",
+      "startA": 200,
+      "fileB": "packages/coding-agent/src/extensibility/custom-tools/loader.ts",
+      "startB": 163,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/continuous-learning/storage.ts",
+      "startA": 619,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/storage.ts",
+      "startB": 546,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startA": 347,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startB": 303,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startA": 576,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startB": 275,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/continuous-learning/commands.ts",
+      "startA": 108,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/commands.ts",
+      "startB": 17,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/continuous-learning/commands.ts",
+      "startA": 211,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/commands.ts",
+      "startB": 108,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/map-reduce/reduce-phase.ts",
+      "startA": 31,
+      "fileB": "packages/coding-agent/src/commit/agentic/tools/schemas.ts",
+      "startB": 17,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/map-reduce/reduce-phase.ts",
+      "startA": 101,
+      "fileB": "packages/coding-agent/src/commit/map-reduce/reduce-phase.ts",
+      "startB": 92,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/changelog/index.ts",
+      "startA": 117,
+      "fileB": "packages/coding-agent/src/commit/changelog/index.ts",
+      "startB": 62,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/changelog/generate.ts",
+      "startA": 10,
+      "fileB": "packages/coding-agent/src/commit/agentic/tools/propose-changelog.ts",
+      "startB": 4,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/analysis/scope.ts",
+      "startA": 159,
+      "fileB": "packages/coding-agent/src/commit/analysis/scope.ts",
+      "startB": 127,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/analysis/conventional.ts",
+      "startA": 14,
+      "fileB": "packages/coding-agent/src/commit/map-reduce/reduce-phase.ts",
+      "startB": 14,
+      "lines": 38,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/analysis/conventional.ts",
+      "startA": 105,
+      "fileB": "packages/coding-agent/src/commit/map-reduce/reduce-phase.ts",
+      "startB": 92,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/tools/log-experiment.ts",
+      "startA": 97,
+      "fileB": "packages/coding-agent/src/autoresearch/tools/run-experiment.ts",
+      "startB": 85,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/tools/init-experiment.ts",
+      "startA": 99,
+      "fileB": "packages/coding-agent/src/autoresearch/tools/log-experiment.ts",
+      "startB": 95,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/tools/init-experiment.ts",
+      "startA": 387,
+      "fileB": "packages/coding-agent/src/autoresearch/tools/log-experiment.ts",
+      "startB": 476,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/zai.ts",
+      "startA": 38,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/xiaomi.ts",
+      "startA": 74,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/venice.ts",
+      "startA": 37,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 30,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/together.ts",
+      "startA": 36,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/synthetic.ts",
+      "startA": 37,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/qianfan.ts",
+      "startA": 36,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 30,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/openai-codex.ts",
+      "startA": 28,
+      "fileB": "packages/coding-agent/src/web/search/providers/codex.ts",
+      "startB": 98,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/openai-codex.ts",
+      "startA": 171,
+      "fileB": "packages/ai/src/utils/oauth/openai-codex.ts",
+      "startB": 106,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/nvidia.ts",
+      "startA": 38,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 30,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/nanogpt.ts",
+      "startA": 29,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/moonshot.ts",
+      "startA": 36,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/minimax-code.ts",
+      "startA": 49,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/litellm.ts",
+      "startA": 33,
+      "fileB": "packages/ai/src/utils/oauth/opencode.ts",
+      "startB": 35,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/huggingface.ts",
+      "startA": 40,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 30,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/google-antigravity.ts",
+      "startA": 84,
+      "fileB": "packages/ai/src/utils/oauth/google-gemini-cli.ts",
+      "startB": 178,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/google-antigravity.ts",
+      "startA": 171,
+      "fileB": "packages/ai/src/utils/oauth/google-gemini-cli.ts",
+      "startB": 229,
+      "lines": 67,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/google-antigravity.ts",
+      "startA": 246,
+      "fileB": "packages/ai/src/utils/oauth/google-gemini-cli.ts",
+      "startB": 305,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/google-antigravity.ts",
+      "startA": 260,
+      "fileB": "packages/ai/src/utils/oauth/google-gemini-cli.ts",
+      "startB": 319,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/gitlab-duo.ts",
+      "startA": 111,
+      "fileB": "packages/ai/src/utils/oauth/gitlab-duo.ts",
+      "startB": 78,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/cerebras.ts",
+      "startA": 37,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 30,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/api-key-validation.ts",
+      "startA": 73,
+      "fileB": "packages/ai/src/utils/oauth/api-key-validation.ts",
+      "startB": 38,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/oauth/alibaba-coding-plan.ts",
+      "startA": 36,
+      "fileB": "packages/ai/src/utils/oauth/zenmux.ts",
+      "startB": 29,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/discovery/gemini.ts",
+      "startA": 88,
+      "fileB": "packages/ai/src/utils/discovery/openai-compatible.ts",
+      "startB": 128,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/discovery/antigravity.ts",
+      "startA": 191,
+      "fileB": "packages/ai/src/utils/discovery/codex.ts",
+      "startB": 103,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/unix/fs.rs",
+      "startA": 176,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/fs.rs",
+      "startB": 111,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/unix/commands.rs",
+      "startA": 10,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/commands.rs",
+      "startB": 57,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/stubs/users.rs",
+      "startA": 14,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/users.rs",
+      "startB": 43,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/stubs/fs.rs",
+      "startA": 17,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/fs.rs",
+      "startB": 26,
+      "lines": 32,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/stubs/fs.rs",
+      "startA": 48,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/fs.rs",
+      "startB": 61,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/stubs/commands.rs",
+      "startA": 8,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/commands.rs",
+      "startB": 10,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/sys/stubs/commands.rs",
+      "startA": 37,
+      "fileB": "crates/brush-core-vendored/src/sys/windows/commands.rs",
+      "startB": 41,
+      "lines": 36,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/validate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validate.py",
+      "startB": 1,
+      "lines": 69,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/unpack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/unpack.py",
+      "startB": 1,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/docx/ooxml/scripts/pack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/pack.py",
+      "startB": 1,
+      "lines": 159,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/capacity/scripts/query_capacity.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startB": 1,
+      "lines": 75,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startB": 1,
+      "lines": 80,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/validate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validate.py",
+      "startB": 1,
+      "lines": 69,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/unpack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/unpack.py",
+      "startB": 1,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/ooxml/scripts/pack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/pack.py",
+      "startB": 1,
+      "lines": 159,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/validate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/validate.py",
+      "startB": 1,
+      "lines": 69,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/unpack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/unpack.py",
+      "startB": 1,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/ooxml/scripts/pack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/ooxml/scripts/pack.py",
+      "startB": 1,
+      "lines": 159,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/utils/ooxml_helpers.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/utils/ooxml_helpers.py",
+      "startB": 1,
+      "lines": 345,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/capacity/scripts/query_capacity.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startB": 1,
+      "lines": 75,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startB": 1,
+      "lines": 80,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/webapp-testing/scripts/with_server.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/webapp-testing/scripts/with_server.py",
+      "startB": 1,
+      "lines": 106,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/webapp-testing/examples/static_html_automation.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/webapp-testing/examples/static_html_automation.py",
+      "startB": 1,
+      "lines": 33,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/webapp-testing/examples/element_discovery.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/webapp-testing/examples/element_discovery.py",
+      "startB": 1,
+      "lines": 40,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/webapp-testing/examples/console_logging.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/webapp-testing/examples/console_logging.py",
+      "startB": 1,
+      "lines": 35,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/playwright/scripts/playwright_cli.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/playwright/scripts/playwright_cli.sh",
+      "startB": 1,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/hooks/use-file-operations.ts",
+      "startA": 84,
+      "fileB": "packages/tui/src/hooks/use-file-operations.ts",
+      "startB": 56,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/hooks/use-file-operations.ts",
+      "startA": 99,
+      "fileB": "packages/tui/src/hooks/use-file-operations.ts",
+      "startB": 71,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/editor/markdown-editor.ts",
+      "startA": 306,
+      "fileB": "packages/tui/src/editor/markdown-editor.ts",
+      "startB": 274,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/components/markdown.ts",
+      "startA": 112,
+      "fileB": "packages/tui/src/components/text.ts",
+      "startB": 40,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/components/markdown.ts",
+      "startA": 186,
+      "fileB": "packages/tui/src/components/text.ts",
+      "startB": 87,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/components/markdown.ts",
+      "startA": 262,
+      "fileB": "packages/tui/src/components/markdown.ts",
+      "startB": 230,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/components/markdown.ts",
+      "startA": 619,
+      "fileB": "packages/tui/src/components/markdown.ts",
+      "startB": 344,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/components/markdown.ts",
+      "startA": 627,
+      "fileB": "packages/tui/src/components/markdown.ts",
+      "startB": 353,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/web/parallel.ts",
+      "startA": 336,
+      "fileB": "packages/coding-agent/src/web/parallel.ts",
+      "startB": 305,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/utils/image-resize.ts",
+      "startA": 146,
+      "fileB": "packages/coding-agent/src/utils/image-resize.ts",
+      "startB": 127,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/utils/image-resize.ts",
+      "startA": 174,
+      "fileB": "packages/coding-agent/src/utils/image-resize.ts",
+      "startB": 146,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/utils/image-resize.ts",
+      "startA": 194,
+      "fileB": "packages/coding-agent/src/utils/image-resize.ts",
+      "startB": 130,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/render-utils.ts",
+      "startA": 529,
+      "fileB": "packages/coding-agent/src/tools/render-utils.ts",
+      "startB": 469,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/path-utils.ts",
+      "startA": 499,
+      "fileB": "packages/coding-agent/src/tools/path-utils.ts",
+      "startB": 457,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/jtd-to-json-schema.ts",
+      "startA": 11,
+      "fileB": "packages/coding-agent/src/tools/jtd-to-typescript.ts",
+      "startB": 8,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/json-tree.ts",
+      "startA": 198,
+      "fileB": "packages/coding-agent/src/tools/json-tree.ts",
+      "startB": 171,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/inspect-image-renderer.ts",
+      "startA": 95,
+      "fileB": "packages/coding-agent/src/tools/inspect-image-renderer.ts",
+      "startB": 75,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/grep.ts",
+      "startA": 398,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 294,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/grep.ts",
+      "startA": 586,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 500,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/gemini-image.ts",
+      "startA": 499,
+      "fileB": "packages/coding-agent/src/tools/gemini-image.ts",
+      "startB": 313,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/gemini-image.ts",
+      "startA": 825,
+      "fileB": "packages/coding-agent/src/tools/gemini-image.ts",
+      "startB": 734,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 201,
+      "fileB": "packages/coding-agent/src/tools/find.ts",
+      "startB": 136,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 325,
+      "fileB": "packages/coding-agent/src/tools/find.ts",
+      "startB": 170,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 375,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 479,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 404,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 498,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 419,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 514,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 466,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 501,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/find.ts",
+      "startA": 480,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 611,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/calculator.ts",
+      "startA": 1,
+      "fileB": "packages/coding-agent/src/tools/resolve.ts",
+      "startB": 1,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/bash.ts",
+      "startA": 436,
+      "fileB": "packages/coding-agent/src/tools/ssh.ts",
+      "startB": 168,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 104,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 129,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 111,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 136,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 176,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 268,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 213,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 334,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 232,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 357,
+      "lines": 41,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 364,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 541,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 374,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 550,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 381,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 557,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 415,
+      "fileB": "packages/coding-agent/src/tools/find.ts",
+      "startB": 463,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startA": 429,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 600,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 3,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 3,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 11,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 11,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 106,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 119,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 124,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 136,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 165,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 157,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 236,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 358,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 369,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 328,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 392,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 356,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 403,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 367,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 409,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 552,
+      "lines": 26,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 446,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 407,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 468,
+      "fileB": "packages/coding-agent/src/tools/grep.ts",
+      "startB": 601,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/ast-edit.ts",
+      "startA": 480,
+      "fileB": "packages/coding-agent/src/tools/ast-grep.ts",
+      "startB": 441,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/archive-reader.ts",
+      "startA": 57,
+      "fileB": "packages/coding-agent/src/tools/archive-reader.ts",
+      "startB": 45,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/tools/archive-reader.ts",
+      "startA": 124,
+      "fileB": "packages/coding-agent/src/tools/write.ts",
+      "startB": 232,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/task/worktree.ts",
+      "startA": 236,
+      "fileB": "packages/coding-agent/src/task/worktree.ts",
+      "startB": 195,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/ssh/config-writer.ts",
+      "startA": 124,
+      "fileB": "packages/coding-agent/src/ssh/config-writer.ts",
+      "startB": 85,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/slash-commands/marketplace-install-parser.ts",
+      "startA": 76,
+      "fileB": "packages/coding-agent/src/slash-commands/marketplace-install-parser.ts",
+      "startB": 30,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startA": 472,
+      "fileB": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startB": 452,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startA": 626,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 435,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startA": 805,
+      "fileB": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startB": 602,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startA": 815,
+      "fileB": "packages/coding-agent/src/slash-commands/builtin-registry.ts",
+      "startB": 621,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/streaming-output.ts",
+      "startA": 158,
+      "fileB": "packages/coding-agent/src/session/streaming-output.ts",
+      "startB": 139,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/streaming-output.ts",
+      "startA": 279,
+      "fileB": "packages/coding-agent/src/session/streaming-output.ts",
+      "startB": 257,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/streaming-output.ts",
+      "startA": 327,
+      "fileB": "packages/coding-agent/src/session/streaming-output.ts",
+      "startB": 223,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/session-storage.ts",
+      "startA": 249,
+      "fileB": "packages/coding-agent/src/session/session-storage.ts",
+      "startB": 65,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/session-dump-format.ts",
+      "startA": 164,
+      "fileB": "packages/coding-agent/src/session/session-dump-format.ts",
+      "startB": 100,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/session/blob-store.ts",
+      "startA": 125,
+      "fileB": "packages/coding-agent/src/session/blob-store.ts",
+      "startB": 108,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/types.ts",
+      "startA": 258,
+      "fileB": "packages/coding-agent/src/modes/controllers/extension-ui-controller.ts",
+      "startB": 868,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/print-mode.ts",
+      "startA": 54,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startB": 422,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/print-mode.ts",
+      "startA": 78,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startB": 446,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/print-mode.ts",
+      "startA": 83,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startB": 453,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/modes/print-mode.ts",
+      "startA": 101,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-mode.ts",
+      "startB": 472,
+      "lines": 30,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/memories/storage.ts",
+      "startA": 349,
+      "fileB": "packages/coding-agent/src/memories/storage.ts",
+      "startB": 311,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/memories/storage.ts",
+      "startA": 452,
+      "fileB": "packages/coding-agent/src/memories/storage.ts",
+      "startB": 396,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/tool-bridge.ts",
+      "startA": 331,
+      "fileB": "packages/coding-agent/src/mcp/tool-bridge.ts",
+      "startB": 236,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/config-writer.ts",
+      "startA": 43,
+      "fileB": "packages/coding-agent/src/ssh/config-writer.ts",
+      "startB": 48,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/config-writer.ts",
+      "startA": 123,
+      "fileB": "packages/coding-agent/src/mcp/config-writer.ts",
+      "startB": 83,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/client.ts",
+      "startA": 293,
+      "fileB": "packages/coding-agent/src/mcp/client.ts",
+      "startB": 223,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/client.ts",
+      "startA": 326,
+      "fileB": "packages/coding-agent/src/mcp/client.ts",
+      "startB": 223,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/client.ts",
+      "startA": 393,
+      "fileB": "packages/coding-agent/src/mcp/client.ts",
+      "startB": 367,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/mcp/client.ts",
+      "startA": 445,
+      "fileB": "packages/coding-agent/src/mcp/client.ts",
+      "startB": 223,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/lsp/types.ts",
+      "startA": 253,
+      "fileB": "packages/coding-agent/src/lsp/utils.ts",
+      "startB": 531,
+      "lines": 30,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/lsp/client.ts",
+      "startA": 148,
+      "fileB": "packages/coding-agent/src/lsp/client.ts",
+      "startB": 96,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/lsp/client.ts",
+      "startA": 584,
+      "fileB": "packages/coding-agent/src/lsp/client.ts",
+      "startB": 533,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/ipy/prelude.py",
+      "startA": 256,
+      "fileB": "packages/coding-agent/src/ipy/prelude.py",
+      "startB": 215,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/internal-urls/local-protocol.ts",
+      "startA": 169,
+      "fileB": "packages/coding-agent/src/internal-urls/memory-protocol.ts",
+      "startB": 93,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/extensibility/utils.ts",
+      "startA": 27,
+      "fileB": "packages/coding-agent/src/extensibility/extensions/runner.ts",
+      "startB": 133,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/exa/render.ts",
+      "startA": 152,
+      "fileB": "packages/coding-agent/src/exa/render.ts",
+      "startB": 114,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/exa/mcp-client.ts",
+      "startA": 264,
+      "fileB": "packages/coding-agent/src/exa/websets.ts",
+      "startB": 36,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/exa/factory.ts",
+      "startA": 48,
+      "fileB": "packages/coding-agent/src/exa/websets.ts",
+      "startB": 36,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/edit/renderer.ts",
+      "startA": 41,
+      "fileB": "packages/coding-agent/src/tools/write.ts",
+      "startB": 54,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/edit/renderer.ts",
+      "startA": 286,
+      "fileB": "packages/coding-agent/src/tools/write.ts",
+      "startB": 345,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/edit/normalize.ts",
+      "startA": 283,
+      "fileB": "packages/coding-agent/src/edit/normalize.ts",
+      "startB": 265,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/edit/index.ts",
+      "startA": 257,
+      "fileB": "packages/coding-agent/src/edit/index.ts",
+      "startB": 223,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/opencode.ts",
+      "startA": 284,
+      "fileB": "packages/coding-agent/src/discovery/opencode.ts",
+      "startB": 205,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/mcp-json.ts",
+      "startA": 153,
+      "fileB": "packages/coding-agent/src/discovery/ssh.ts",
+      "startB": 138,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/helpers.ts",
+      "startA": 790,
+      "fileB": "packages/coding-agent/src/discovery/helpers.ts",
+      "startB": 748,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/helpers.ts",
+      "startA": 835,
+      "fileB": "packages/coding-agent/src/discovery/helpers.ts",
+      "startB": 787,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/gemini.ts",
+      "startA": 70,
+      "fileB": "packages/coding-agent/src/discovery/vscode.ts",
+      "startB": 47,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/gemini.ts",
+      "startA": 95,
+      "fileB": "packages/coding-agent/src/discovery/vscode.ts",
+      "startB": 73,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/gemini.ts",
+      "startA": 238,
+      "fileB": "packages/coding-agent/src/discovery/opencode.ts",
+      "startB": 227,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/codex.ts",
+      "startA": 251,
+      "fileB": "packages/coding-agent/src/discovery/opencode.ts",
+      "startB": 227,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/codex.ts",
+      "startA": 381,
+      "fileB": "packages/coding-agent/src/discovery/codex.ts",
+      "startB": 301,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/codex.ts",
+      "startA": 418,
+      "fileB": "packages/coding-agent/src/discovery/codex.ts",
+      "startB": 301,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/codex.ts",
+      "startA": 432,
+      "fileB": "packages/coding-agent/src/discovery/codex.ts",
+      "startB": 76,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/cline.ts",
+      "startA": 53,
+      "fileB": "packages/coding-agent/src/discovery/windsurf.ts",
+      "startB": 117,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude.ts",
+      "startA": 92,
+      "fileB": "packages/coding-agent/src/discovery/cursor.ts",
+      "startB": 59,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude.ts",
+      "startA": 386,
+      "fileB": "packages/coding-agent/src/discovery/claude.ts",
+      "startB": 288,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 70,
+      "fileB": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startB": 36,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 133,
+      "fileB": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startB": 86,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 139,
+      "fileB": "packages/coding-agent/src/discovery/claude.ts",
+      "startB": 339,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 155,
+      "fileB": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startB": 36,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 170,
+      "fileB": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startB": 86,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/claude-plugins.ts",
+      "startA": 218,
+      "fileB": "packages/coding-agent/src/discovery/mcp-json.ts",
+      "startB": 26,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/builtin.ts",
+      "startA": 7,
+      "fileB": "packages/coding-agent/src/discovery/gemini.ts",
+      "startB": 19,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/builtin.ts",
+      "startA": 17,
+      "fileB": "packages/coding-agent/src/discovery/claude.ts",
+      "startB": 14,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/builtin.ts",
+      "startA": 816,
+      "fileB": "packages/coding-agent/src/discovery/builtin.ts",
+      "startB": 227,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/agents.ts",
+      "startA": 61,
+      "fileB": "packages/coding-agent/src/discovery/builtin.ts",
+      "startB": 284,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/agents.ts",
+      "startA": 120,
+      "fileB": "packages/coding-agent/src/discovery/agents.ts",
+      "startB": 88,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/discovery/agents.ts",
+      "startA": 153,
+      "fileB": "packages/coding-agent/src/discovery/agents.ts",
+      "startB": 88,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/debug/index.ts",
+      "startA": 229,
+      "fileB": "packages/coding-agent/src/debug/index.ts",
+      "startB": 168,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/debug/index.ts",
+      "startA": 237,
+      "fileB": "packages/coding-agent/src/debug/index.ts",
+      "startB": 176,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/debug/index.ts",
+      "startA": 268,
+      "fileB": "packages/coding-agent/src/debug/index.ts",
+      "startB": 168,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/debug/index.ts",
+      "startA": 276,
+      "fileB": "packages/coding-agent/src/debug/index.ts",
+      "startB": 176,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/debug/index.ts",
+      "startA": 398,
+      "fileB": "packages/coding-agent/src/debug/index.ts",
+      "startB": 169,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/dap/client.ts",
+      "startA": 43,
+      "fileB": "packages/coding-agent/src/lsp/client.ts",
+      "startB": 171,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/dap/client.ts",
+      "startA": 59,
+      "fileB": "packages/coding-agent/src/lsp/client.ts",
+      "startB": 209,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/dap/client.ts",
+      "startA": 237,
+      "fileB": "packages/coding-agent/src/dap/client.ts",
+      "startB": 182,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/dap/client.ts",
+      "startA": 648,
+      "fileB": "packages/coding-agent/src/dap/client.ts",
+      "startB": 611,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/commit/pipeline.ts",
+      "startA": 59,
+      "fileB": "packages/coding-agent/src/commit/agentic/index.ts",
+      "startB": 35,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/ssh-cli.ts",
+      "startA": 120,
+      "fileB": "packages/coding-agent/src/cli/ssh-cli.ts",
+      "startB": 99,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startA": 692,
+      "fileB": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startB": 587,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startA": 859,
+      "fileB": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startB": 845,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startA": 872,
+      "fileB": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startB": 829,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startA": 878,
+      "fileB": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startB": 835,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startA": 902,
+      "fileB": "packages/coding-agent/src/cli/plugin-cli.ts",
+      "startB": 888,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/config-cli.ts",
+      "startA": 330,
+      "fileB": "packages/coding-agent/src/cli/config-cli.ts",
+      "startB": 306,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cli/config-cli.ts",
+      "startA": 360,
+      "fileB": "packages/coding-agent/src/cli/config-cli.ts",
+      "startB": 306,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/index.ts",
+      "startA": 161,
+      "fileB": "packages/coding-agent/src/autoresearch/index.ts",
+      "startB": 152,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/index.ts",
+      "startA": 325,
+      "fileB": "packages/coding-agent/src/autoresearch/index.ts",
+      "startB": 286,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/index.ts",
+      "startA": 486,
+      "fileB": "packages/coding-agent/src/autoresearch/tools/log-experiment.ts",
+      "startB": 473,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startA": 275,
+      "fileB": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startB": 237,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startA": 290,
+      "fileB": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startB": 253,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startA": 496,
+      "fileB": "packages/coding-agent/src/autoresearch/helpers.ts",
+      "startB": 472,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/autoresearch/git.ts",
+      "startA": 254,
+      "fileB": "packages/coding-agent/src/autoresearch/git.ts",
+      "startB": 129,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/sdk/06-extensions.ts",
+      "startA": 26,
+      "fileB": "packages/coding-agent/examples/sdk/06-hooks.ts",
+      "startB": 40,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/sdk/02-custom-model.ts",
+      "startA": 38,
+      "fileB": "packages/coding-agent/examples/sdk/06-hooks.ts",
+      "startB": 41,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/hooks/handoff.ts",
+      "startA": 91,
+      "fileB": "packages/coding-agent/examples/hooks/qna.ts",
+      "startB": 82,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 30,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 36,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 141,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 77,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 155,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 91,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 162,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 98,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 169,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 105,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 177,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 113,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 189,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 120,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 195,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 126,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 205,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 136,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 223,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 149,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 236,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 163,
+      "lines": 35,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/examples/extensions/todo.ts",
+      "startA": 271,
+      "fileB": "packages/coding-agent/examples/custom-tools/todo/index.ts",
+      "startB": 198,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/utils/tool-choice.ts",
+      "startA": 56,
+      "fileB": "packages/ai/src/utils/tool-choice.ts",
+      "startB": 40,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/usage/kimi.ts",
+      "startA": 32,
+      "fileB": "packages/ai/src/usage/openai-codex.ts",
+      "startB": 63,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/usage/github-copilot.ts",
+      "startA": 146,
+      "fileB": "packages/ai/src/utils/oauth/github-copilot.ts",
+      "startB": 89,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/usage/claude.ts",
+      "startA": 186,
+      "fileB": "packages/ai/src/usage/openai-codex.ts",
+      "startB": 219,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/synthetic.ts",
+      "startA": 97,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 68,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/register-builtins.ts",
+      "startA": 182,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 132,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/openai-responses.ts",
+      "startA": 152,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 133,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/openai-responses-shared.ts",
+      "startA": 293,
+      "fileB": "packages/ai/src/providers/openai-responses-shared.ts",
+      "startB": 278,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/kimi.ts",
+      "startA": 54,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 51,
+      "lines": 39,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/kimi.ts",
+      "startA": 94,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 68,
+      "lines": 55,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google.ts",
+      "startA": 66,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 152,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google.ts",
+      "startA": 245,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 164,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google.ts",
+      "startA": 271,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 237,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google.ts",
+      "startA": 283,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 245,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 9,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 8,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 68,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 55,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 79,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 152,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 99,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 84,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 109,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 92,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 124,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 107,
+      "lines": 48,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 174,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 153,
+      "lines": 31,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 204,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 184,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 215,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 195,
+      "lines": 100,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 373,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 317,
+      "lines": 43,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/google-vertex.ts",
+      "startA": 415,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 360,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/gitlab-duo.ts",
+      "startA": 218,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 129,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/gitlab-duo.ts",
+      "startA": 344,
+      "fileB": "packages/ai/src/providers/gitlab-duo.ts",
+      "startB": 315,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 106,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 152,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 130,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 182,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 138,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 190,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 162,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 220,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 168,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 263,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 276,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 340,
+      "lines": 31,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 306,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 370,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/azure-openai-responses.ts",
+      "startA": 371,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 490,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/amazon-bedrock.ts",
+      "startA": 66,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 55,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/amazon-bedrock.ts",
+      "startA": 77,
+      "fileB": "packages/ai/src/providers/openai-responses.ts",
+      "startB": 152,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/amazon-bedrock.ts",
+      "startA": 192,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 267,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/providers/amazon-bedrock.ts",
+      "startA": 227,
+      "fileB": "packages/ai/src/providers/google.ts",
+      "startB": 283,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/language/mod.rs",
+      "startA": 70,
+      "fileB": "crates/pi-natives/src/language/mod.rs",
+      "startB": 21,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/language/mod.rs",
+      "startA": 90,
+      "fileB": "crates/pi-natives/src/language/mod.rs",
+      "startB": 33,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/language/mod.rs",
+      "startA": 184,
+      "fileB": "crates/pi-natives/src/language/mod.rs",
+      "startB": 25,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/language/mod.rs",
+      "startA": 228,
+      "fileB": "crates/pi-natives/src/language/mod.rs",
+      "startB": 218,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/language/mod.rs",
+      "startA": 338,
+      "fileB": "crates/pi-natives/src/language/mod.rs",
+      "startB": 270,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/indent.rs",
+      "startA": 495,
+      "fileB": "crates/pi-natives/src/chunk/resolve.rs",
+      "startB": 728,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/common.rs",
+      "startA": 162,
+      "fileB": "crates/pi-natives/src/chunk/common.rs",
+      "startB": 153,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/common.rs",
+      "startA": 208,
+      "fileB": "crates/pi-natives/src/chunk/common.rs",
+      "startB": 171,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/common.rs",
+      "startA": 226,
+      "fileB": "crates/pi-natives/src/chunk/common.rs",
+      "startB": 189,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 65,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 71,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 149,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 86,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 160,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 174,
+      "lines": 26,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 215,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 197,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 220,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 224,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 227,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 231,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_svelte.rs",
+      "startA": 241,
+      "fileB": "crates/pi-natives/src/chunk/ast_vue.rs",
+      "startB": 246,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_ruby_lua.rs",
+      "startA": 100,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 107,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startA": 85,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 58,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_proto.rs",
+      "startA": 69,
+      "fileB": "crates/pi-natives/src/chunk/ast_proto.rs",
+      "startB": 28,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_proto.rs",
+      "startA": 98,
+      "fileB": "crates/pi-natives/src/chunk/ast_sql.rs",
+      "startB": 187,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_powershell.rs",
+      "startA": 38,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 68,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_perl.rs",
+      "startA": 74,
+      "fileB": "crates/pi-natives/src/chunk/ast_powershell.rs",
+      "startB": 206,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_ocaml.rs",
+      "startA": 151,
+      "fileB": "crates/pi-natives/src/chunk/ast_powershell.rs",
+      "startB": 206,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 162,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 68,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 195,
+      "fileB": "crates/pi-natives/src/chunk/ast_ruby_lua.rs",
+      "startB": 73,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 224,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 92,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 234,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 98,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 258,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 79,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startA": 288,
+      "fileB": "crates/pi-natives/src/chunk/ast_ruby_lua.rs",
+      "startB": 100,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_markup.rs",
+      "startA": 72,
+      "fileB": "crates/pi-natives/src/chunk/ast_markup.rs",
+      "startB": 60,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startA": 148,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 114,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startA": 419,
+      "fileB": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startB": 263,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_ini.rs",
+      "startA": 54,
+      "fileB": "crates/pi-natives/src/chunk/ast_powershell.rs",
+      "startB": 206,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_haskell_scala.rs",
+      "startA": 55,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 68,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_haskell_scala.rs",
+      "startA": 64,
+      "fileB": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startB": 193,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_haskell_scala.rs",
+      "startA": 86,
+      "fileB": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startB": 240,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_haskell_scala.rs",
+      "startA": 91,
+      "fileB": "crates/pi-natives/src/chunk/ast_rust.rs",
+      "startB": 107,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_graphql.rs",
+      "startA": 215,
+      "fileB": "crates/pi-natives/src/chunk/ast_sql.rs",
+      "startB": 187,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_graphql.rs",
+      "startA": 233,
+      "fileB": "crates/pi-natives/src/chunk/ast_sql.rs",
+      "startB": 205,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_go.rs",
+      "startA": 70,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 114,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_go.rs",
+      "startA": 146,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 179,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_go.rs",
+      "startA": 189,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 242,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_elixir.rs",
+      "startA": 145,
+      "fileB": "crates/pi-natives/src/chunk/ast_elixir.rs",
+      "startB": 138,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_dockerfile.rs",
+      "startA": 13,
+      "fileB": "crates/pi-natives/src/chunk/ast_just.rs",
+      "startB": 9,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_dockerfile.rs",
+      "startA": 105,
+      "fileB": "crates/pi-natives/src/chunk/ast_just.rs",
+      "startB": 78,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 36,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 38,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 85,
+      "fileB": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startB": 42,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 102,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 104,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 183,
+      "fileB": "crates/pi-natives/src/chunk/ast_python.rs",
+      "startB": 179,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 186,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 166,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 199,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 184,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 207,
+      "fileB": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startB": 397,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startA": 221,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 245,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_cmake.rs",
+      "startA": 7,
+      "fileB": "crates/pi-natives/src/chunk/ast_dockerfile.rs",
+      "startB": 7,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_clojure.rs",
+      "startA": 57,
+      "fileB": "crates/pi-natives/src/chunk/ast_elixir.rs",
+      "startB": 133,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_clojure.rs",
+      "startA": 64,
+      "fileB": "crates/pi-natives/src/chunk/ast_elixir.rs",
+      "startB": 140,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_clojure.rs",
+      "startA": 69,
+      "fileB": "crates/pi-natives/src/chunk/ast_clojure.rs",
+      "startB": 62,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 194,
+      "fileB": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startB": 73,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 208,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 105,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 251,
+      "fileB": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startB": 157,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 269,
+      "fileB": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startB": 125,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 282,
+      "fileB": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startB": 139,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 297,
+      "fileB": "crates/pi-natives/src/chunk/ast_js_ts.rs",
+      "startB": 145,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 311,
+      "fileB": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startB": 183,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 320,
+      "fileB": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startB": 192,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 323,
+      "fileB": "crates/pi-natives/src/chunk/ast_csharp_java.rs",
+      "startB": 198,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_c_cpp_objc.rs",
+      "startA": 332,
+      "fileB": "crates/pi-natives/src/chunk/ast_misc.rs",
+      "startB": 397,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_bash_make_diff.rs",
+      "startA": 66,
+      "fileB": "crates/pi-natives/src/chunk/ast_dockerfile.rs",
+      "startB": 102,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_bash_make_diff.rs",
+      "startA": 77,
+      "fileB": "crates/pi-natives/src/chunk/ast_bash_make_diff.rs",
+      "startB": 52,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/chunk/ast_astro.rs",
+      "startA": 119,
+      "fileB": "crates/pi-natives/src/chunk/ast_sql.rs",
+      "startB": 187,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/videodb/scripts/ws_listener.py",
+      "startA": 204,
+      "fileB": ".floyd/skills/videodb/scripts/ws_listener.py",
+      "startB": 160,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/vercel-deploy/scripts/deploy.sh",
+      "startA": 171,
+      "fileB": ".floyd/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startB": 164,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/vercel-deploy/scripts/deploy.sh",
+      "startA": 212,
+      "fileB": ".floyd/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startB": 195,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/vercel-deploy/scripts/deploy.sh",
+      "startA": 227,
+      "fileB": ".floyd/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startB": 210,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/vercel-deploy/scripts/deploy.sh",
+      "startA": 243,
+      "fileB": ".floyd/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startB": 224,
+      "lines": 26,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/speech/scripts/text_to_speech.py",
+      "startA": 43,
+      "fileB": ".floyd/skills/transcribe/scripts/transcribe_diarize.py",
+      "startB": 21,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/sora/scripts/sora.py",
+      "startA": 41,
+      "fileB": ".floyd/skills/transcribe/scripts/transcribe_diarize.py",
+      "startB": 24,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/sora/scripts/sora.py",
+      "startA": 242,
+      "fileB": ".floyd/skills/speech/scripts/text_to_speech.py",
+      "startB": 239,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/sora/scripts/sora.py",
+      "startA": 286,
+      "fileB": ".floyd/skills/speech/scripts/text_to_speech.py",
+      "startB": 143,
+      "lines": 34,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startA": 26,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 27,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/spin.py",
+      "startA": 26,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 27,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/spin.py",
+      "startA": 127,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 206,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/slide.py",
+      "startA": 127,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 196,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/pulse.py",
+      "startA": 8,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/spin.py",
+      "startB": 8,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/pulse.py",
+      "startA": 26,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 26,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startA": 26,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 27,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/flip.py",
+      "startA": 8,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 8,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/flip.py",
+      "startA": 25,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 25,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/flip.py",
+      "startA": 81,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 173,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/flip.py",
+      "startA": 140,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 205,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startA": 25,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 27,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startA": 123,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 205,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startA": 179,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 25,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startA": 213,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 59,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startA": 226,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 75,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/explode.py",
+      "startA": 29,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 27,
+      "lines": 24,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/templates/explode.py",
+      "startA": 223,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/explode.py",
+      "startB": 93,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startA": 142,
+      "fileB": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startB": 89,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startA": 192,
+      "fileB": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startB": 89,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/core/frame_composer.py",
+      "startA": 122,
+      "fileB": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startB": 93,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/slack-gif-creator/core/frame_composer.py",
+      "startA": 362,
+      "fileB": ".floyd/skills/slack-gif-creator/core/frame_composer.py",
+      "startB": 29,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/query_ownership.py",
+      "startA": 191,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/query_ownership.py",
+      "startB": 173,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/community_maintainers.py",
+      "startA": 185,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/query_ownership.py",
+      "startB": 92,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startA": 68,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/run_ownership_map.py",
+      "startB": 15,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startA": 127,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/run_ownership_map.py",
+      "startB": 39,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startA": 148,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/run_ownership_map.py",
+      "startB": 65,
+      "lines": 33,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startA": 342,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/community_maintainers.py",
+      "startB": 306,
+      "lines": 27,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/screenshot/scripts/macos_display_info.swift",
+      "startA": 12,
+      "fileB": ".floyd/skills/screenshot/scripts/macos_window_info.swift",
+      "startB": 116,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startA": 58,
+      "fileB": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startB": 16,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startA": 71,
+      "fileB": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startB": 47,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startA": 156,
+      "fileB": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startB": 116,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/notion-research-documentation/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/notion-meeting-intelligence/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/notion-knowledge-capture/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 42,
+      "fileB": ".floyd/skills/transcribe/scripts/transcribe_diarize.py",
+      "startB": 24,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 59,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 47,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 196,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 338,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 228,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 319,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 308,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 248,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 355,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 218,
+      "lines": 58,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 447,
+      "fileB": ".floyd/skills/speech/scripts/text_to_speech.py",
+      "startB": 144,
+      "lines": 33,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 479,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 520,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 489,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 530,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 561,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 571,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 576,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 482,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 618,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 602,
+      "lines": 23,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 715,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 648,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 726,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 658,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 735,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 666,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 770,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 690,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startA": 792,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 814,
+      "lines": 27,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/image-generation/scripts/generate.py",
+      "startA": 96,
+      "fileB": ".floyd/skills/video-generation/scripts/generate.py",
+      "startB": 80,
+      "lines": 29,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/figma/assets/icon.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/figma-implement-design/assets/icon.svg",
+      "startB": 1,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "startA": 450,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "startB": 435,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "startA": 455,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "startB": 440,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/scripts/generate_deployment_url.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.sh",
+      "startB": 1,
+      "lines": 90,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/deploy-model/scripts/generate_deployment_url.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.ps1",
+      "startB": 1,
+      "lines": 73,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startA": 580,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startB": 545,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startA": 841,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startB": 802,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startA": 876,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startB": 839,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startA": 922,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startB": 839,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/continuous-learning-v2/hooks/observe.sh",
+      "startA": 30,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/detect-project.sh",
+      "startB": 26,
+      "lines": 20,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/capacity/scripts/query_capacity.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startB": 1,
+      "lines": 75,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/capacity/scripts/query_capacity.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startB": 1,
+      "lines": 80,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/capacity/scripts/discover_and_rank.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/capacity/scripts/discover_and_rank.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/videodb/scripts/ws_listener.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/videodb/scripts/ws_listener.py",
+      "startB": 1,
+      "lines": 282,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/video-generation/scripts/generate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/video-generation/scripts/generate.py",
+      "startB": 1,
+      "lines": 116,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/vercel-deploy-claimable/scripts/deploy.sh",
+      "startB": 1,
+      "lines": 249,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/vercel-deploy/scripts/deploy.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/vercel-deploy/scripts/deploy.sh",
+      "startB": 1,
+      "lines": 268,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/transcribe/scripts/transcribe_diarize.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/transcribe/scripts/transcribe_diarize.py",
+      "startB": 1,
+      "lines": 276,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/speech/scripts/text_to_speech.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/speech/scripts/text_to_speech.py",
+      "startB": 1,
+      "lines": 528,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/sora/scripts/sora.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/sora/scripts/sora.py",
+      "startB": 1,
+      "lines": 970,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/zoom.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/zoom.py",
+      "startB": 1,
+      "lines": 312,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/wiggle.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/wiggle.py",
+      "startB": 1,
+      "lines": 300,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/spin.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/spin.py",
+      "startB": 1,
+      "lines": 269,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/slide.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/slide.py",
+      "startB": 1,
+      "lines": 291,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/shake.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/shake.py",
+      "startB": 1,
+      "lines": 127,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/pulse.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/pulse.py",
+      "startB": 1,
+      "lines": 268,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/move.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/move.py",
+      "startB": 1,
+      "lines": 293,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/morph.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/morph.py",
+      "startB": 1,
+      "lines": 329,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/kaleidoscope.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/kaleidoscope.py",
+      "startB": 1,
+      "lines": 211,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/flip.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/flip.py",
+      "startB": 1,
+      "lines": 291,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/fade.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/fade.py",
+      "startB": 1,
+      "lines": 329,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/explode.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/explode.py",
+      "startB": 1,
+      "lines": 331,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/templates/bounce.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/templates/bounce.py",
+      "startB": 1,
+      "lines": 106,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/visual_effects.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/visual_effects.py",
+      "startB": 1,
+      "lines": 494,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/validators.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/validators.py",
+      "startB": 1,
+      "lines": 264,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/typography.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/typography.py",
+      "startB": 1,
+      "lines": 357,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/gif_builder.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/gif_builder.py",
+      "startB": 1,
+      "lines": 246,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/frame_composer.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/frame_composer.py",
+      "startB": 1,
+      "lines": 469,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/easing.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/easing.py",
+      "startB": 1,
+      "lines": 230,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/slack-gif-creator/core/color_palettes.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/slack-gif-creator/core/color_palettes.py",
+      "startB": 1,
+      "lines": 302,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-stocktake/scripts/scan.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-stocktake/scripts/scan.sh",
+      "startB": 1,
+      "lines": 170,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-stocktake/scripts/save-results.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-stocktake/scripts/save-results.sh",
+      "startB": 1,
+      "lines": 56,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-stocktake/scripts/quick-diff.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-stocktake/scripts/quick-diff.sh",
+      "startB": 1,
+      "lines": 87,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-installer/scripts/list-skills.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-installer/scripts/list-skills.py",
+      "startB": 1,
+      "lines": 107,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-installer/scripts/install-skill-from-github.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-installer/scripts/install-skill-from-github.py",
+      "startB": 1,
+      "lines": 308,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-installer/scripts/github_utils.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-installer/scripts/github_utils.py",
+      "startB": 1,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-guard/scripts/safe-install.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-guard/scripts/safe-install.sh",
+      "startB": 1,
+      "lines": 211,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/sentry/scripts/sentry_api.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/sentry/scripts/sentry_api.py",
+      "startB": 1,
+      "lines": 238,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/security-ownership-map/scripts/run_ownership_map.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/run_ownership_map.py",
+      "startB": 1,
+      "lines": 200,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/security-ownership-map/scripts/query_ownership.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/query_ownership.py",
+      "startB": 1,
+      "lines": 483,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/security-ownership-map/scripts/community_maintainers.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/community_maintainers.py",
+      "startB": 1,
+      "lines": 544,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/security-ownership-map/scripts/build_ownership_map.py",
+      "startB": 1,
+      "lines": 956,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/take_screenshot.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/take_screenshot.py",
+      "startB": 1,
+      "lines": 585,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/take_screenshot.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/take_screenshot.ps1",
+      "startB": 1,
+      "lines": 163,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/macos_window_info.swift",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/macos_window_info.swift",
+      "startB": 1,
+      "lines": 126,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/macos_permissions.swift",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/macos_permissions.swift",
+      "startB": 1,
+      "lines": 40,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/macos_display_info.swift",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/macos_display_info.swift",
+      "startB": 1,
+      "lines": 22,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/screenshot/scripts/ensure_macos_permissions.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/screenshot/scripts/ensure_macos_permissions.sh",
+      "startB": 1,
+      "lines": 54,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/scripts/thumbnail.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/scripts/thumbnail.py",
+      "startB": 1,
+      "lines": 450,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/scripts/replace.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/scripts/replace.py",
+      "startB": 1,
+      "lines": 385,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/scripts/rearrange.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/scripts/rearrange.py",
+      "startB": 1,
+      "lines": 231,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pptx/scripts/html2pptx.js",
+      "startA": 1,
+      "fileB": ".floyd/skills/pptx/scripts/html2pptx.js",
+      "startB": 1,
+      "lines": 979,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/ppt-generation/scripts/generate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/ppt-generation/scripts/generate.py",
+      "startB": 1,
+      "lines": 161,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/podcast-generation/scripts/generate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/podcast-generation/scripts/generate.py",
+      "startB": 1,
+      "lines": 284,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/plugin-creator/scripts/create_basic_plugin.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/plugin-creator/scripts/create_basic_plugin.py",
+      "startB": 1,
+      "lines": 301,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/fill_pdf_form_with_annotations.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/fill_pdf_form_with_annotations.py",
+      "startB": 1,
+      "lines": 108,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/fill_fillable_fields.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/fill_fillable_fields.py",
+      "startB": 1,
+      "lines": 114,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/extract_form_field_info.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/extract_form_field_info.py",
+      "startB": 1,
+      "lines": 152,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/create_validation_image.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/create_validation_image.py",
+      "startB": 1,
+      "lines": 41,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/convert_pdf_to_images.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/convert_pdf_to_images.py",
+      "startB": 1,
+      "lines": 35,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/check_bounding_boxes_test.py",
+      "startB": 1,
+      "lines": 226,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/pdf/scripts/check_bounding_boxes.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/pdf/scripts/check_bounding_boxes.py",
+      "startB": 1,
+      "lines": 70,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notion-research-documentation/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notion-meeting-intelligence/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notion-knowledge-capture/assets/notion-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/notion-spec-to-implementation/assets/notion-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/setup_environment.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/setup_environment.py",
+      "startB": 1,
+      "lines": 201,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/run.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/run.py",
+      "startB": 1,
+      "lines": 100,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/notebook_manager.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/notebook_manager.py",
+      "startB": 1,
+      "lines": 410,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/cleanup_manager.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/cleanup_manager.py",
+      "startB": 1,
+      "lines": 302,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/browser_session.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/browser_session.py",
+      "startB": 1,
+      "lines": 309,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/auth_manager.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/auth_manager.py",
+      "startB": 1,
+      "lines": 352,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/ask_question.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/ask_question.py",
+      "startB": 1,
+      "lines": 271,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/notebooklm/scripts/__init__.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/notebooklm/scripts/__init__.py",
+      "startB": 1,
+      "lines": 81,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/netlify-deploy/assets/netlify-small.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/netlify-deploy/assets/netlify-small.svg",
+      "startB": 1,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/jupyter-notebook/scripts/new_notebook.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/jupyter-notebook/scripts/new_notebook.py",
+      "startB": 1,
+      "lines": 130,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/imagegen/scripts/image_gen.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/imagegen/scripts/image_gen.py",
+      "startB": 1,
+      "lines": 926,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/image-generation/scripts/generate.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/image-generation/scripts/generate.py",
+      "startB": 1,
+      "lines": 132,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/github-deep-research/scripts/github_api.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/github-deep-research/scripts/github_api.py",
+      "startB": 1,
+      "lines": 331,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/gh-fix-ci/scripts/inspect_pr_checks.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/gh-fix-ci/scripts/inspect_pr_checks.py",
+      "startB": 1,
+      "lines": 509,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/gh-address-comments/scripts/fetch_comments.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/gh-address-comments/scripts/fetch_comments.py",
+      "startB": 1,
+      "lines": 237,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/find-skills/scripts/install-skill.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/find-skills/scripts/install-skill.sh",
+      "startB": 1,
+      "lines": 62,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/figma-implement-design/assets/icon.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/figma-implement-design/assets/icon.svg",
+      "startB": 1,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/figma/assets/icon.svg",
+      "startA": 1,
+      "fileB": ".floyd/skills/figma-implement-design/assets/icon.svg",
+      "startB": 1,
+      "lines": 28,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/docx/scripts/utilities.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/docx/scripts/utilities.py",
+      "startB": 1,
+      "lines": 374,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/xlsx_recalc.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/xlsx_recalc.py",
+      "startB": 1,
+      "lines": 342,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/xlsx_create.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/xlsx_create.py",
+      "startB": 1,
+      "lines": 392,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/docx_unpack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_unpack.py",
+      "startB": 1,
+      "lines": 87,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/docx_pack.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_pack.py",
+      "startB": 1,
+      "lines": 114,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/docx_edit.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_edit.py",
+      "startB": 1,
+      "lines": 371,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/document-creator/scripts/docx_create.ts",
+      "startA": 1,
+      "fileB": ".floyd/skills/document-creator/scripts/docx_create.ts",
+      "startB": 1,
+      "lines": 818,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/doc/scripts/render_docx.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/doc/scripts/render_docx.py",
+      "startB": 1,
+      "lines": 296,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "startA": 1,
+      "fileB": ".floyd/skills/develop-web-game/scripts/web_game_playwright_client.js",
+      "startB": 1,
+      "lines": 356,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/scripts/generate_deployment_url.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.sh",
+      "startB": 1,
+      "lines": 90,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/deploy-model/scripts/generate_deployment_url.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/scripts/generate_deployment_url.ps1",
+      "startB": 1,
+      "lines": 73,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/data-analysis/scripts/analyze.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/data-analysis/scripts/analyze.py",
+      "startB": 1,
+      "lines": 566,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/test_parse_instinct.py",
+      "startB": 1,
+      "lines": 984,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/scripts/detect-project.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/scripts/detect-project.sh",
+      "startB": 1,
+      "lines": 228,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/hooks/observe.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/hooks/observe.sh",
+      "startB": 1,
+      "lines": 412,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/agents/start-observer.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/agents/start-observer.sh",
+      "startB": 1,
+      "lines": 240,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/agents/session-guardian.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/agents/session-guardian.sh",
+      "startB": 1,
+      "lines": 150,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning-v2/agents/observer-loop.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning-v2/agents/observer-loop.sh",
+      "startB": 1,
+      "lines": 210,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/chart-visualization/scripts/generate.js",
+      "startA": 1,
+      "fileB": ".floyd/skills/chart-visualization/scripts/generate.js",
+      "startB": 1,
+      "lines": 173,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/capacity/scripts/query_capacity.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.sh",
+      "startB": 1,
+      "lines": 75,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/capacity/scripts/query_capacity.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/query_capacity.ps1",
+      "startB": 1,
+      "lines": 80,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/capacity/scripts/discover_and_rank.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.sh",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/capacity/scripts/discover_and_rank.ps1",
+      "startA": 1,
+      "fileB": ".floyd/skills/microsoft-foundry/models/deploy-model/capacity/scripts/discover_and_rank.ps1",
+      "startB": 1,
+      "lines": 113,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/atlas/scripts/atlas_common.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/atlas/scripts/atlas_common.py",
+      "startB": 1,
+      "lines": 168,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/atlas/scripts/atlas_cli.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/atlas/scripts/atlas_cli.py",
+      "startB": 1,
+      "lines": 473,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/artifacts-builder/scripts/init-artifact.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/artifacts-builder/scripts/init-artifact.sh",
+      "startB": 1,
+      "lines": 322,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/artifacts-builder/scripts/bundle-artifact.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/artifacts-builder/scripts/bundle-artifact.sh",
+      "startB": 1,
+      "lines": 54,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/algorithmic-art/templates/viewer.html",
+      "startA": 1,
+      "fileB": ".floyd/skills/algorithmic-art/templates/viewer.html",
+      "startB": 1,
+      "lines": 599,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/algorithmic-art/templates/generator_template.js",
+      "startA": 1,
+      "fileB": ".floyd/skills/algorithmic-art/templates/generator_template.js",
+      "startB": 1,
+      "lines": 223,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/agent-migration-workflow/scripts/status.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/agent-migration-workflow/scripts/status.sh",
+      "startB": 1,
+      "lines": 98,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/agent-migration-workflow/scripts/chat.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/agent-migration-workflow/scripts/chat.sh",
+      "startB": 1,
+      "lines": 234,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/agent-browser/templates/form-automation.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/agent-browser/templates/form-automation.sh",
+      "startB": 1,
+      "lines": 62,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/agent-browser/templates/capture-workflow.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/agent-browser/templates/capture-workflow.sh",
+      "startB": 1,
+      "lines": 69,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/agent-browser/templates/authenticated-session.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/agent-browser/templates/authenticated-session.sh",
+      "startB": 1,
+      "lines": 105,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/_quarantine/webapp-testing/test_codebase_cartographer.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/_quarantine/webapp-testing/test_codebase_cartographer.py",
+      "startB": 1,
+      "lines": 67,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/utils/src/frontmatter.ts",
+      "startA": 41,
+      "fileB": "packages/coding-agent/src/task/agents.ts",
+      "startB": 87,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "startA": 41,
+      "fileB": "packages/typescript-edit-benchmark/src/verify.ts",
+      "startB": 23,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "startA": 123,
+      "fileB": "packages/typescript-edit-benchmark/src/tasks.ts",
+      "startB": 72,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/report.ts",
+      "startA": 197,
+      "fileB": "packages/typescript-edit-benchmark/src/report.ts",
+      "startB": 179,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/report.ts",
+      "startA": 463,
+      "fileB": "packages/typescript-edit-benchmark/src/report.ts",
+      "startB": 378,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/in-process-client.ts",
+      "startA": 127,
+      "fileB": "packages/coding-agent/src/modes/rpc/rpc-client.ts",
+      "startB": 269,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/typescript-edit-benchmark/src/formatter.ts",
+      "startA": 39,
+      "fileB": "packages/typescript-edit-benchmark/src/verify.ts",
+      "startB": 26,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/terminal.ts",
+      "startA": 522,
+      "fileB": "packages/tui/src/terminal.ts",
+      "startB": 459,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/stdin-buffer.ts",
+      "startA": 315,
+      "fileB": "packages/tui/src/stdin-buffer.ts",
+      "startB": 283,
+      "lines": 21,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/fuzzy.ts",
+      "startA": 15,
+      "fileB": "packages/coding-agent/src/utils/fuzzy.ts",
+      "startB": 13,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/fuzzy.ts",
+      "startA": 110,
+      "fileB": "packages/coding-agent/src/utils/fuzzy.ts",
+      "startB": 71,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/autocomplete.ts",
+      "startA": 128,
+      "fileB": "packages/coding-agent/src/modes/prompt-action-autocomplete.ts",
+      "startB": 52,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/autocomplete.ts",
+      "startA": 182,
+      "fileB": "packages/coding-agent/src/modes/prompt-action-autocomplete.ts",
+      "startB": 134,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/autocomplete.ts",
+      "startA": 217,
+      "fileB": "packages/coding-agent/src/modes/prompt-action-autocomplete.ts",
+      "startB": 97,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/autocomplete.ts",
+      "startA": 722,
+      "fileB": "packages/coding-agent/src/modes/prompt-action-autocomplete.ts",
+      "startB": 100,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/src/autocomplete.ts",
+      "startA": 751,
+      "fileB": "packages/tui/src/autocomplete.ts",
+      "startB": 726,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/bench/sanitize.ts",
+      "startA": 42,
+      "fileB": "packages/tui/bench/text-layout.ts",
+      "startB": 4,
+      "lines": 27,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/bench/parse-key.ts",
+      "startA": 57,
+      "fileB": "packages/tui/bench/text-layout.ts",
+      "startB": 14,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/tui/bench/kitty-sequence.ts",
+      "startA": 27,
+      "fileB": "packages/tui/bench/text-layout.ts",
+      "startB": 16,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/stats/src/index.ts",
+      "startA": 26,
+      "fileB": "packages/coding-agent/src/cli/stats-cli.ts",
+      "startB": 56,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/stats/src/index.ts",
+      "startA": 45,
+      "fileB": "packages/coding-agent/src/cli/stats-cli.ts",
+      "startB": 121,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/stats/src/index.ts",
+      "startA": 59,
+      "fileB": "packages/coding-agent/src/cli/stats-cli.ts",
+      "startB": 135,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/stats/src/index.ts",
+      "startA": 68,
+      "fileB": "packages/coding-agent/src/cli/stats-cli.ts",
+      "startB": 144,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/main.ts",
+      "startA": 715,
+      "fileB": "packages/coding-agent/src/modes/controllers/selector-controller.ts",
+      "startB": 431,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/src/cursor.ts",
+      "startA": 120,
+      "fileB": "packages/coding-agent/src/cursor.ts",
+      "startB": 85,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/scripts/generate-template.ts",
+      "startA": 7,
+      "fileB": "packages/coding-agent/src/export/html/template.macro.ts",
+      "startB": 6,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/coding-agent/bench/rendering.ts",
+      "startA": 10,
+      "fileB": "packages/tui/bench/text-layout.ts",
+      "startB": 14,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/types.ts",
+      "startA": 287,
+      "fileB": "packages/stats/src/client/types.ts",
+      "startB": 6,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/stream.ts",
+      "startA": 54,
+      "fileB": "packages/ai/src/utils/anthropic-auth.ts",
+      "startB": 35,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/stream.ts",
+      "startA": 367,
+      "fileB": "packages/ai/src/stream.ts",
+      "startB": 348,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 121,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 110,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 134,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 99,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 145,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 110,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 155,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 110,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 181,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 197,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 225,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 242,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 259,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 275,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/ai/src/cli.ts",
+      "startA": 292,
+      "fileB": "packages/ai/src/cli.ts",
+      "startB": 165,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/agent/src/proxy.ts",
+      "startA": 91,
+      "fileB": "packages/ai/src/providers/register-builtins.ts",
+      "startB": 181,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "packages/agent/src/agent-loop.ts",
+      "startA": 351,
+      "fileB": "packages/ai/src/providers/synthetic.ts",
+      "startB": 135,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/utils.rs",
+      "startA": 16,
+      "fileB": "crates/pi-natives/src/utils.rs",
+      "startB": 4,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/pty.rs",
+      "startA": 433,
+      "fileB": "crates/pi-natives/src/pty.rs",
+      "startB": 397,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/ps.rs",
+      "startA": 97,
+      "fileB": "crates/pi-natives/src/ps.rs",
+      "startB": 35,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/ps.rs",
+      "startA": 115,
+      "fileB": "crates/pi-natives/src/ps.rs",
+      "startB": 53,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/highlight.rs",
+      "startA": 433,
+      "fileB": "crates/pi-natives/src/highlight.rs",
+      "startB": 404,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/fff.rs",
+      "startA": 199,
+      "fileB": "crates/pi-natives/src/glob.rs",
+      "startB": 140,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/fff.rs",
+      "startA": 346,
+      "fileB": "crates/pi-natives/src/fs_cache.rs",
+      "startB": 406,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/fff.rs",
+      "startA": 356,
+      "fileB": "crates/pi-natives/src/fs_cache.rs",
+      "startB": 416,
+      "lines": 17,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/pi-natives/src/fff.rs",
+      "startA": 421,
+      "fileB": "crates/pi-natives/src/fff.rs",
+      "startB": 387,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "startA": 200,
+      "fileB": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "startB": 185,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/patterns.rs",
+      "startA": 491,
+      "fileB": "crates/brush-core-vendored/src/patterns.rs",
+      "startB": 465,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/jobs.rs",
+      "startA": 399,
+      "fileB": "crates/brush-core-vendored/src/jobs.rs",
+      "startB": 384,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/functions.rs",
+      "startA": 118,
+      "fileB": "crates/brush-core-vendored/src/scripts.rs",
+      "startB": 35,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 256,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 280,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 292,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 304,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 316,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 329,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 244,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 356,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 342,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 370,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 342,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 384,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 342,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 398,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 342,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 412,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 342,
+      "lines": 13,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 450,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 430,
+      "lines": 19,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 577,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 560,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startA": 594,
+      "fileB": "crates/brush-core-vendored/src/extendedtests.rs",
+      "startB": 560,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/escape.rs",
+      "startA": 115,
+      "fileB": "crates/brush-core-vendored/src/escape.rs",
+      "startB": 93,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/escape.rs",
+      "startA": 143,
+      "fileB": "crates/brush-core-vendored/src/escape.rs",
+      "startB": 93,
+      "lines": 14,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/escape.rs",
+      "startA": 158,
+      "fileB": "crates/brush-core-vendored/src/escape.rs",
+      "startB": 130,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/env.rs",
+      "startA": 308,
+      "fileB": "crates/brush-core-vendored/src/env.rs",
+      "startB": 127,
+      "lines": 26,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/env.rs",
+      "startA": 360,
+      "fileB": "crates/brush-core-vendored/src/env.rs",
+      "startB": 128,
+      "lines": 25,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/env.rs",
+      "startA": 450,
+      "fileB": "crates/brush-core-vendored/src/env.rs",
+      "startB": 410,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-core-vendored/src/builtins.rs",
+      "startA": 434,
+      "fileB": "crates/brush-core-vendored/src/builtins.rs",
+      "startB": 415,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/set.rs",
+      "startA": 338,
+      "fileB": "crates/brush-builtins-vendored/src/set.rs",
+      "startB": 319,
+      "lines": 11,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/mapfile.rs",
+      "startA": 142,
+      "fileB": "crates/brush-builtins-vendored/src/read.rs",
+      "startB": 291,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/hash.rs",
+      "startA": 32,
+      "fileB": "crates/brush-builtins-vendored/src/type_.rs",
+      "startB": 46,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/fg.rs",
+      "startA": 48,
+      "fileB": "crates/brush-builtins-vendored/src/fg.rs",
+      "startB": 23,
+      "lines": 18,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/fc.rs",
+      "startA": 92,
+      "fileB": "crates/brush-builtins-vendored/src/fc.rs",
+      "startB": 59,
+      "lines": 8,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/exit.rs",
+      "startA": 12,
+      "fileB": "crates/brush-builtins-vendored/src/return_.rs",
+      "startB": 13,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/echo.rs",
+      "startA": 33,
+      "fileB": "crates/brush-builtins-vendored/src/getopts.rs",
+      "startB": 28,
+      "lines": 16,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/break_.rs",
+      "startA": 13,
+      "fileB": "crates/brush-builtins-vendored/src/continue_.rs",
+      "startB": 13,
+      "lines": 15,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/bg.rs",
+      "startA": 13,
+      "fileB": "crates/brush-builtins-vendored/src/unalias.rs",
+      "startB": 17,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": "crates/brush-builtins-vendored/src/alias.rs",
+      "startA": 18,
+      "fileB": "crates/brush-builtins-vendored/src/unalias.rs",
+      "startB": 17,
+      "lines": 10,
+      "tokens": 0
+    },
+    {
+      "fileA": ".floyd/skills/xlsx/recalc.py",
+      "startA": 140,
+      "fileB": ".floyd/skills/document-creator/scripts/xlsx_recalc.py",
+      "startB": 222,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/xlsx/recalc.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/xlsx/recalc.py",
+      "startB": 1,
+      "lines": 178,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/writing-skills/render-graphs.js",
+      "startA": 1,
+      "fileB": ".floyd/skills/writing-skills/render-graphs.js",
+      "startB": 1,
+      "lines": 168,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/strategic-compact/suggest-compact.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/strategic-compact/suggest-compact.sh",
+      "startB": 1,
+      "lines": 54,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-scanner/streamlit_ui.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-scanner/streamlit_ui.py",
+      "startB": 1,
+      "lines": 289,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/skill-scanner/skill_scanner.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/skill-scanner/skill_scanner.py",
+      "startB": 1,
+      "lines": 392,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/post-compaction-drift-check/drift_check.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/post-compaction-drift-check/drift_check.py",
+      "startB": 1,
+      "lines": 554,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/continuous-learning/evaluate-session.sh",
+      "startA": 1,
+      "fileB": ".floyd/skills/continuous-learning/evaluate-session.sh",
+      "startB": 1,
+      "lines": 69,
+      "tokens": 0
+    },
+    {
+      "fileA": ".crush/skills/canvas-design/create_social_card.py",
+      "startA": 1,
+      "fileB": ".floyd/skills/canvas-design/create_social_card.py",
+      "startB": 1,
+      "lines": 117,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 62,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/storage.ts",
+      "startB": 161,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 210,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startB": 222,
+      "lines": 9,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 273,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/storage.ts",
+      "startB": 417,
+      "lines": 7,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 376,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startB": 363,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 384,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/observer.ts",
+      "startB": 372,
+      "lines": 12,
+      "tokens": 0
+    },
+    {
+      "fileA": ".omp/hooks/continuous-learning.ts",
+      "startA": 417,
+      "fileB": "packages/coding-agent/src/extensibility/continuous-learning/storage.ts",
+      "startB": 133,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "scripts/sync-versions.ts",
+      "startA": 85,
+      "fileB": "scripts/sync-versions.ts",
+      "startB": 69,
+      "lines": 6,
+      "tokens": 0
+    },
+    {
+      "fileA": "scripts/release.ts",
+      "startA": 90,
+      "fileB": "scripts/release.ts",
+      "startB": 43,
+      "lines": 7,
+      "tokens": 0
+    }
+  ],
+  "duplicatedLines": 48078,
+  "totalLines": 300321,
+  "percentage": 16.01
 }

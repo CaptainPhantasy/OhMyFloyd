@@ -1,0 +1,711 @@
+{
+  "items": [
+    {
+      "type": "TODO",
+      "message": "implement 'cd -@'",
+      "file": "crates/brush-builtins-vendored/src/cd.rs",
+      "line": 40,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "remove clone, and use temporary lifetime extension after rust 1.75",
+      "file": "crates/brush-builtins-vendored/src/cd.rs",
+      "line": 57,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "jobs: review this logic",
+      "file": "crates/brush-builtins-vendored/src/command.rs",
+      "line": 159,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "`local -` allows shadowing the current `set` options (i.e., $-), with",
+      "file": "crates/brush-builtins-vendored/src/declare.rs",
+      "line": 258,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "implement +N and -N",
+      "file": "crates/brush-builtins-vendored/src/dirs.rs",
+      "line": 47,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Handle trap inheritance.",
+      "file": "crates/brush-builtins-vendored/src/dot.rs",
+      "line": 24,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "we can safely remove this after the issue is resolved",
+      "file": "crates/brush-builtins-vendored/src/echo.rs",
+      "line": 32,
+      "column": 8
+    },
+    {
+      "type": "TODO",
+      "message": "should be exec_declaration_builtin",
+      "file": "crates/brush-builtins-vendored/src/factory.rs",
+      "line": 72,
+      "column": 64
+    },
+    {
+      "type": "TODO",
+      "message": "implement caller builtin",
+      "file": "crates/brush-builtins-vendored/src/factory.rs",
+      "line": 169,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "implement disown builtin",
+      "file": "crates/brush-builtins-vendored/src/factory.rs",
+      "line": 172,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "implement logout builtin",
+      "file": "crates/brush-builtins-vendored/src/factory.rs",
+      "line": 175,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "we can safely remove this after the issue is resolved",
+      "file": "crates/brush-builtins-vendored/src/getopts.rs",
+      "line": 27,
+      "column": 17
+    },
+    {
+      "type": "TODO",
+      "message": "honor OPTERR=0 indicating suppression of error messages",
+      "file": "crates/brush-builtins-vendored/src/getopts.rs",
+      "line": 141,
+      "column": 8
+    },
+    {
+      "type": "TODO",
+      "message": "Evaluate which of the options conflict with each other.",
+      "file": "crates/brush-builtins-vendored/src/history.rs",
+      "line": 6,
+      "column": 3
+    },
+    {
+      "type": "TODO",
+      "message": "Add -x option",
+      "file": "crates/brush-builtins-vendored/src/jobs.rs",
+      "line": 30,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement -sigspec syntax",
+      "file": "crates/brush-builtins-vendored/src/kill.rs",
+      "line": 19,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement +N and -N",
+      "file": "crates/brush-builtins-vendored/src/popd.rs",
+      "line": 12,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement +N and -N",
+      "file": "crates/brush-builtins-vendored/src/pushd.rs",
+      "line": 15,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Figure out how to restore terminal settings on error?",
+      "file": "crates/brush-builtins-vendored/src/read.rs",
+      "line": 235,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "we can safely remove this after the issue is resolved",
+      "file": "crates/brush-builtins-vendored/src/set.rs",
+      "line": 143,
+      "column": 8
+    },
+    {
+      "type": "TODO",
+      "message": "This is getting pretty messy; we need to see how to avoid this -- handling from",
+      "file": "crates/brush-builtins-vendored/src/set.rs",
+      "line": 149,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "For now, skip all dynamic variables. The current behavior",
+      "file": "crates/brush-builtins-vendored/src/set.rs",
+      "line": 410,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "implement nameref",
+      "file": "crates/brush-builtins-vendored/src/unset.rs",
+      "line": 47,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Deal with readonly functions",
+      "file": "crates/brush-builtins-vendored/src/unset.rs",
+      "line": 81,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "Confirm whether trap handlers should be executed in the same process",
+      "file": "crates/brush-core-vendored/src/commands.rs",
+      "line": 251,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "This shouldn't *just* be set in a trap situation.",
+      "file": "crates/brush-core-vendored/src/commands.rs",
+      "line": 258,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "Discard result?",
+      "file": "crates/brush-core-vendored/src/commands.rs",
+      "line": 269,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "if we have no completions, then fall back to default \"bash\"",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 360,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "add COMP_KEY",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 576,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "add COMP_TYPE",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 577,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "Don't pollute the persistent environment with these?",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 630,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "add COMP_KEY",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 634,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "add COMP_TYPE",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 635,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "Find a more appropriate interlock here. For now we use the existing",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 669,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "Should insert an empty token here; the position looks to have",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 921,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Do a better job than just checking if index == 0.",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 1118,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "Replace unescaped '&' with the word being completed.",
+      "file": "crates/brush-core-vendored/src/completion.rs",
+      "line": 1205,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "Should we panic instead on failure? It's effectively a broken invariant.",
+      "file": "crates/brush-core-vendored/src/env.rs",
+      "line": 77,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Handle other interesting sequences.",
+      "file": "crates/brush-core-vendored/src/escape.rs",
+      "line": 266,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Use IFS instead for separator?",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 36,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "Use IFS instead for separator?",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 415,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "Use IFS instead for separator?",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 439,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "dynamic): confirm this",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 1047,
+      "column": 27
+    },
+    {
+      "type": "TODO",
+      "message": "This isn't right for arrays.",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 1612,
+      "column": 8
+    },
+    {
+      "type": "TODO",
+      "message": "This doesn't honor 'separate_words'",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 1613,
+      "column": 8
+    },
+    {
+      "type": "TODO",
+      "message": "What if expansions have different concatenation values?",
+      "file": "crates/brush-core-vendored/src/expansion.rs",
+      "line": 1647,
+      "column": 6
+    },
+    {
+      "type": "TODO",
+      "message": "Docs indicate we should yield 2 on an invalid regex (not 1).",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 220,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "According to docs, should be lexicographical order of the current locale.",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 326,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "According to docs, should be lexicographical order of the current locale.",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 339,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "implement case-insensitive matching if relevant via shopt options (nocasematch).",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 429,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "According to docs, should be lexicographical order of the current locale.",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 491,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "According to docs, should be lexicographical order of the current locale.",
+      "file": "crates/brush-core-vendored/src/extendedtests.rs",
+      "line": 495,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "support maximum item count",
+      "file": "crates/brush-core-vendored/src/history.rs",
+      "line": 15,
+      "column": 3
+    },
+    {
+      "type": "TODO",
+      "message": "Figure out what to do here or if the key encodes the shift in it.",
+      "file": "crates/brush-core-vendored/src/interfaces/keybindings.rs",
+      "line": 247,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "Reenable launching in child process?",
+      "file": "crates/brush-core-vendored/src/interp.rs",
+      "line": 273,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "#57): This is a total hack; aliases are supposed to be",
+      "file": "crates/brush-core-vendored/src/interp.rs",
+      "line": 1033,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "jobs: do we need to move self back to foreground on error here?",
+      "file": "crates/brush-core-vendored/src/interp.rs",
+      "line": 1152,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "Don't execute synchronously!",
+      "file": "crates/brush-core-vendored/src/interp.rs",
+      "line": 1652,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "This is a workaround to remove jobs that are done but for which we don't",
+      "file": "crates/brush-core-vendored/src/jobs.rs",
+      "line": 174,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "Don't assume that the first PID is the PGID.",
+      "file": "crates/brush-core-vendored/src/jobs.rs",
+      "line": 446,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Figure out appropriate thing to do on non-Unix platforms.",
+      "file": "crates/brush-core-vendored/src/patterns.rs",
+      "line": 211,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "Make this more accurate.",
+      "file": "crates/brush-core-vendored/src/patterns.rs",
+      "line": 384,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Decide how to sort this out in a platform-independent way.",
+      "file": "crates/brush-core-vendored/src/results.rs",
+      "line": 29,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Without this a script that sets extglob will fail because we",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 388,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "look at $ENV/BASH_ENV; source its expansion if that file exists",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 641,
+      "column": 23
+    },
+    {
+      "type": "TODO",
+      "message": "Find a cleaner way to change args.",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 768,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Actually track line numbers; this is something of a hack, assuming each time",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 856,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Confirm whether trap handlers should be executed in the same process group.",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 968,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "prompt): bash appears to do this in a subshell; we need to investigate",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 1059,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "Observe options.append_to_history_file",
+      "file": "crates/brush-core-vendored/src/shell.rs",
+      "line": 1163,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "implement",
+      "file": "crates/brush-core-vendored/src/sys/stubs/pipes.rs",
+      "line": 20,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "implement",
+      "file": "crates/brush-core-vendored/src/sys/stubs/pipes.rs",
+      "line": 44,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "jobs: This sometimes fails with ENOTTY even though we checked that stdin is a",
+      "file": "crates/brush-core-vendored/src/sys/unix/terminal.rs",
+      "line": 104,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "#475): uzers::all_users() is available but unsafe",
+      "file": "crates/brush-core-vendored/src/sys/unix/users.rs",
+      "line": 62,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "#475): uzers::all_groups() is available but unsafe",
+      "file": "crates/brush-core-vendored/src/sys/unix/users.rs",
+      "line": 69,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement some version of this for Windows",
+      "file": "crates/brush-core-vendored/src/sys/windows/users.rs",
+      "line": 68,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement some version of this for Windows",
+      "file": "crates/brush-core-vendored/src/sys/windows/users.rs",
+      "line": 74,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "implement some version of this for Windows",
+      "file": "crates/brush-core-vendored/src/sys/windows/users.rs",
+      "line": 80,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "jobs: Investigate why this sometimes fails with EPERM.",
+      "file": "crates/brush-core-vendored/src/terminal.rs",
+      "line": 16,
+      "column": 11
+    },
+    {
+      "type": "TODO",
+      "message": "dynamic): implement appending to dynamic vars",
+      "file": "crates/brush-core-vendored/src/variables.rs",
+      "line": 309,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "dynamic): Allow updates to dynamic values",
+      "file": "crates/brush-core-vendored/src/variables.rs",
+      "line": 353,
+      "column": 19
+    },
+    {
+      "type": "TODO",
+      "message": "#479): implement $_",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 45,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): when extdebug is enabled, BASH_ARGC and BASH_ARGV are set to valid values",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 90,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement BASH_ARGC",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 91,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement BASH_ARGV",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 92,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement updating BASH_ARGV0",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 102,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement mutation of BASH_CMDS",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 107,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement BASH_COMMAND",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 116,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement BASH_EXECUTIION_STRING",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 117,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement BASH_LINENO",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 118,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Investigate what happens if this gets unset.",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 340,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "Investigate if this needs to be saved/preserved across prompt display.",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 341,
+      "column": 7
+    },
+    {
+      "type": "TODO",
+      "message": "vars): implement updating SECONDS",
+      "file": "crates/brush-core-vendored/src/wellknownvars.rs",
+      "line": 381,
+      "column": 15
+    },
+    {
+      "type": "TODO",
+      "message": "Today we use model_details, but we are getting ready to deprecate that and use requested_model instead.",
+      "file": "packages/ai/src/providers/cursor/gen/agent_pb.ts",
+      "line": 2748,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "you should be able to override / configure this list in your .vscode settings not exactly sure what that should look like... but i guess you should be able to specify an override URL because we use UR",
+      "file": "packages/ai/src/providers/cursor/gen/agent_pb.ts",
+      "line": 9795,
+      "column": 3
+    },
+    {
+      "type": "TODO",
+      "message": "remove once proper IDE context format is implemented.",
+      "file": "packages/ai/src/providers/cursor/gen/agent_pb.ts",
+      "line": 11190,
+      "column": 93
+    },
+    {
+      "type": "TODO",
+      "message": "Why?",
+      "file": "packages/coding-agent/src/system-prompt.ts",
+      "line": 564,
+      "column": 63
+    },
+    {
+      "type": "TODO",
+      "message": "Get parent/context messages?",
+      "file": "packages/stats/src/aggregator.ts",
+      "line": 112,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "Pass layout to SelectList when constructor is updated to support it",
+      "file": "packages/tui/src/components/editor.ts",
+      "line": 2399,
+      "column": 5
+    },
+    {
+      "type": "TODO",
+      "message": "relay result to OpenFloyd's task coordinator",
+      "file": "relay/src/relay-client.ts",
+      "line": 191,
+      "column": 4
+    },
+    {
+      "type": "TODO",
+      "message": "relay error to OpenFloyd's error tracker",
+      "file": "relay/src/relay-client.ts",
+      "line": 195,
+      "column": 4
+    }
+  ]
+}

@@ -74,3 +74,20 @@ packages/typescript-edit-benchmark/runs/
 *.DELETE
 *-stub.*
 *.old.*
+
+# ── GSD baseline (auto-generated) ──
+.gsd
+.gsd-id
+.bg-shell/
+Thumbs.db
+*.code-workspace
+.env.*
+!.env.example
+.next/
+build/
+*.pyc
+.venv/
+venv/
+vendor/
+.cache/
+tmp/

@@ -9,6 +9,7 @@
  * - File locking for concurrent access safety
  */
 import { createHash, randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { appendFile, mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
@@ -69,6 +70,29 @@ export function isoTimestamp(): string {
  */
 export function uuid(): string {
 	return randomUUID();
+}
+
+/**
+ * Kill switch: classifier write methods (writeObservation, writeInstinct,
+ * updateInstinct) become no-ops. Existing state remains readable; new
+ * state creation is suppressed. Used during audit and recovery to halt
+ * the feedback loop without ripping out the classifier code path.
+ *
+ * Two activation mechanisms (either one triggers the freeze):
+ *   1. OMP_CLASSIFIER_FROZEN=1 env var — set for new shells via .zshrc
+ *   2. ~/.omp/CLASSIFIER_FROZEN sentinel file — picked up by already-
+ *      running processes on their next write call, no restart needed
+ *
+ * The sentinel file exists because env vars are inherited at process
+ * start; a shell edit to .zshrc does not propagate to running children.
+ */
+export function isClassifierFrozen(): boolean {
+	if (process.env.OMP_CLASSIFIER_FROZEN === "1") return true;
+	try {
+		return existsSync(join(homedir(), OMP_DIR, "CLASSIFIER_FROZEN"));
+	} catch {
+		return false;
+	}
 }
 
 /**
@@ -353,6 +377,7 @@ export class ContinuousLearningStorage {
 	 * Handles rotation if file exceeds size limit.
 	 */
 	async writeObservation(observation: Omit<Observation, "id" | "checksum" | "schemaVersion">): Promise<string> {
+		if (isClassifierFrozen()) return "";
 		const id = uuid();
 		const projectDir = await this.getProjectDir(observation.projectId);
 		const obsPath = join(projectDir, OBSERVATIONS_FILE);
@@ -457,6 +482,7 @@ export class ContinuousLearningStorage {
 	 * Write an instinct to YAML file.
 	 */
 	async writeInstinct(instinct: Omit<Instinct, "checksum">): Promise<void> {
+		if (isClassifierFrozen()) return;
 		// Compute checksum
 		const fullInstinct: Instinct = {
 			...instinct,
@@ -484,6 +510,7 @@ export class ContinuousLearningStorage {
 	 * Update an existing instinct.
 	 */
 	async updateInstinct(id: string, updates: Partial<Instinct>): Promise<Instinct | null> {
+		if (isClassifierFrozen()) return null;
 		const existing = await this.readInstinct(id);
 		if (!existing) return null;
 
