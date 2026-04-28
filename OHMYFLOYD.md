@@ -1,7 +1,7 @@
 # OhMyFloyd Fork — Single Source of Truth
 
 **Established:** 2026-04-09T09:49:18Z
-**Last updated:** 2026-04-09T09:49:18Z
+**Last updated:** 2026-04-28
 **Authority:** This document is the sole authoritative reference for the OhMyFloyd fork's identity, architecture, upstream relationship, and maintenance workflow. All prior documents describing fork strategy, rebrand procedures, migration plans, or patch workflows are superseded by this file and must not be followed.
 
 ---
@@ -46,25 +46,41 @@ OhMyFloyd is a maintained fork of oh-my-pi. It tracks upstream releases and appl
 | `omf-rebase` HEAD | `0af5502ed` | 8 customization commits on top of upstream/main |
 | `origin/main` | `4140b3992` | Stale standalone history; to be replaced by force-push of `omf-rebase` |
 | Upstream version | 14.0.2 | npm published version at time of rebase |
+| Current OhMyFloyd version | 14.2.1 | Tracked via upstream + 25 customization commits |
 
 ---
 
 ## 4. Customizations
 
-The fork carries exactly 8 commits on top of upstream. Each commit is a self-contained customization. The list below is exhaustive — if a change is not listed here, it is not a fork customization and should not be treated as one.
+The fork carries 25 commits on top of upstream. Each commit is a self-contained customization. The list below is exhaustive — if a change is not listed here, it is not a fork customization and should not be treated as one.
 
-| # | Commit | Description | Files touched |
-|---|--------|-------------|---------------|
-| 1 | `de20c1fd3` | Remove external CI/CD workflows | 1 (deletion of `.github/workflows/ci.yml`) |
-| 2 | `957c57799` | Harden execution paths, add planning guards | 8 (new: `intel/`, `intelligence/`, `planning/`, `security/`) |
-| 3 | `b5ef9375e` | Todo reminder: progress-based check replaces auto-continue heuristic | 8 (modifies `agent-session.ts`, `eager-todo.md`, adds test) |
-| 4 | `2369d5ebc` | VIBEBOX configuration for Debian VM sandbox | 1 (new: `vibebox.toml`) |
-| 5 | `3e571e4ff` | VIBEBOX skill for isolated sandbox | 1 (new: `.omp/skills/vibebox/SKILL.md`) |
-| 6 | `5535ca93b` | GLM-5.1 model in ZAI provider catalog | 4 (modifies `models.json`, adds security whitelist entries, test) |
-| 7 | `673b3f156` | Fork branding and documentation | 3 (STAGES.md, `assets/FLOYD_ASCII.txt`, `docs/guides/zai-claude-provider.md`) |
-| 8 | `0af5502ed` | Hooks refactor: consolidate hook runtime into extension system | 21 (deletes `hooks/loader.ts`, `hooks/runner.ts`, `hooks/tool-wrapper.ts`; guts `hooks/types.ts` to aliases; adds 4 test files + `check-dead-runtime.ts`) |
-| 9 | `d4dcf670b` | OHMYFLOYD.md: fork SSOT document | 1 (this file) |
-| 10 | `27611f5b0` | Continuous learning system: built-in extension | 7 (6 module files in `extensibility/continuous-learning/` + `sdk.ts` wiring) |
+| # | Commit | Description |
+|---|--------|------------|
+| 1 | `de20c1fd3` | Remove external CI/CD workflows |
+| 2 | `957c57799` | Harden execution paths, add planning guards |
+| 3 | `b5ef9375e` | Todo reminder: progress-based check replaces auto-continue heuristic |
+| 4 | `2369d5ebc` | VIBEBOX configuration for Debian VM sandbox |
+| 5 | `3e571e4ff` | VIBEBOX skill for isolated sandbox |
+| 6 | `5535ca93b` | GLM-5.1 model in ZAI provider catalog |
+| 7 | `673b3f156` | Fork branding and documentation |
+| 8 | `0af5502ed` | Hooks refactor: consolidate hook runtime into extension system |
+| 9 | `d4dcf670b` | OHMYFLOYD.md: fork SSOT document |
+| 10 | `27611f5b0` | Continuous learning system: built-in extension |
+| 11 | `3b5dd0047` | Regenerate patches (10 commits, includes continuous-learning) |
+| 12 | `b7a9a56ce` | Update OHMYFLOYD.md with continuous-learning as commit 10 |
+| 13 | `97ed55e19` | Wire continuous-learning enforcement chain end-to-end |
+| 14 | `642fea01e` | Regenerate patches (13 commits, includes enforcement chain) |
+| 15 | `11c9dc5fe` | Transcript-text behavioral classifier with enforcement chain |
+| 16 | `c8780a19e` | Regenerate patches (15 commits, includes behavioral classifier) |
+| 17 | `dba02da2d` | Hook system integration with comprehensive tests |
+| 18 | `05f6bcf56` | Prevent crash on Ctrl+O tool output expansion |
+| 19 | `671907618` | Add continuous learning lifecycle observability markers |
+| 20 | `a146b0a80` | Integrate hook loader and normalize code style |
+| 21 | `b82e0d736` | Mission Control welcome dashboard with Floyd branding |
+| 22 | `745373c96` | Resolve all TypeScript compilation errors across workspace |
+| 23 | `4518ce7e1` | Accurate CPU/RAM telemetry and restore Tips section |
+| 24 | `73c609143` | Enterprise-grade markdown editor with AI smart capabilities |
+| 25 | `1f4d50679` | Init GSD |
 
 ### What is NOT a customization
 
@@ -79,7 +95,7 @@ The following items from earlier fork history are explicitly excluded. They are 
 
 ## 5. Patch Layer
 
-All 10 customization commits are exported as sequential `git format-patch` files in `patches/rebased/`:
+All 25 customization commits are exported as sequential `git format-patch` files in `patches/rebased/`:
 
 ```
 patches/
@@ -229,7 +245,7 @@ This section defines when to activate the **mega-skills**, **metacognitive workf
 ### 11.1 Mega-Skills Triggers
 | Workflow | Trigger | Scope |
 |----------|---------|-------|
-| **Change Impact Analyzer** | After every `edit`/`write` tool call | All packages |
+| **Change Impact Analyzer** | Before applying any `edit`/`write` tool call | All packages |
 | **Error Resolution Engine** | After build/test errors (e.g., `bun check:ts` failure) | All packages |
 | **Dependency Health Check** | After adding/removing imports (e.g., `import { foo } from "bar"`) | All packages |
 | **Pre-Edit Intelligence** | Before refactoring 3+ files | `packages/coding-agent/`, `packages/agent/` |
@@ -260,3 +276,57 @@ This section defines when to activate the **mega-skills**, **metacognitive workf
 | **Prefer ES Native `#` for Privacy** | During code review | All packages |
 | **Ban `ReturnType<>`** | During type checking | All packages |
 | **Semantic Diff + Blast Radius** | After every edit | All packages |
+
+---
+
+## 12. Local Upstream Mirror
+
+A local clone of upstream exists for parity operations and change validation:
+
+| Field | Value |
+|-------|-------|
+| Path | `/Volumes/Storage/oh-my-pi-upstream` |
+| Remote | `origin` → `https://github.com/can1357/oh-my-pi` |
+| Version | 14.2.1 (latest) |
+
+### Purpose
+- **Testing upstream changes** before cherry-picking into OhMyFloyd
+- **Validating bug fixes** from upstream releases
+- **Previewing new features** without affecting OhMyFloyd stability
+
+### Workflow
+
+```bash
+# 1. Update local upstream mirror
+cd /Volumes/Storage/oh-my-pi-upstream
+git pull origin main
+
+# 2. Test/preview changes in local upstream
+cd /Volumes/Storage/oh-my-pi-upstream
+bun install && bun run dev
+
+# 3. Cherry-pick safe commits into OhMyFloyd
+cd /Volumes/SanDisk1Tb/OhMyFloyd
+git fetch upstream  # fetch from local mirror
+git cherry-pick <commit-hash>
+```
+
+### Safe to Cherry-Pick
+
+| Type | Prefix | Risk |
+|------|--------|------|
+| Bug fixes | `fix:` | Low |
+| Dependency updates | `chore(deps):` | Low |
+| Documentation | `docs:` | Low |
+| Non-breaking additions | `feat:` | Medium |
+
+### Avoid Cherry-Picking
+
+| Type | Reason |
+|------|--------|
+| Architectural rewrites | May conflict with fork customizations |
+| Deletions | Fork may depend on deleted code |
+| Breaking changes | Requires fork adaptation |
+| vim/chunk/extension changes | Major rewrites that conflict with OhMyFloyd additions |
+
+See `FLOYD.md` for detailed cherry-pick decision criteria.
