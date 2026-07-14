@@ -1,5 +1,5 @@
 import * as path from "node:path";
-import type { ExperienceEnvelope, FloydClient, FloydProject, FloydStreamEvent } from "@floyd/sdk";
+import type { ExperienceEnvelope, FloydClient, FloydProject, FloydRun, FloydStreamEvent } from "@floyd/sdk";
 import { Box, Input, ProcessTerminal, replaceTabs, Spacer, Text, TUI, truncateToWidth } from "@oh-my-pi/pi-tui";
 import chalk from "chalk";
 import {
@@ -71,6 +71,22 @@ export interface FloydCoreModeOptions {
 	cwd: string;
 	projectId?: string;
 	continueActive?: boolean;
+	handoff?: FloydHandoffSelection;
+}
+
+export interface FloydHandoffSelection {
+	sessionId: string;
+	runId: string;
+	lastEventId?: string;
+}
+
+export function validateFloydHandoffRun(run: FloydRun, projectId: string, sessionId: string): void {
+	if (run.project_id !== projectId) {
+		throw new Error(`Run ${run.id} belongs to Core project ${run.project_id}, not cwd project ${projectId}.`);
+	}
+	if (run.session_id !== sessionId) {
+		throw new Error(`Run ${run.id} belongs to Core session ${run.session_id}, not handoff session ${sessionId}.`);
+	}
 }
 
 /**
@@ -82,6 +98,7 @@ export class FloydCoreMode {
 	readonly #cwd: string;
 	readonly #requestedProjectId?: string;
 	readonly #continueActive: boolean;
+	readonly #handoff?: FloydHandoffSelection;
 	readonly #ui = new TUI(new ProcessTerminal());
 	readonly #transcript = new Box(0, 0);
 	readonly #input = new Input();
@@ -117,6 +134,7 @@ export class FloydCoreMode {
 		this.#cwd = path.resolve(options.cwd);
 		this.#requestedProjectId = options.projectId;
 		this.#continueActive = options.continueActive ?? false;
+		this.#handoff = options.handoff;
 		const deferred = Promise.withResolvers<void>();
 		this.#done = deferred.promise;
 		this.#resolveDone = deferred.resolve;
@@ -166,11 +184,21 @@ export class FloydCoreMode {
 			this.#ui.setFocus(this.#input);
 			this.#ui.start();
 			this.#addSystem("Floyd Core owns this session. Type a coding goal to begin.");
-			await this.#restoreEnvelope(envelope);
+			if (this.#handoff) {
+				await this.#selectRun(this.#handoff.runId, {
+					expectedProjectId: this.#projectId,
+					expectedSessionId: this.#handoff.sessionId,
+					lastEventId: this.#handoff.lastEventId,
+				});
+				await this.#restoreEnvelope(this.#experience.envelope ?? envelope);
+			} else {
+				await this.#restoreEnvelope(envelope);
+			}
 			this.#lastPublishedDraft = this.#input.getValue();
 			this.#draftTask = this.#publishDraftChanges();
 			if (initialMessage) {
-				if (!startupShouldContinue(initialMessage, this.#continueActive)) await this.#startNewRunContext(false);
+				if (!this.#handoff && !startupShouldContinue(initialMessage, this.#continueActive))
+					await this.#startNewRunContext(false);
 				await this.#handleInput(initialMessage);
 			}
 			await this.#done;
@@ -355,7 +383,12 @@ export class FloydCoreMode {
 
 	async #selectRun(
 		runId: string,
-		options: { publish?: boolean; expectedSessionId?: string | null; lastEventId?: string } = {},
+		options: {
+			publish?: boolean;
+			expectedProjectId?: string;
+			expectedSessionId?: string | null;
+			lastEventId?: string;
+		} = {},
 	): Promise<void> {
 		const previousGeneration = this.#selectionGeneration;
 		const generation = ++this.#selectionGeneration;
@@ -365,6 +398,9 @@ export class FloydCoreMode {
 		const run = await this.#client.run(runId);
 		if (generation !== this.#selectionGeneration || this.#closed) return;
 		if (!run.session_id) throw new Error(`Run ${runId} has no Core session.`);
+		if (options.expectedProjectId && options.expectedSessionId) {
+			validateFloydHandoffRun(run, options.expectedProjectId, options.expectedSessionId);
+		}
 		if (options.expectedSessionId && run.session_id !== options.expectedSessionId) {
 			throw new Error(`Run ${runId} no longer belongs to Core session ${options.expectedSessionId}.`);
 		}
@@ -375,10 +411,11 @@ export class FloydCoreMode {
 		this.#projectId = run.project_id;
 		this.#addSystem(`Attached to run ${run.id} (${run.status}).`);
 		if (options.publish !== false) {
+			const transcriptCursor = options.lastEventId ? Number(options.lastEventId) : 0;
 			await this.#experience?.publish({
 				active: { project_id: run.project_id, session_id: run.session_id, run_id: run.id },
-				transcript_cursor: 0,
-				last_event_id: null,
+				transcript_cursor: transcriptCursor,
+				last_event_id: options.lastEventId ?? null,
 				selected_view: "tui:run",
 				composer_draft: this.#input.getValue(),
 			});

@@ -6,6 +6,7 @@ import {
 	FloydApiError,
 	type FloydStreamEvent,
 } from "@floyd/sdk";
+import { parseFloydHandoff } from "../src/commands/floyd";
 import {
 	FLOYD_TUI_CAPABILITIES,
 	FLOYD_TUI_SURFACE_ID,
@@ -21,6 +22,7 @@ import {
 	formatArtifactContent,
 	formatModelRoute,
 	pendingInteractionKey,
+	validateFloydHandoffRun,
 } from "../src/floyd-core/mode";
 
 function envelope(revision: number, overrides: Partial<ExperienceEnvelope> = {}): ExperienceEnvelope {
@@ -70,6 +72,41 @@ describe("Floyd Experience coordinator", () => {
 		expect(startupShouldContinue(undefined, false)).toBeTrue();
 		expect(startupShouldContinue("fix the parser", false)).toBeFalse();
 		expect(startupShouldContinue("fix the parser", true)).toBeTrue();
+	});
+
+	test("requires an exact session and run pair for command-line handoff", () => {
+		expect(parseFloydHandoff(undefined, undefined, undefined)).toBeUndefined();
+		expect(parseFloydHandoff("session-1", "run-1", "42")).toEqual({
+			sessionId: "session-1",
+			runId: "run-1",
+			lastEventId: "42",
+		});
+		expect(() => parseFloydHandoff("session-1", undefined, undefined)).toThrow(
+			"Floyd handoff requires both --session and --run.",
+		);
+		expect(() => parseFloydHandoff(undefined, "run-1", "42")).toThrow(
+			"Floyd handoff requires both --session and --run.",
+		);
+		expect(() => parseFloydHandoff("session-1", "run-1", "latest")).toThrow(
+			"--event must be a non-negative integer Floyd event ID.",
+		);
+	});
+
+	test("rejects a handoff outside the cwd project or requested session", () => {
+		const run = {
+			id: "run-1",
+			project_id: "project-1",
+			session_id: "session-1",
+			goal: "test",
+			status: "running",
+		};
+		expect(() => validateFloydHandoffRun(run, "project-1", "session-1")).not.toThrow();
+		expect(() => validateFloydHandoffRun(run, "project-2", "session-1")).toThrow(
+			"Run run-1 belongs to Core project project-1, not cwd project project-2.",
+		);
+		expect(() => validateFloydHandoffRun(run, "project-1", "session-2")).toThrow(
+			"Run run-1 belongs to Core session session-1, not handoff session session-2.",
+		);
 	});
 
 	test("detects remote draft divergence without overwriting local input", () => {

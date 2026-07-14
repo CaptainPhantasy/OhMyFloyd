@@ -1,6 +1,22 @@
 import { Args, Command, Flags } from "@oh-my-pi/pi-utils/cli";
 import { createFloydClient } from "../floyd-core/client";
-import { FloydCoreMode } from "../floyd-core/mode";
+import { FloydCoreMode, type FloydHandoffSelection } from "../floyd-core/mode";
+
+export function parseFloydHandoff(
+	sessionId: string | undefined,
+	runId: string | undefined,
+	lastEventId: string | undefined,
+): FloydHandoffSelection | undefined {
+	if (!sessionId && !runId && !lastEventId) return undefined;
+	if (!sessionId || !runId) throw new Error("Floyd handoff requires both --session and --run.");
+	if (/[\r\n]/.test(sessionId) || /[\r\n]/.test(runId) || (lastEventId && /[\r\n]/.test(lastEventId))) {
+		throw new Error("Floyd handoff identifiers must not contain line breaks.");
+	}
+	if (lastEventId !== undefined && !/^(0|[1-9]\d*)$/.test(lastEventId)) {
+		throw new Error("--event must be a non-negative integer Floyd event ID.");
+	}
+	return { sessionId, runId, lastEventId };
+}
 
 export default class Floyd extends Command {
 	static description = "Natural-language coding partner powered by Floyd Core and managed OpenCode";
@@ -15,6 +31,9 @@ export default class Floyd extends Command {
 		"base-url": Flags.string({ description: "Floyd Core loopback URL" }),
 		"runtime-root": Flags.string({ description: "Floyd runtime root containing the Core gateway token" }),
 		"project-id": Flags.string({ description: "Existing Floyd Core project ID" }),
+		session: Flags.string({ description: "Exact Floyd Core session ID from a handoff" }),
+		run: Flags.string({ description: "Exact Floyd Core run ID from a handoff" }),
+		event: Flags.string({ description: "Last received event ID from a handoff" }),
 		print: Flags.boolean({ char: "p", description: "Submit the goal without opening the TUI", default: false }),
 		continue: Flags.boolean({
 			description: "Continue the matching active Floyd experience when a goal is supplied",
@@ -24,6 +43,10 @@ export default class Floyd extends Command {
 
 	async run(): Promise<void> {
 		const { args, flags } = await this.parse(Floyd);
+		const handoff = parseFloydHandoff(flags.session, flags.run, flags.event);
+		if (handoff && (flags.status || flags.print)) {
+			throw new Error("--session, --run, and --event are only valid in interactive Floyd mode.");
+		}
 		const client = createFloydClient({ baseUrl: flags["base-url"], runtimeRoot: flags["runtime-root"] });
 		if (flags.status) {
 			const health = await client.health();
@@ -53,6 +76,7 @@ export default class Floyd extends Command {
 			cwd: process.cwd(),
 			projectId: flags["project-id"],
 			continueActive: flags.continue,
+			handoff,
 		});
 		await mode.run(message || undefined);
 	}
