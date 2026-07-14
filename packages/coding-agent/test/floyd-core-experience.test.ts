@@ -14,7 +14,7 @@ import {
 	FloydExperienceCoordinator,
 	startupShouldContinue,
 } from "../src/floyd-core/experience";
-import { classifyDraftRestore, formatArtifactContent } from "../src/floyd-core/mode";
+import { classifyDraftRestore, formatArtifactContent, formatModelRoute } from "../src/floyd-core/mode";
 
 function envelope(revision: number, overrides: Partial<ExperienceEnvelope> = {}): ExperienceEnvelope {
 	return {
@@ -77,6 +77,19 @@ describe("Floyd Experience coordinator", () => {
 		expect(formatArtifactContent("result\u001b[31m\u0000")).toBe("result[31m");
 		expect(formatArtifactContent({ status: "pass" })).toContain('"status": "pass"');
 		expect(formatArtifactContent("x".repeat(20_000))).toEndWith("[artifact truncated for TUI display]");
+	});
+
+	test("displays the active model route without credential material", () => {
+		expect(formatModelRoute(envelope(1).model_route)).toBe("Core default");
+		expect(
+			formatModelRoute({
+				provider: "opencode-go",
+				model: "qwen-coder",
+				base_url: "https://example.test/v1",
+				provider_profile_id: "profile-1",
+				credential_ref: "floyd-connector:secret",
+			}),
+		).toBe("opencode-go / qwen-coder");
 	});
 
 	test("negotiates capabilities and serializes optimistic publications", async () => {

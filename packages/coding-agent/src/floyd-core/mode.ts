@@ -39,6 +39,11 @@ export function formatArtifactContent(value: unknown): string {
 		: `${sanitized.slice(0, 16 * 1024)}\n[artifact truncated for TUI display]`;
 }
 
+export function formatModelRoute(route: ExperienceEnvelope["model_route"]): string {
+	const parts = [route.provider, route.model].filter((value): value is string => Boolean(value));
+	return parts.length ? parts.join(" / ") : "Core default";
+}
+
 export function classifyDraftRestore(
 	localDraft: string,
 	lastPublishedDraft: string,
@@ -111,11 +116,12 @@ export class FloydCoreMode {
 		this.#experience = experience;
 		const envelope = await experience.start();
 		try {
+			const modelRoute = formatModelRoute(envelope.model_route);
 			const frame = new Box(1, 1, line => chalk.bgHex("#11131a")(line));
 			frame.addChild(
 				new Text(
 					`${chalk.bold(chalk.hex("#8be9fd")("FLOYD CURSE'M"))}  ${chalk.hex("#bd93f9")("natural-language coding partner")}\n` +
-						`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Project ${this.#projectId}  ${this.#cwd}`,
+						`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Route ${modelRoute}  Project ${this.#projectId}  ${this.#cwd}`,
 					1,
 					0,
 				),
