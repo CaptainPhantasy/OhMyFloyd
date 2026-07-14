@@ -5,6 +5,7 @@ import { APP_NAME, MIN_BUN_VERSION, VERSION } from "@oh-my-pi/pi-utils";
  * lightweight CLI runner from pi-utils.
  */
 import { type CommandEntry, run } from "@oh-my-pi/pi-utils/cli";
+import FloydCommand from "./commands/floyd";
 
 function parseSemver(version: string): [number, number, number] {
 	function toint(value: string): number {
@@ -56,6 +57,7 @@ const commands: CommandEntry[] = [
 	{ name: "shell", load: () => import("./commands/shell").then(m => m.default) },
 	{ name: "ssh", load: () => import("./commands/ssh").then(m => m.default) },
 	{ name: "stats", load: () => import("./commands/stats").then(m => m.default) },
+	{ name: "floyd", load: async () => FloydCommand },
 	{ name: "update", load: () => import("./commands/update").then(m => m.default) },
 	{ name: "search", load: () => import("./commands/web-search").then(m => m.default), aliases: ["q"] },
 ];
@@ -72,7 +74,7 @@ async function showHelp(config: import("@oh-my-pi/pi-utils/cli").CliConfig): Pro
 
 /**
  * Determine whether argv[0] is a known subcommand name.
- * If not, the entire argv is treated as args to the default "launch" command.
+ * If not, the entire argv is treated as args to the default Floyd Core command.
  */
 function isSubcommand(first: string | undefined): boolean {
 	if (!first || first.startsWith("-") || first.startsWith("@")) return false;
@@ -82,14 +84,14 @@ function isSubcommand(first: string | undefined): boolean {
 /** Run the CLI with the given argv (no `process.argv` prefix). */
 export function runCli(argv: string[]): Promise<void> {
 	// --help and --version are handled by run() directly, don't rewrite those.
-	// Everything else that isn't a known subcommand routes to "launch".
+	// Everything else that isn't a known subcommand routes through Floyd Core.
 	const first = argv[0];
 	const runArgv =
 		first === "--help" || first === "-h" || first === "--version" || first === "-v" || first === "help"
 			? argv
 			: isSubcommand(first)
 				? argv
-				: ["launch", ...argv];
+				: ["floyd", ...argv];
 	return run({ bin: APP_NAME, version: VERSION, argv: runArgv, commands, help: showHelp });
 }
 

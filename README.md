@@ -39,13 +39,14 @@ It's a fork of [oh-my-pi](https://github.com/can1357/oh-my-pi) — a genuinely e
 
 Unfortunately, yes. I was kind of hoping it wouldn't so I could go back to complaining about AI companies, but here we are.
 
+The workstation build now opens the Floyd Core coding partner by default:
+
 ```bash
-bun install -g @oh-my-pi/pi-coding-agent
-export ANTHROPIC_API_KEY="your-key-here"
 omp
+omp --status
 ```
 
-That's it. Two lines. One of them is just setting an environment variable, which is the kind of thing that reminds you we still live in the 1970s despite carrying supercomputers in our pockets.
+OhMyFloyd does not receive provider credentials in this mode. It reads the local Floyd Core gateway token, and Floyd Core owns the managed OpenCode lifecycle, sessions, tools, permissions, streams, and review decisions. Use `omp launch` only when you deliberately need the old direct-provider migration path.
 
 **What you get:**
 

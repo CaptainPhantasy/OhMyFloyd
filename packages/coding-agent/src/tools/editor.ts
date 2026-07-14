@@ -16,15 +16,9 @@
 
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import type {
-	AgentTool,
-	AgentToolContext,
-	AgentToolResult,
-	AgentToolUpdateCallback,
-} from "@oh-my-pi/pi-agent-core";
+import type { AgentTool, AgentToolContext, AgentToolResult, AgentToolUpdateCallback } from "@oh-my-pi/pi-agent-core";
 import type { Component } from "@oh-my-pi/pi-tui";
 import { Text } from "@oh-my-pi/pi-tui";
-import { prompt } from "@oh-my-pi/pi-utils";
 import { type Static, Type } from "@sinclair/typebox";
 import type { RenderResultOptions } from "../extensibility/custom-tools/types";
 import { getLanguageFromPath, type Theme } from "../modes/theme/theme";
@@ -133,7 +127,10 @@ function formatMarkdown(content: string): string {
 	formatted = formatted.replace(/\r\n/g, "\n");
 
 	// Remove trailing whitespace on lines
-	formatted = formatted.split("\n").map(line => line.trimEnd()).join("\n");
+	formatted = formatted
+		.split("\n")
+		.map(line => line.trimEnd())
+		.join("\n");
 
 	// Ensure single blank line between sections
 	formatted = formatted.replace(/\n{3,}/g, "\n\n");
@@ -155,7 +152,10 @@ function formatCode(content: string, language: string): string {
 		// Normalize tabs to spaces
 		formatted = formatted.replace(/\t/g, "  ");
 		// Remove trailing whitespace
-		formatted = formatted.split("\n").map(line => line.trimEnd()).join("\n");
+		formatted = formatted
+			.split("\n")
+			.map(line => line.trimEnd())
+			.join("\n");
 		return formatted;
 	}
 
@@ -306,7 +306,7 @@ export class EditorFormatTool implements AgentTool<typeof editorFormatSchema> {
 		const absolutePath = path.resolve(this._session.cwd, filePath);
 
 		// Check if file exists
-		if (!await pathExists(absolutePath)) {
+		if (!(await pathExists(absolutePath))) {
 			throw new ToolError(`File not found: ${filePath}`);
 		}
 
@@ -423,7 +423,7 @@ export class ExplorerNavigateTool implements AgentTool<typeof explorerNavigateSc
 		const absolutePath = path.resolve(this._session.cwd, targetPath);
 
 		// Check if path exists
-		if (!await pathExists(absolutePath)) {
+		if (!(await pathExists(absolutePath))) {
 			throw new ToolError(`Directory not found: ${targetPath}`);
 		}
 
@@ -490,11 +490,9 @@ export class ExplorerSearchTool implements AgentTool<typeof explorerSearchSchema
 		_onUpdate?: AgentToolUpdateCallback,
 		_context?: AgentToolContext,
 	): Promise<AgentToolResult> {
-		const searchDir = searchPath
-			? path.resolve(this._session.cwd, searchPath)
-			: this._session.cwd;
+		const searchDir = searchPath ? path.resolve(this._session.cwd, searchPath) : this._session.cwd;
 
-		if (!await pathExists(searchDir)) {
+		if (!(await pathExists(searchDir))) {
 			throw new ToolError(`Directory not found: ${searchPath ?? this._session.cwd}`);
 		}
 
@@ -573,7 +571,7 @@ export class ExplorerSelectTool implements AgentTool<typeof explorerSelectSchema
 	): Promise<AgentToolResult> {
 		const absolutePath = path.resolve(this._session.cwd, filePath);
 
-		if (!await pathExists(absolutePath)) {
+		if (!(await pathExists(absolutePath))) {
 			throw new ToolError(`File not found: ${filePath}`);
 		}
 
@@ -597,12 +595,12 @@ export class ExplorerSelectTool implements AgentTool<typeof explorerSelectSchema
 				const content = await fs.readFile(absolutePath, "utf-8");
 				const previewLines = content.split("\n").slice(0, 20);
 				resultText += "\n\nPreview:\n";
-				resultText += "-".repeat(40) + "\n";
+				resultText += `${"-".repeat(40)}\n`;
 				resultText += previewLines.join("\n");
 				if (content.split("\n").length > 20) {
 					resultText += "\n... (truncated)";
 				}
-				resultText += "\n" + "-".repeat(40);
+				resultText += `\n${"-".repeat(40)}`;
 			} catch {
 				// Ignore preview errors
 			}

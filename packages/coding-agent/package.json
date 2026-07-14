@@ -46,6 +46,7 @@
 	},
 	"dependencies": {
 		"@agentclientprotocol/sdk": "0.16.1",
+		"@floyd/sdk": "workspace:*",
 		"@mozilla/readability": "^0.6",
 		"@oh-my-pi/omp-stats": "workspace:*",
 		"@oh-my-pi/pi-agent-core": "workspace:*",

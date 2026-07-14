@@ -18,6 +18,7 @@
 
 ### Added
 
+- `omp floyd`, a provider-credential-free coding partner mode whose sessions, tools, permissions, and decisions are owned by Floyd Core through `@floyd/sdk`
 - CI job `dead-runtime-check` that fails on reintroduction of legacy hook runtime code
 - Extension event contract tests (`test/extension-event-contract.test.ts`) verifying all documented events have production emitters
 - E2E smoke test for extension loading from CLI (`test/extension-cli-smoke.test.ts`)

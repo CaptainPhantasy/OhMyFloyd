@@ -25,20 +25,19 @@ import { AstGrepTool } from "./ast-grep";
 import { AwaitTool } from "./await-tool";
 import { BashTool } from "./bash";
 import { BrowserTool } from "./browser";
-import {
-	EditorOpenTool,
-	EditorSaveTool,
-	EditorFormatTool,
-	EditorCloseTool,
-	ExplorerNavigateTool,
-	ExplorerSearchTool,
-	ExplorerSelectTool,
-} from "./editor";
-
 import { CalculatorTool } from "./calculator";
 import { CancelJobTool } from "./cancel-job";
 import { type CheckpointState, CheckpointTool, RewindTool } from "./checkpoint";
 import { DebugTool } from "./debug";
+import {
+	EditorCloseTool,
+	EditorFormatTool,
+	EditorOpenTool,
+	EditorSaveTool,
+	ExplorerNavigateTool,
+	ExplorerSearchTool,
+	ExplorerSelectTool,
+} from "./editor";
 import { ExitPlanModeTool } from "./exit-plan-mode";
 import { FindTool } from "./find";
 import {
@@ -87,6 +86,7 @@ export * from "./calculator";
 export * from "./cancel-job";
 export * from "./checkpoint";
 export * from "./debug";
+export * from "./editor";
 export * from "./exit-plan-mode";
 export * from "./find";
 export * from "./gemini-image";
@@ -105,7 +105,6 @@ export * from "./ssh";
 export * from "./submit-result";
 export * from "./todo-write";
 export * from "./write";
-export * from "./editor";
 
 /** Tool type (AgentTool from pi-ai) */
 export type Tool = AgentTool<any, any, any>;
