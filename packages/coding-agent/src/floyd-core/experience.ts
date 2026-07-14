@@ -3,6 +3,7 @@ import {
 	type ExperienceEnvelopePatch,
 	FLOYD_SDK_PROTOCOL_VERSION,
 	type FloydClient,
+	type FloydStreamEvent,
 } from "@floyd/sdk";
 
 export const FLOYD_TUI_SURFACE_ID = "tui";
@@ -17,7 +18,116 @@ export const FLOYD_TUI_CAPABILITIES = [
 	"drafts",
 	"selected-view",
 	"experience-stream",
+	"model-route-display",
 ] as const;
+
+export type FloydSessionStreamClient = Pick<FloydClient, "attachSession" | "experience">;
+
+export interface FollowFloydSessionOptions {
+	client: FloydSessionStreamClient;
+	sessionId: string;
+	runId: string;
+	actor: string;
+	signal: AbortSignal;
+	initialLastEventId?: string;
+	initialEpoch?: string | null;
+	onEvent: (event: FloydStreamEvent) => void | Promise<void>;
+	onEpochChange: (epoch: string) => void | Promise<void>;
+	onReconnectError?: (error: unknown, attempt: number) => void;
+	reconnectBaseDelayMs?: number;
+	reconnectMaxDelayMs?: number;
+}
+
+function nextEventId(current: string | undefined, candidate: string | null | undefined): string | undefined {
+	if (!candidate) return current;
+	const currentNumber = Number(current);
+	const candidateNumber = Number(candidate);
+	if (Number.isFinite(currentNumber) && Number.isFinite(candidateNumber)) {
+		return candidateNumber > currentNumber ? candidate : current;
+	}
+	return candidate;
+}
+
+function abortableDelay(delayMs: number, signal: AbortSignal): Promise<void> {
+	return new Promise(resolve => {
+		const finish = () => {
+			signal.removeEventListener("abort", onAbort);
+			resolve();
+		};
+		const timer = setTimeout(finish, delayMs);
+		const onAbort = () => {
+			clearTimeout(timer);
+			finish();
+		};
+		signal.addEventListener("abort", onAbort, { once: true });
+	});
+}
+
+/**
+ * Follows a semantic Core session until explicitly aborted. Unexpected EOF is
+ * a transport failure, not successful completion. Reconnects resume from the
+ * last event observed by this process; a Core epoch change deliberately drops
+ * that cursor and reconnects once without it so Core sends a fresh transcript.
+ */
+export async function followFloydSession(options: FollowFloydSessionOptions): Promise<void> {
+	let lastEventId = options.initialLastEventId;
+	let epoch = options.initialEpoch ?? null;
+	let failures = 0;
+	while (!options.signal.aborted) {
+		let epochChanged = false;
+		try {
+			for await (const event of options.client.attachSession(options.sessionId, options.actor, {
+				signal: options.signal,
+				runId: options.runId,
+				lastEventId,
+			})) {
+				if (options.signal.aborted) return;
+				if (event.type === "hello") {
+					const data = typeof event.data === "object" && event.data ? (event.data as Record<string, unknown>) : {};
+					const nextEpoch = typeof data.stream_epoch === "string" ? data.stream_epoch : "";
+					if (nextEpoch && epoch && nextEpoch !== epoch) {
+						epoch = nextEpoch;
+						lastEventId = undefined;
+						epochChanged = true;
+						await options.onEpochChange(nextEpoch);
+						break;
+					}
+					if (nextEpoch) epoch = nextEpoch;
+					continue;
+				}
+				await options.onEvent(event);
+				lastEventId = nextEventId(lastEventId, event.id);
+				failures = 0;
+			}
+			if (options.signal.aborted) return;
+			if (epochChanged) continue;
+			throw new Error("Floyd session stream ended before abort");
+		} catch (error) {
+			if (options.signal.aborted) return;
+			failures += 1;
+			options.onReconnectError?.(error, failures);
+			try {
+				const envelope = await options.client.experience("primary", options.signal);
+				if (envelope.active.session_id !== options.sessionId || envelope.active.run_id !== options.runId) return;
+				if (epoch && envelope.transcript_epoch && envelope.transcript_epoch !== epoch) {
+					epoch = envelope.transcript_epoch;
+					lastEventId = undefined;
+					await options.onEpochChange(epoch);
+				} else {
+					lastEventId = nextEventId(lastEventId, envelope.last_event_id);
+				}
+			} catch (restoreError) {
+				if (options.signal.aborted) return;
+				options.onReconnectError?.(restoreError, failures);
+			}
+			const delay = Math.min(
+				(options.reconnectBaseDelayMs ?? 150) * 2 ** Math.min(failures - 1, 6),
+				options.reconnectMaxDelayMs ?? 2_000,
+			);
+			await abortableDelay(delay, options.signal);
+		}
+	}
+}
 
 export type FloydExperienceClient = Pick<
 	FloydClient,

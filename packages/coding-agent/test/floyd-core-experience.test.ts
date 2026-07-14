@@ -12,6 +12,8 @@ import {
 	FloydCursorPublicationQueue,
 	type FloydExperienceClient,
 	FloydExperienceCoordinator,
+	type FloydSessionStreamClient,
+	followFloydSession,
 	startupShouldContinue,
 } from "../src/floyd-core/experience";
 import {
@@ -217,6 +219,93 @@ describe("Floyd Experience coordinator", () => {
 		expect(coordinator.envelope).toBe(restored);
 		expect(applied).toEqual([restored]);
 		await coordinator.stop();
+	});
+
+	test("resumes an unexpectedly ended semantic session from the last observed event", async () => {
+		const controller = new AbortController();
+		const requestedCursors: Array<string | undefined> = [];
+		const received: string[] = [];
+		let streams = 0;
+		const client: FloydSessionStreamClient = {
+			experience: async () => envelope(2, { last_event_id: "4" }),
+			attachSession: (_sessionId, _actor, options) => {
+				const streamOptions = options ?? {};
+				requestedCursors.push(streamOptions.lastEventId);
+				streams += 1;
+				if (streams === 1)
+					return (async function* () {
+						yield { type: "hello", data: { stream_epoch: "epoch-1" } };
+						yield { id: "4", type: "token", data: { data: { text: "first" } } };
+						throw new Error("socket dropped");
+					})();
+				return (async function* () {
+					yield { type: "hello", data: { stream_epoch: "epoch-1" } };
+					yield { id: "5", type: "token", data: { data: { text: "second" } } };
+					while (!streamOptions.signal?.aborted) await Bun.sleep(1);
+				})();
+			},
+		};
+		await followFloydSession({
+			client,
+			sessionId: "session-1",
+			runId: "run-1",
+			actor: "test",
+			signal: controller.signal,
+			initialEpoch: "epoch-1",
+			reconnectBaseDelayMs: 1,
+			reconnectMaxDelayMs: 1,
+			onEpochChange: () => {},
+			onEvent: event => {
+				received.push(event.id!);
+				if (event.id === "5") controller.abort();
+			},
+		});
+		expect(requestedCursors).toEqual([undefined, "4"]);
+		expect(received).toEqual(["4", "5"]);
+	});
+
+	test("drops a stale cursor and requests a fresh transcript after an epoch change", async () => {
+		const controller = new AbortController();
+		const requestedCursors: Array<string | undefined> = [];
+		const epochs: string[] = [];
+		const received: string[] = [];
+		let streams = 0;
+		const client: FloydSessionStreamClient = {
+			experience: async () => envelope(1),
+			attachSession: (_sessionId, _actor, options) => {
+				const streamOptions = options ?? {};
+				requestedCursors.push(streamOptions.lastEventId);
+				streams += 1;
+				if (streams === 1)
+					return (async function* () {
+						yield { type: "hello", data: { stream_epoch: "epoch-2" } };
+					})();
+				return (async function* () {
+					yield { type: "hello", data: { stream_epoch: "epoch-2" } };
+					yield { type: "transcript", data: { messages: [] } };
+					while (!streamOptions.signal?.aborted) await Bun.sleep(1);
+				})();
+			},
+		};
+		await followFloydSession({
+			client,
+			sessionId: "session-1",
+			runId: "run-1",
+			actor: "test",
+			signal: controller.signal,
+			initialLastEventId: "99",
+			initialEpoch: "epoch-1",
+			onEpochChange: epoch => {
+				epochs.push(epoch);
+			},
+			onEvent: event => {
+				received.push(event.type);
+				controller.abort();
+			},
+		});
+		expect(requestedCursors).toEqual(["99", undefined]);
+		expect(epochs).toEqual(["epoch-2"]);
+		expect(received).toEqual(["transcript"]);
 	});
 
 	test("publishes cursors only for the matching run and stream epoch", async () => {

@@ -2,7 +2,12 @@ import * as path from "node:path";
 import type { ExperienceEnvelope, FloydClient, FloydProject, FloydStreamEvent } from "@floyd/sdk";
 import { Box, Input, ProcessTerminal, replaceTabs, Spacer, Text, TUI, truncateToWidth } from "@oh-my-pi/pi-tui";
 import chalk from "chalk";
-import { FloydCursorPublicationQueue, FloydExperienceCoordinator, startupShouldContinue } from "./experience";
+import {
+	FloydCursorPublicationQueue,
+	FloydExperienceCoordinator,
+	followFloydSession,
+	startupShouldContinue,
+} from "./experience";
 
 const ACTOR = "ohmyfloyd";
 const MAX_EVENT_WIDTH = 240;
@@ -87,6 +92,9 @@ export class FloydCoreMode {
 	#sessionId?: string;
 	#streamAbort?: AbortController;
 	#streamTask?: Promise<void>;
+	#interactionAbort?: AbortController;
+	#artifactAbort?: AbortController;
+	#artifactTask?: Promise<void>;
 	#experience?: FloydExperienceCoordinator;
 	#experienceApplyChain = Promise.resolve();
 	#draftTask?: Promise<void>;
@@ -100,6 +108,7 @@ export class FloydCoreMode {
 		onError: error => this.#addError(displayError(error)),
 	});
 	#assistantText?: Text;
+	#modelRouteText?: Text;
 	#inputChain = Promise.resolve();
 	#closed = false;
 
@@ -129,11 +138,13 @@ export class FloydCoreMode {
 			frame.addChild(
 				new Text(
 					`${chalk.bold(chalk.hex("#8be9fd")("FLOYD CURSE'M"))}  ${chalk.hex("#bd93f9")("natural-language coding partner")}\n` +
-						`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Route ${modelRoute}  Project ${this.#projectId}  ${this.#cwd}`,
+						`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Project ${this.#projectId}  ${this.#cwd}`,
 					1,
 					0,
 				),
 			);
+			this.#modelRouteText = new Text(`Route ${modelRoute}`, 1, 0);
+			frame.addChild(this.#modelRouteText);
 			frame.addChild(new Spacer(1));
 			frame.addChild(this.#transcript);
 			frame.addChild(new Spacer(1));
@@ -178,9 +189,15 @@ export class FloydCoreMode {
 		// Abort the fetch body immediately, then wait for FloydClient.stream's
 		// reader cancellation before restoring the terminal and resolving run().
 		this.#streamAbort?.abort();
+		this.#interactionAbort?.abort();
+		this.#artifactAbort?.abort();
 		const streamTask = this.#streamTask;
+		const artifactTask = this.#artifactTask;
+		const inputTask = this.#inputChain;
 		void (async () => {
 			await streamTask;
+			await artifactTask;
+			await inputTask;
 			await this.#cursorPublications.stop(streamGeneration);
 			await this.#experience?.stop();
 			await this.#draftTask;
@@ -259,37 +276,72 @@ export class FloydCoreMode {
 				break;
 			case "/answer":
 				if (!this.#sessionId || !args[0] || args.length < 2) throw new Error("Usage: /answer <id> <answer>");
-				await this.#client.answer(
-					this.#sessionId,
-					args[0],
-					[[args.slice(1).join(" ")]],
-					ACTOR,
-					undefined,
-					this.#runId,
+				await this.#runInteraction(
+					signal =>
+						this.#client.answer(
+							this.#sessionId!,
+							args[0]!,
+							[[args.slice(1).join(" ")]],
+							ACTOR,
+							signal,
+							this.#runId,
+						),
+					() => this.#addSystem(`Answer sent for ${args[0]}.`),
 				);
-				this.#addSystem(`Answer sent for ${args[0]}.`);
 				break;
 			case "/allow":
 			case "/always":
 			case "/deny": {
 				if (!this.#sessionId || !args[0]) throw new Error(`Usage: ${command} <id>`);
 				const reply = command === "/allow" ? "once" : command === "/always" ? "always" : "reject";
-				await this.#client.permission(this.#sessionId, args[0], reply, ACTOR, undefined, this.#runId);
-				this.#addSystem(`Permission response sent for ${args[0]}.`);
+				await this.#runInteraction(
+					signal => this.#client.permission(this.#sessionId!, args[0]!, reply, ACTOR, signal, this.#runId),
+					() => this.#addSystem(`Permission response sent for ${args[0]}.`),
+				);
 				break;
 			}
 			case "/accept":
 			case "/reject":
 			case "/escalate":
 				if (!this.#runId) throw new Error("No active run.");
-				await this.#client.decision(this.#runId, command.slice(1) as "accept" | "reject" | "escalate", ACTOR);
-				this.#addSystem(`Decision recorded: ${command.slice(1)}.`);
+				await this.#runInteraction(
+					signal =>
+						this.#client.decision(
+							this.#runId!,
+							command.slice(1) as "accept" | "reject" | "escalate",
+							ACTOR,
+							signal,
+						),
+					() => this.#addSystem(`Decision recorded: ${command.slice(1)}.`),
+				);
 				break;
 			case "/quit":
 				this.stop();
 				break;
 			default:
 				throw new Error(`Unknown Floyd command: ${command}. Use /help.`);
+		}
+	}
+
+	async #runInteraction(action: (signal: AbortSignal) => Promise<unknown>, onSuccess: () => void): Promise<void> {
+		this.#interactionAbort?.abort();
+		const controller = new AbortController();
+		this.#interactionAbort = controller;
+		const generation = this.#selectionGeneration;
+		const runId = this.#runId;
+		const sessionId = this.#sessionId;
+		try {
+			await action(controller.signal);
+			if (
+				!controller.signal.aborted &&
+				!this.#closed &&
+				generation === this.#selectionGeneration &&
+				runId === this.#runId &&
+				sessionId === this.#sessionId
+			)
+				onSuccess();
+		} finally {
+			if (this.#interactionAbort === controller) this.#interactionAbort = undefined;
 		}
 	}
 
@@ -307,6 +359,8 @@ export class FloydCoreMode {
 	): Promise<void> {
 		const previousGeneration = this.#selectionGeneration;
 		const generation = ++this.#selectionGeneration;
+		this.#interactionAbort?.abort();
+		this.#artifactAbort?.abort();
 		this.#cursorPublications.setGeneration(generation);
 		const run = await this.#client.run(runId);
 		if (generation !== this.#selectionGeneration || this.#closed) return;
@@ -347,41 +401,45 @@ export class FloydCoreMode {
 		lastEventId?: string,
 	): Promise<void> {
 		try {
-			for await (const event of this.#client.attachSession(sessionId, ACTOR, {
-				signal: controller.signal,
+			await followFloydSession({
+				client: this.#client,
+				sessionId,
 				runId,
-				lastEventId,
-			})) {
-				if (controller.signal.aborted || this.#closed) break;
-				if (event.type === "hello") {
-					const epoch = textValue(record(event.data).stream_epoch);
-					const envelope = this.#experience?.envelope;
-					if (epoch && envelope?.active.run_id === runId && envelope.transcript_epoch !== epoch) {
-						await this.#experience?.publish({
-							transcript_epoch: epoch,
-							transcript_cursor: 0,
-							last_event_id: null,
-						});
+				actor: ACTOR,
+				signal: controller.signal,
+				initialLastEventId: lastEventId,
+				initialEpoch: this.#experience?.envelope?.transcript_epoch,
+				onEpochChange: async epoch => {
+					if (generation !== this.#selectionGeneration || this.#closed) return;
+					this.#assistantText = undefined;
+					this.#transcript.clear();
+					this.#addSystem("Core stream restarted; restoring the authoritative transcript.");
+					await this.#experience?.publish({ transcript_epoch: epoch, transcript_cursor: 0, last_event_id: null });
+				},
+				onReconnectError: (error, attempt) => {
+					if (attempt === 1 || attempt % 5 === 0)
+						this.#addError(`Stream reconnect attempt ${attempt}: ${displayError(error)}`);
+				},
+				onEvent: async event => {
+					if (controller.signal.aborted || this.#closed || generation !== this.#selectionGeneration) return;
+					this.#renderEvent(event);
+					if (event.id) {
+						const cursor = Number(event.id);
+						const experience = this.#experience;
+						if (Number.isFinite(cursor) && experience) {
+							this.#cursorPublications.queue(
+								{
+									runId,
+									epoch: experience.envelope?.transcript_epoch ?? null,
+									cursor,
+									eventId: event.id,
+								},
+								generation,
+							);
+						}
 					}
-					continue;
-				}
-				this.#renderEvent(event);
-				if (event.id) {
-					const cursor = Number(event.id);
-					const experience = this.#experience;
-					if (Number.isFinite(cursor) && experience) {
-						this.#cursorPublications.queue(
-							{
-								runId,
-								epoch: experience.envelope?.transcript_epoch ?? null,
-								cursor,
-								eventId: event.id,
-							},
-							generation,
-						);
-					}
-				}
-			}
+				},
+			});
 		} catch (error) {
 			if (!controller.signal.aborted) this.#addError(displayError(error));
 		} finally {
@@ -470,6 +528,8 @@ export class FloydCoreMode {
 
 	async #restoreEnvelope(envelope: ExperienceEnvelope): Promise<void> {
 		if (this.#closed) return;
+		this.#modelRouteText?.setText(`Route ${formatModelRoute(envelope.model_route)}`);
+		this.#ui.requestRender();
 		const localDraft = this.#input.getValue();
 		const draftDecision = classifyDraftRestore(localDraft, this.#lastPublishedDraft, envelope.composer_draft);
 		if (draftDecision === "restore") {
@@ -531,29 +591,57 @@ export class FloydCoreMode {
 			envelope.selected_artifact_id &&
 			envelope.selected_artifact_id !== this.#restoredArtifactId &&
 			envelope.selected_view.includes("artifact")
-		) {
+		)
+			this.#scheduleArtifactRestore(envelope);
+		else this.#artifactAbort?.abort();
+	}
+
+	#scheduleArtifactRestore(envelope: ExperienceEnvelope): void {
+		this.#artifactAbort?.abort();
+		const controller = new AbortController();
+		this.#artifactAbort = controller;
+		const artifactId = envelope.selected_artifact_id!;
+		const runId = envelope.active.run_id;
+		const generation = this.#selectionGeneration;
+		const task = (async () => {
 			try {
-				const artifact = await this.#client.artifactById(envelope.selected_artifact_id);
-				if (this.#closed || this.#experience?.envelope?.selected_artifact_id !== envelope.selected_artifact_id)
+				const artifact = await this.#client.artifactById(artifactId, controller.signal);
+				const current = this.#experience?.envelope;
+				if (
+					controller.signal.aborted ||
+					this.#closed ||
+					generation !== this.#selectionGeneration ||
+					runId !== this.#runId ||
+					current?.active.run_id !== runId ||
+					current.selected_artifact_id !== artifactId
+				)
 					return;
-				this.#restoredArtifactId = envelope.selected_artifact_id;
+				this.#restoredArtifactId = artifactId;
 				this.#addTranscript(
 					new Text(
-						`${chalk.hex("#bd93f9")(`Artifact ${envelope.selected_artifact_id.slice(0, 12)}`)}\n${formatArtifactContent(artifact)}`,
+						`${chalk.hex("#bd93f9")(`Artifact ${artifactId.slice(0, 12)}`)}\n${formatArtifactContent(artifact)}`,
 						1,
 						1,
 					),
 				);
 				this.#ui.requestRender();
 			} catch (error) {
-				this.#addError(`Artifact unavailable: ${displayError(error)}`);
+				if (!controller.signal.aborted) this.#addError(`Artifact unavailable: ${displayError(error)}`);
+			} finally {
+				if (this.#artifactAbort === controller) this.#artifactAbort = undefined;
 			}
-		}
+		})();
+		this.#artifactTask = task;
+		void task.finally(() => {
+			if (this.#artifactTask === task) this.#artifactTask = undefined;
+		});
 	}
 
 	async #startNewRunContext(publish: boolean): Promise<void> {
 		const previousGeneration = this.#selectionGeneration;
 		this.#selectionGeneration += 1;
+		this.#interactionAbort?.abort();
+		this.#artifactAbort?.abort();
 		this.#cursorPublications.setGeneration(this.#selectionGeneration);
 		await this.#detach(previousGeneration);
 		this.#runId = undefined;
