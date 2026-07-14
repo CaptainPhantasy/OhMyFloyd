@@ -31,6 +31,16 @@ function safeDisplay(text: string): string {
 	return truncateToWidth(sanitizeTerminalText(text), MAX_EVENT_WIDTH);
 }
 
+export function classifyDraftRestore(
+	localDraft: string,
+	lastPublishedDraft: string,
+	incomingDraft: string,
+): "restore" | "keep-local" | "conflict" {
+	if (localDraft === lastPublishedDraft || localDraft === "" || localDraft === incomingDraft) return "restore";
+	if (incomingDraft !== lastPublishedDraft) return "conflict";
+	return "keep-local";
+}
+
 export interface FloydCoreModeOptions {
 	client: FloydClient;
 	cwd: string;
@@ -61,6 +71,7 @@ export class FloydCoreMode {
 	#experienceApplyChain = Promise.resolve();
 	#draftTask?: Promise<void>;
 	#lastPublishedDraft = "";
+	#blockedConflictingDraft?: string;
 	#selectionGeneration = 0;
 	readonly #cursorPublications = new FloydCursorPublicationQueue({
 		publish: publication => this.#experience?.publishCursor(publication) ?? Promise.resolve(undefined),
@@ -436,9 +447,20 @@ export class FloydCoreMode {
 
 	async #restoreEnvelope(envelope: ExperienceEnvelope): Promise<void> {
 		if (this.#closed) return;
-		if (this.#input.getValue() === this.#lastPublishedDraft || this.#input.getValue() === "") {
+		const localDraft = this.#input.getValue();
+		const draftDecision = classifyDraftRestore(localDraft, this.#lastPublishedDraft, envelope.composer_draft);
+		if (draftDecision === "restore") {
 			this.#input.setValue(envelope.composer_draft);
 			this.#lastPublishedDraft = envelope.composer_draft;
+			this.#blockedConflictingDraft = undefined;
+		} else if (draftDecision === "conflict") {
+			this.#lastPublishedDraft = envelope.composer_draft;
+			if (this.#blockedConflictingDraft !== localDraft) {
+				this.#blockedConflictingDraft = localDraft;
+				this.#addError(
+					"Draft changed in another Floyd surface. Your local text is preserved; edit it again to publish an override.",
+				);
+			}
 		}
 		const active = envelope.active;
 		if (active.project_id !== this.#projectId || !active.run_id || !active.session_id) {
@@ -486,6 +508,8 @@ export class FloydCoreMode {
 			if (this.#closed) break;
 			const draft = this.#input.getValue();
 			if (draft === this.#lastPublishedDraft) continue;
+			if (draft === this.#blockedConflictingDraft) continue;
+			if (this.#blockedConflictingDraft !== undefined) this.#blockedConflictingDraft = undefined;
 			try {
 				await this.#experience?.publish({ composer_draft: draft });
 				this.#lastPublishedDraft = draft;

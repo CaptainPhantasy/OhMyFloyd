@@ -7,10 +7,14 @@ import {
 
 export const FLOYD_TUI_SURFACE_ID = "tui";
 export const FLOYD_TUI_CAPABILITIES = [
+	"active-context",
 	"coding-runs",
+	"durable-transcript",
+	"transcript-cursor",
 	"questions",
 	"permissions",
 	"drafts",
+	"selected-view",
 	"experience-stream",
 ] as const;
 
@@ -24,6 +28,8 @@ export interface FloydExperienceCoordinatorOptions {
 	envelopeId?: string;
 	onEnvelope: (envelope: ExperienceEnvelope) => void | Promise<void>;
 	onWatchError?: (error: unknown) => void;
+	reconnectBaseDelayMs?: number;
+	reconnectMaxDelayMs?: number;
 }
 
 export interface FloydCursorPublication {
@@ -127,6 +133,8 @@ export class FloydExperienceCoordinator {
 	readonly #envelopeId: string;
 	readonly #onEnvelope: FloydExperienceCoordinatorOptions["onEnvelope"];
 	readonly #onWatchError: NonNullable<FloydExperienceCoordinatorOptions["onWatchError"]>;
+	readonly #reconnectBaseDelayMs: number;
+	readonly #reconnectMaxDelayMs: number;
 	#envelope?: ExperienceEnvelope;
 	#publishTail = Promise.resolve<unknown>(undefined);
 	#watchAbort?: AbortController;
@@ -138,6 +146,8 @@ export class FloydExperienceCoordinator {
 		this.#envelopeId = options.envelopeId ?? "primary";
 		this.#onEnvelope = options.onEnvelope;
 		this.#onWatchError = options.onWatchError ?? (() => {});
+		this.#reconnectBaseDelayMs = options.reconnectBaseDelayMs ?? 150;
+		this.#reconnectMaxDelayMs = options.reconnectMaxDelayMs ?? 2_000;
 	}
 
 	get envelope(): ExperienceEnvelope | undefined {
@@ -223,20 +233,51 @@ export class FloydExperienceCoordinator {
 	}
 
 	async #watch(controller: AbortController): Promise<void> {
-		try {
-			for await (const event of this.#client.watchExperience(this.#envelopeId, {
-				lastEventId: String(this.#envelope?.revision ?? 0),
-				signal: controller.signal,
-			})) {
-				if (controller.signal.aborted || this.#closed || event.type !== "experience") continue;
-				const envelope = event.data as ExperienceEnvelope;
-				if (!envelope || typeof envelope.revision !== "number") continue;
-				if (this.#envelope && envelope.revision <= this.#envelope.revision) continue;
-				this.#envelope = envelope;
-				await this.#onEnvelope(envelope);
+		let failures = 0;
+		while (!controller.signal.aborted && !this.#closed) {
+			try {
+				if (failures > 0) {
+					// A fresh GET is authoritative even when Core was restored to a
+					// lower revision than this process previously observed.
+					const restored = await this.#client.experience(this.#envelopeId, controller.signal);
+					if (!this.#envelope || restored.revision !== this.#envelope.revision) {
+						this.#envelope = restored;
+						await this.#onEnvelope(restored);
+					}
+				}
+				for await (const event of this.#client.watchExperience(this.#envelopeId, {
+					lastEventId: String(this.#envelope?.revision ?? 0),
+					signal: controller.signal,
+				})) {
+					if (controller.signal.aborted || this.#closed || event.type !== "experience") continue;
+					const envelope = event.data as ExperienceEnvelope;
+					if (!envelope || typeof envelope.revision !== "number") continue;
+					if (this.#envelope && envelope.revision <= this.#envelope.revision) continue;
+					failures = 0;
+					this.#envelope = envelope;
+					await this.#onEnvelope(envelope);
+				}
+				if (!controller.signal.aborted && !this.#closed) throw new Error("Floyd experience stream ended");
+			} catch (error) {
+				if (controller.signal.aborted || this.#closed) return;
+				this.#onWatchError(error);
+				failures += 1;
+				const delay = Math.min(
+					this.#reconnectBaseDelayMs * 2 ** Math.min(failures - 1, 6),
+					this.#reconnectMaxDelayMs,
+				);
+				await new Promise<void>(resolve => {
+					const timer = setTimeout(resolve, delay);
+					controller.signal.addEventListener(
+						"abort",
+						() => {
+							clearTimeout(timer);
+							resolve();
+						},
+						{ once: true },
+					);
+				});
 			}
-		} catch (error) {
-			if (!controller.signal.aborted) throw error;
 		}
 	}
 }

@@ -14,6 +14,7 @@ import {
 	FloydExperienceCoordinator,
 	startupShouldContinue,
 } from "../src/floyd-core/experience";
+import { classifyDraftRestore } from "../src/floyd-core/mode";
 
 function envelope(revision: number, overrides: Partial<ExperienceEnvelope> = {}): ExperienceEnvelope {
 	return {
@@ -62,6 +63,14 @@ describe("Floyd Experience coordinator", () => {
 		expect(startupShouldContinue(undefined, false)).toBeTrue();
 		expect(startupShouldContinue("fix the parser", false)).toBeFalse();
 		expect(startupShouldContinue("fix the parser", true)).toBeTrue();
+	});
+
+	test("detects remote draft divergence without overwriting local input", () => {
+		expect(classifyDraftRestore("", "base", "remote")).toBe("restore");
+		expect(classifyDraftRestore("base", "base", "remote")).toBe("restore");
+		expect(classifyDraftRestore("local", "base", "base")).toBe("keep-local");
+		expect(classifyDraftRestore("local", "base", "local")).toBe("restore");
+		expect(classifyDraftRestore("local", "base", "remote")).toBe("conflict");
 	});
 
 	test("negotiates capabilities and serializes optimistic publications", async () => {
@@ -136,6 +145,47 @@ describe("Floyd Experience coordinator", () => {
 		expect(writes).toBe(1);
 		expect(coordinator.envelope).toBe(latest);
 		expect(applied).toEqual([latest]);
+		await coordinator.stop();
+	});
+
+	test("reconnects a failed watch and restores authoritative Core state", async () => {
+		const initial = envelope(9, { composer_draft: "before restart" });
+		const restored = envelope(3, { composer_draft: "after restore" });
+		let reads = 0;
+		let watches = 0;
+		const errors: unknown[] = [];
+		const applied: ExperienceEnvelope[] = [];
+		const client: FloydExperienceClient = {
+			negotiateExperience: async () => accepted,
+			experience: async () => (++reads === 1 ? initial : restored),
+			updateExperience: async () => restored,
+			watchExperience: (_id, options) => {
+				watches += 1;
+				if (watches === 1)
+					return (async function* () {
+						yield* [] as FloydStreamEvent<ExperienceEnvelope>[];
+						throw new Error("Core restarted");
+					})();
+				return quietWatch(options?.signal);
+			},
+		};
+		const coordinator = new FloydExperienceCoordinator({
+			client,
+			onEnvelope: value => {
+				applied.push(value);
+			},
+			onWatchError: error => {
+				errors.push(error);
+			},
+			reconnectBaseDelayMs: 1,
+			reconnectMaxDelayMs: 2,
+		});
+		await coordinator.start();
+		for (let attempt = 0; attempt < 100 && watches < 2; attempt += 1) await Bun.sleep(1);
+		expect(watches).toBe(2);
+		expect(errors).toHaveLength(1);
+		expect(coordinator.envelope).toBe(restored);
+		expect(applied).toEqual([restored]);
 		await coordinator.stop();
 	});
 
