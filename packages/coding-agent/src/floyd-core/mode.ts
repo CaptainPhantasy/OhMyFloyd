@@ -44,6 +44,13 @@ export function formatModelRoute(route: ExperienceEnvelope["model_route"]): stri
 	return parts.length ? parts.join(" / ") : "Core default";
 }
 
+export function pendingInteractionKey(kind: "question" | "permission", value: unknown, index: number): string {
+	const payload = record(value);
+	const data = record(payload.data);
+	const id = textValue(data.id, textValue(data.request_id, textValue(payload.request_id)));
+	return `${kind}:${id || index}`;
+}
+
 export function classifyDraftRestore(
 	localDraft: string,
 	lastPublishedDraft: string,
@@ -86,6 +93,7 @@ export class FloydCoreMode {
 	#lastPublishedDraft = "";
 	#blockedConflictingDraft?: string;
 	#restoredArtifactId?: string;
+	#visiblePendingInteractions = new Set<string>();
 	#selectionGeneration = 0;
 	readonly #cursorPublications = new FloydCursorPublicationQueue({
 		publish: publication => this.#experience?.publishCursor(publication) ?? Promise.resolve(undefined),
@@ -496,6 +504,29 @@ export class FloydCoreMode {
 				lastEventId: envelope.last_event_id ?? undefined,
 			});
 		}
+		const nextPending = new Set<string>();
+		for (const [kind, items] of [
+			["question", envelope.pending_questions],
+			["permission", envelope.pending_permissions],
+		] as const) {
+			items.forEach((item, index) => {
+				const key = pendingInteractionKey(kind, item, index);
+				nextPending.add(key);
+				if (this.#visiblePendingInteractions.has(key)) return;
+				const data = record(record(item).data);
+				const id = key.slice(key.indexOf(":") + 1);
+				if (kind === "question") {
+					this.#addEvent(
+						`Pending question ${id}: ${safeDisplay(JSON.stringify(data))}\nUse /answer ${id} <answer>.`,
+					);
+				} else {
+					this.#addEvent(
+						`Pending permission ${id}: ${safeDisplay(JSON.stringify(data))}\nUse /allow, /always, or /deny ${id}.`,
+					);
+				}
+			});
+		}
+		this.#visiblePendingInteractions = nextPending;
 		if (
 			envelope.selected_artifact_id &&
 			envelope.selected_artifact_id !== this.#restoredArtifactId &&

@@ -14,7 +14,12 @@ import {
 	FloydExperienceCoordinator,
 	startupShouldContinue,
 } from "../src/floyd-core/experience";
-import { classifyDraftRestore, formatArtifactContent, formatModelRoute } from "../src/floyd-core/mode";
+import {
+	classifyDraftRestore,
+	formatArtifactContent,
+	formatModelRoute,
+	pendingInteractionKey,
+} from "../src/floyd-core/mode";
 
 function envelope(revision: number, overrides: Partial<ExperienceEnvelope> = {}): ExperienceEnvelope {
 	return {
@@ -90,6 +95,12 @@ describe("Floyd Experience coordinator", () => {
 				credential_ref: "floyd-connector:secret",
 			}),
 		).toBe("opencode-go / qwen-coder");
+	});
+
+	test("uses stable request identities for restored pending interactions", () => {
+		expect(pendingInteractionKey("question", { data: { id: "q-1" } }, 0)).toBe("question:q-1");
+		expect(pendingInteractionKey("permission", { request_id: "p-1" }, 0)).toBe("permission:p-1");
+		expect(pendingInteractionKey("question", { data: {} }, 3)).toBe("question:3");
 	});
 
 	test("negotiates capabilities and serializes optimistic publications", async () => {
