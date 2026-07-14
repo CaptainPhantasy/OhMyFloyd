@@ -13,6 +13,7 @@ export const FLOYD_TUI_CAPABILITIES = [
 	"transcript-cursor",
 	"questions",
 	"permissions",
+	"artifacts",
 	"drafts",
 	"selected-view",
 	"experience-stream",

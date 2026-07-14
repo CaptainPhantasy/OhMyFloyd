@@ -197,6 +197,10 @@ export class FloydClient {
 		return this.request("GET", `/api/runs/${encodeURIComponent(runId)}`, undefined, signal);
 	}
 
+	artifactById(artifactId: string, signal?: AbortSignal): Promise<unknown> {
+		return this.request("GET", `/api/artifacts/${encodeURIComponent(artifactId)}`, undefined, signal);
+	}
+
 	steer(
 		sessionId: string,
 		text: string,

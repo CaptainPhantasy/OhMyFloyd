@@ -14,7 +14,7 @@ import {
 	FloydExperienceCoordinator,
 	startupShouldContinue,
 } from "../src/floyd-core/experience";
-import { classifyDraftRestore } from "../src/floyd-core/mode";
+import { classifyDraftRestore, formatArtifactContent } from "../src/floyd-core/mode";
 
 function envelope(revision: number, overrides: Partial<ExperienceEnvelope> = {}): ExperienceEnvelope {
 	return {
@@ -71,6 +71,12 @@ describe("Floyd Experience coordinator", () => {
 		expect(classifyDraftRestore("local", "base", "base")).toBe("keep-local");
 		expect(classifyDraftRestore("local", "base", "local")).toBe("restore");
 		expect(classifyDraftRestore("local", "base", "remote")).toBe("conflict");
+	});
+
+	test("renders selected artifact content without terminal control bytes", () => {
+		expect(formatArtifactContent("result\u001b[31m\u0000")).toBe("result[31m");
+		expect(formatArtifactContent({ status: "pass" })).toContain('"status": "pass"');
+		expect(formatArtifactContent("x".repeat(20_000))).toEndWith("[artifact truncated for TUI display]");
 	});
 
 	test("negotiates capabilities and serializes optimistic publications", async () => {

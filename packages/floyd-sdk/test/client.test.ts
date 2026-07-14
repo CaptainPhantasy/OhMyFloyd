@@ -107,12 +107,14 @@ describe("FloydClient", () => {
 		await client.negotiateExperience({ surface_id: "test-surface", capabilities: ["experience-read"] });
 		await client.experience("team one");
 		await client.updateExperience("team one", { expected_revision: 7, composer_draft: "next" });
+		await client.artifactById("artifact one");
 		await client.steer("session one", "continue", "test", undefined, "run one");
 
 		expect(requests.map(request => `${request.method} ${request.pathname}`)).toEqual([
 			"POST /api/experience/negotiate",
 			"GET /api/experience/team%20one",
 			"PATCH /api/experience/team%20one",
+			"GET /api/artifacts/artifact%20one",
 			"POST /api/sessions/session%20one/steer",
 		]);
 		expect(requests[0]?.body).toEqual({
@@ -121,7 +123,7 @@ describe("FloydClient", () => {
 			supported_envelope_versions: [FLOYD_EXPERIENCE_VERSION],
 			capabilities: ["experience-read"],
 		});
-		expect(requests[3]?.body).toMatchObject({ type: "steer", run_id: "run one" });
+		expect(requests[4]?.body).toMatchObject({ type: "steer", run_id: "run one" });
 		expect(requests.every(request => request.headers.get("authorization") === "Bearer core-secret")).toBeTrue();
 	});
 

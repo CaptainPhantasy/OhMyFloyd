@@ -31,6 +31,14 @@ function safeDisplay(text: string): string {
 	return truncateToWidth(sanitizeTerminalText(text), MAX_EVENT_WIDTH);
 }
 
+export function formatArtifactContent(value: unknown): string {
+	const text = typeof value === "string" ? value : JSON.stringify(value, null, 2);
+	const sanitized = sanitizeTerminalText(text ?? "");
+	return sanitized.length <= 16 * 1024
+		? sanitized
+		: `${sanitized.slice(0, 16 * 1024)}\n[artifact truncated for TUI display]`;
+}
+
 export function classifyDraftRestore(
 	localDraft: string,
 	lastPublishedDraft: string,
@@ -72,6 +80,7 @@ export class FloydCoreMode {
 	#draftTask?: Promise<void>;
 	#lastPublishedDraft = "";
 	#blockedConflictingDraft?: string;
+	#restoredArtifactId?: string;
 	#selectionGeneration = 0;
 	readonly #cursorPublications = new FloydCursorPublicationQueue({
 		publish: publication => this.#experience?.publishCursor(publication) ?? Promise.resolve(undefined),
@@ -480,6 +489,28 @@ export class FloydCoreMode {
 				expectedSessionId: active.session_id,
 				lastEventId: envelope.last_event_id ?? undefined,
 			});
+		}
+		if (
+			envelope.selected_artifact_id &&
+			envelope.selected_artifact_id !== this.#restoredArtifactId &&
+			envelope.selected_view.includes("artifact")
+		) {
+			try {
+				const artifact = await this.#client.artifactById(envelope.selected_artifact_id);
+				if (this.#closed || this.#experience?.envelope?.selected_artifact_id !== envelope.selected_artifact_id)
+					return;
+				this.#restoredArtifactId = envelope.selected_artifact_id;
+				this.#addTranscript(
+					new Text(
+						`${chalk.hex("#bd93f9")(`Artifact ${envelope.selected_artifact_id.slice(0, 12)}`)}\n${formatArtifactContent(artifact)}`,
+						1,
+						1,
+					),
+				);
+				this.#ui.requestRender();
+			} catch (error) {
+				this.#addError(`Artifact unavailable: ${displayError(error)}`);
+			}
 		}
 	}
 
