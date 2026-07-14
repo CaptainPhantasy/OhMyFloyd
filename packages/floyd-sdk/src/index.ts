@@ -1,4 +1,75 @@
 export const DEFAULT_FLOYD_CORE_URL = "http://127.0.0.1:41414";
+export const FLOYD_EXPERIENCE_VERSION = "1.0.0" as const;
+export const FLOYD_SDK_PROTOCOL_VERSION = "1.0.0" as const;
+
+export interface ExperienceActiveContext {
+	project_id: string | null;
+	session_id: string | null;
+	run_id: string | null;
+}
+
+export interface ExperienceModelRoute {
+	provider: string | null;
+	model: string | null;
+	base_url: string | null;
+	provider_profile_id: string | null;
+	credential_ref: string | null;
+}
+
+export interface SurfaceExperienceState {
+	surface_id: string;
+	sdk_version: string;
+	envelope_version: string;
+	capabilities: string[];
+	transcript_cursor: number;
+	transcript_epoch: string | null;
+	last_event_id: string | null;
+	last_seen_at: string;
+}
+
+export interface ExperienceEnvelope {
+	id: string;
+	schema_version: typeof FLOYD_EXPERIENCE_VERSION;
+	revision: number;
+	active: ExperienceActiveContext;
+	model_route: ExperienceModelRoute;
+	transcript_cursor: number;
+	transcript_epoch: string | null;
+	last_event_id: string | null;
+	pending_questions: unknown[];
+	pending_permissions: unknown[];
+	composer_draft: string;
+	selected_artifact_id: string | null;
+	selected_view: string;
+	surfaces: Record<string, SurfaceExperienceState>;
+	updated_at: string;
+	updated_by_device_id: string | null;
+}
+
+export interface ExperienceEnvelopePatch {
+	expected_revision: number;
+	active?: Partial<ExperienceActiveContext>;
+	model_route?: Partial<ExperienceModelRoute>;
+	transcript_cursor?: number;
+	transcript_epoch?: string | null;
+	last_event_id?: string | null;
+	composer_draft?: string;
+	selected_artifact_id?: string | null;
+	selected_view?: string;
+	surface?: Omit<SurfaceExperienceState, "last_seen_at" | "envelope_version" | "transcript_epoch"> & {
+		envelope_version?: string;
+		transcript_epoch?: string | null;
+	};
+	device_id?: string | null;
+}
+
+export interface ExperienceNegotiationResult {
+	accepted: boolean;
+	envelope_version: string | null;
+	core_protocol_version: typeof FLOYD_SDK_PROTOCOL_VERSION;
+	minimum_sdk_version: string;
+	reason?: string;
+}
 
 export interface FloydProject {
 	id: string;
@@ -126,11 +197,17 @@ export class FloydClient {
 		return this.request("GET", `/api/runs/${encodeURIComponent(runId)}`, undefined, signal);
 	}
 
-	steer(sessionId: string, text: string, actor: string, signal?: AbortSignal): Promise<Record<string, unknown>> {
+	steer(
+		sessionId: string,
+		text: string,
+		actor: string,
+		signal?: AbortSignal,
+		runId?: string,
+	): Promise<Record<string, unknown>> {
 		return this.request(
 			"POST",
 			`/api/sessions/${encodeURIComponent(sessionId)}/steer`,
-			{ type: "steer", text, actor },
+			{ type: "steer", text, actor, ...(runId ? { run_id: runId } : {}) },
 			signal,
 		);
 	}
@@ -141,11 +218,12 @@ export class FloydClient {
 		answers: string[][],
 		actor: string,
 		signal?: AbortSignal,
+		runId?: string,
 	): Promise<Record<string, unknown>> {
 		return this.request(
 			"POST",
 			`/api/sessions/${encodeURIComponent(sessionId)}/steer`,
-			{ type: "answer", request_id: requestId, answers, actor },
+			{ type: "answer", request_id: requestId, answers, actor, ...(runId ? { run_id: runId } : {}) },
 			signal,
 		);
 	}
@@ -156,11 +234,12 @@ export class FloydClient {
 		reply: "once" | "always" | "reject",
 		actor: string,
 		signal?: AbortSignal,
+		runId?: string,
 	): Promise<Record<string, unknown>> {
 		return this.request(
 			"POST",
 			`/api/sessions/${encodeURIComponent(sessionId)}/steer`,
-			{ type: "permission", request_id: requestId, reply, actor },
+			{ type: "permission", request_id: requestId, reply, actor, ...(runId ? { run_id: runId } : {}) },
 			signal,
 		);
 	}
@@ -172,6 +251,50 @@ export class FloydClient {
 		signal?: AbortSignal,
 	): Promise<Record<string, unknown>> {
 		return this.request("POST", `/api/runs/${encodeURIComponent(runId)}/decision`, { action, actor }, signal);
+	}
+
+	negotiateExperience(
+		input: {
+			surface_id: string;
+			capabilities: string[];
+			sdk_version?: string;
+			supported_envelope_versions?: string[];
+		},
+		signal?: AbortSignal,
+	): Promise<ExperienceNegotiationResult> {
+		return this.request(
+			"POST",
+			"/api/experience/negotiate",
+			{
+				surface_id: input.surface_id,
+				sdk_version: input.sdk_version ?? FLOYD_SDK_PROTOCOL_VERSION,
+				supported_envelope_versions: input.supported_envelope_versions ?? [FLOYD_EXPERIENCE_VERSION],
+				capabilities: input.capabilities,
+			},
+			signal,
+		);
+	}
+
+	experience(envelopeId = "primary", signal?: AbortSignal): Promise<ExperienceEnvelope> {
+		return this.request("GET", `/api/experience/${encodeURIComponent(envelopeId)}`, undefined, signal);
+	}
+
+	updateExperience(
+		envelopeId: string,
+		patch: ExperienceEnvelopePatch,
+		signal?: AbortSignal,
+	): Promise<ExperienceEnvelope> {
+		return this.request("PATCH", `/api/experience/${encodeURIComponent(envelopeId)}`, patch, signal);
+	}
+
+	watchExperience(
+		envelopeId = "primary",
+		options: { lastEventId?: string; signal?: AbortSignal } = {},
+	): AsyncGenerator<FloydStreamEvent<ExperienceEnvelope>> {
+		return this.stream(`/api/experience/${encodeURIComponent(envelopeId)}/stream`, {
+			lastEventId: options.lastEventId,
+			signal: options.signal,
+		}) as AsyncGenerator<FloydStreamEvent<ExperienceEnvelope>>;
 	}
 
 	async *stream(
@@ -261,11 +384,11 @@ export class FloydClient {
 	attachSession(
 		sessionId: string,
 		actor: string,
-		options: { lastEventId?: string; signal?: AbortSignal } = {},
+		options: { lastEventId?: string; signal?: AbortSignal; runId?: string } = {},
 	): AsyncGenerator<FloydStreamEvent> {
 		return this.stream(`/api/sessions/${encodeURIComponent(sessionId)}/attach`, {
 			method: "POST",
-			body: { actor },
+			body: { actor, ...(options.runId ? { run_id: options.runId } : {}) },
 			lastEventId: options.lastEventId,
 			signal: options.signal,
 		});

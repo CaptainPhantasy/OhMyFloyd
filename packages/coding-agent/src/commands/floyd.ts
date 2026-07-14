@@ -16,6 +16,10 @@ export default class Floyd extends Command {
 		"runtime-root": Flags.string({ description: "Floyd runtime root containing the Core gateway token" }),
 		"project-id": Flags.string({ description: "Existing Floyd Core project ID" }),
 		print: Flags.boolean({ char: "p", description: "Submit the goal without opening the TUI", default: false }),
+		continue: Flags.boolean({
+			description: "Continue the matching active Floyd experience when a goal is supplied",
+			default: false,
+		}),
 	};
 
 	async run(): Promise<void> {
@@ -32,6 +36,7 @@ export default class Floyd extends Command {
 
 		const message = args.messages?.join(" ").trim() ?? "";
 		if (flags.print) {
+			if (flags.continue) throw new Error("--continue is only valid in interactive Floyd mode.");
 			if (!message) throw new Error("--print requires a natural-language coding goal.");
 			const mode = new FloydCoreMode({ client, cwd: process.cwd(), projectId: flags["project-id"] });
 			const projectId = await mode.resolveProject();
@@ -43,7 +48,12 @@ export default class Floyd extends Command {
 		if (!process.stdin.isTTY || !process.stdout.isTTY) {
 			throw new Error("Interactive Floyd mode requires a TTY. Supply a goal or use --status.");
 		}
-		const mode = new FloydCoreMode({ client, cwd: process.cwd(), projectId: flags["project-id"] });
+		const mode = new FloydCoreMode({
+			client,
+			cwd: process.cwd(),
+			projectId: flags["project-id"],
+			continueActive: flags.continue,
+		});
 		await mode.run(message || undefined);
 	}
 }

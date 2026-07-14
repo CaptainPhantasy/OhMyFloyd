@@ -1,7 +1,8 @@
 import * as path from "node:path";
-import type { FloydClient, FloydProject, FloydStreamEvent } from "@floyd/sdk";
+import type { ExperienceEnvelope, FloydClient, FloydProject, FloydStreamEvent } from "@floyd/sdk";
 import { Box, Input, ProcessTerminal, replaceTabs, Spacer, Text, TUI, truncateToWidth } from "@oh-my-pi/pi-tui";
 import chalk from "chalk";
+import { FloydCursorPublicationQueue, FloydExperienceCoordinator, startupShouldContinue } from "./experience";
 
 const ACTOR = "ohmyfloyd";
 const MAX_EVENT_WIDTH = 240;
@@ -34,6 +35,7 @@ export interface FloydCoreModeOptions {
 	client: FloydClient;
 	cwd: string;
 	projectId?: string;
+	continueActive?: boolean;
 }
 
 /**
@@ -44,6 +46,7 @@ export class FloydCoreMode {
 	readonly #client: FloydClient;
 	readonly #cwd: string;
 	readonly #requestedProjectId?: string;
+	readonly #continueActive: boolean;
 	readonly #ui = new TUI(new ProcessTerminal());
 	readonly #transcript = new Box(0, 0);
 	readonly #input = new Input();
@@ -54,6 +57,15 @@ export class FloydCoreMode {
 	#sessionId?: string;
 	#streamAbort?: AbortController;
 	#streamTask?: Promise<void>;
+	#experience?: FloydExperienceCoordinator;
+	#experienceApplyChain = Promise.resolve();
+	#draftTask?: Promise<void>;
+	#lastPublishedDraft = "";
+	#selectionGeneration = 0;
+	readonly #cursorPublications = new FloydCursorPublicationQueue({
+		publish: publication => this.#experience?.publishCursor(publication) ?? Promise.resolve(undefined),
+		onError: error => this.#addError(displayError(error)),
+	});
 	#assistantText?: Text;
 	#inputChain = Promise.resolve();
 	#closed = false;
@@ -62,6 +74,7 @@ export class FloydCoreMode {
 		this.#client = options.client;
 		this.#cwd = path.resolve(options.cwd);
 		this.#requestedProjectId = options.projectId;
+		this.#continueActive = options.continueActive ?? false;
 		const deferred = Promise.withResolvers<void>();
 		this.#done = deferred.promise;
 		this.#resolveDone = deferred.resolve;
@@ -70,49 +83,73 @@ export class FloydCoreMode {
 	async run(initialMessage?: string): Promise<void> {
 		await this.resolveProject();
 		const health = await this.#client.health();
-		const frame = new Box(1, 1, line => chalk.bgHex("#11131a")(line));
-		frame.addChild(
-			new Text(
-				`${chalk.bold(chalk.hex("#8be9fd")("FLOYD CURSE'M"))}  ${chalk.hex("#bd93f9")("natural-language coding partner")}\n` +
-					`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Project ${this.#projectId}  ${this.#cwd}`,
-				1,
-				0,
-			),
-		);
-		frame.addChild(new Spacer(1));
-		frame.addChild(this.#transcript);
-		frame.addChild(new Spacer(1));
-		frame.addChild(new Text(chalk.dim("Describe a change or type /help. Escape or Ctrl+C exits."), 1, 0));
-		frame.addChild(this.#input);
-		this.#ui.addChild(frame);
-		this.#input.onSubmit = value => {
-			this.#input.setValue("");
-			this.#enqueueInput(value.trim());
-		};
-		this.#input.onEscape = () => this.stop();
-		this.#ui.addInputListener(data => {
-			if (data === "\x03") {
-				this.stop();
-				return { consume: true };
-			}
-			return undefined;
+		const experience = new FloydExperienceCoordinator({
+			client: this.#client,
+			onEnvelope: envelope => this.#enqueueEnvelope(envelope),
+			onWatchError: error => this.#addError(displayError(error)),
 		});
-		this.#ui.setFocus(this.#input);
-		this.#ui.start();
-		this.#addSystem("Floyd Core owns this session. Type a coding goal to begin.");
-		if (initialMessage) await this.#handleInput(initialMessage);
-		await this.#done;
+		this.#experience = experience;
+		const envelope = await experience.start();
+		try {
+			const frame = new Box(1, 1, line => chalk.bgHex("#11131a")(line));
+			frame.addChild(
+				new Text(
+					`${chalk.bold(chalk.hex("#8be9fd")("FLOYD CURSE'M"))}  ${chalk.hex("#bd93f9")("natural-language coding partner")}\n` +
+						`Core ${health.ok ? "online" : "offline"}  OpenCode ${health.engine.ok ? "online" : "offline"}  Project ${this.#projectId}  ${this.#cwd}`,
+					1,
+					0,
+				),
+			);
+			frame.addChild(new Spacer(1));
+			frame.addChild(this.#transcript);
+			frame.addChild(new Spacer(1));
+			frame.addChild(new Text(chalk.dim("Describe a change or type /help. Escape or Ctrl+C exits."), 1, 0));
+			frame.addChild(this.#input);
+			this.#ui.addChild(frame);
+			this.#input.onSubmit = value => {
+				this.#input.setValue("");
+				this.#enqueueInput(value.trim());
+			};
+			this.#input.onEscape = () => this.stop();
+			this.#ui.addInputListener(data => {
+				if (data === "\x03") {
+					this.stop();
+					return { consume: true };
+				}
+				return undefined;
+			});
+			this.#ui.setFocus(this.#input);
+			this.#ui.start();
+			this.#addSystem("Floyd Core owns this session. Type a coding goal to begin.");
+			await this.#restoreEnvelope(envelope);
+			this.#lastPublishedDraft = this.#input.getValue();
+			this.#draftTask = this.#publishDraftChanges();
+			if (initialMessage) {
+				if (!startupShouldContinue(initialMessage, this.#continueActive)) await this.#startNewRunContext(false);
+				await this.#handleInput(initialMessage);
+			}
+			await this.#done;
+		} catch (error) {
+			await experience.stop();
+			throw error;
+		}
 	}
 
 	stop(): void {
 		if (this.#closed) return;
 		this.#closed = true;
+		const streamGeneration = this.#selectionGeneration;
+		this.#selectionGeneration += 1;
+		this.#cursorPublications.setGeneration(this.#selectionGeneration);
 		// Abort the fetch body immediately, then wait for FloydClient.stream's
 		// reader cancellation before restoring the terminal and resolving run().
 		this.#streamAbort?.abort();
 		const streamTask = this.#streamTask;
 		void (async () => {
 			await streamTask;
+			await this.#cursorPublications.stop(streamGeneration);
+			await this.#experience?.stop();
+			await this.#draftTask;
 			this.#streamAbort = undefined;
 			this.#streamTask = undefined;
 			this.#ui.stop();
@@ -159,7 +196,7 @@ export class FloydCoreMode {
 	async #send(input: string): Promise<void> {
 		this.#addUser(input);
 		if (this.#sessionId) {
-			await this.#client.steer(this.#sessionId, input, ACTOR);
+			await this.#client.steer(this.#sessionId, input, ACTOR, undefined, this.#runId);
 			return;
 		}
 		if (!this.#projectId) throw new Error("Floyd Core project is not resolved.");
@@ -179,9 +216,7 @@ export class FloydCoreMode {
 				await this.#showStatus();
 				break;
 			case "/new":
-				await this.#detach();
-				this.#runId = undefined;
-				this.#sessionId = undefined;
+				await this.#startNewRunContext(true);
 				this.#addSystem("Ready for a new Floyd Core run.");
 				break;
 			case "/run":
@@ -190,7 +225,14 @@ export class FloydCoreMode {
 				break;
 			case "/answer":
 				if (!this.#sessionId || !args[0] || args.length < 2) throw new Error("Usage: /answer <id> <answer>");
-				await this.#client.answer(this.#sessionId, args[0], [[args.slice(1).join(" ")]], ACTOR);
+				await this.#client.answer(
+					this.#sessionId,
+					args[0],
+					[[args.slice(1).join(" ")]],
+					ACTOR,
+					undefined,
+					this.#runId,
+				);
 				this.#addSystem(`Answer sent for ${args[0]}.`);
 				break;
 			case "/allow":
@@ -198,7 +240,7 @@ export class FloydCoreMode {
 			case "/deny": {
 				if (!this.#sessionId || !args[0]) throw new Error(`Usage: ${command} <id>`);
 				const reply = command === "/allow" ? "once" : command === "/always" ? "always" : "reject";
-				await this.#client.permission(this.#sessionId, args[0], reply, ACTOR);
+				await this.#client.permission(this.#sessionId, args[0], reply, ACTOR, undefined, this.#runId);
 				this.#addSystem(`Permission response sent for ${args[0]}.`);
 				break;
 			}
@@ -225,39 +267,102 @@ export class FloydCoreMode {
 		);
 	}
 
-	async #selectRun(runId: string): Promise<void> {
+	async #selectRun(
+		runId: string,
+		options: { publish?: boolean; expectedSessionId?: string | null; lastEventId?: string } = {},
+	): Promise<void> {
+		const previousGeneration = this.#selectionGeneration;
+		const generation = ++this.#selectionGeneration;
+		this.#cursorPublications.setGeneration(generation);
 		const run = await this.#client.run(runId);
+		if (generation !== this.#selectionGeneration || this.#closed) return;
 		if (!run.session_id) throw new Error(`Run ${runId} has no Core session.`);
-		await this.#detach();
+		if (options.expectedSessionId && run.session_id !== options.expectedSessionId) {
+			throw new Error(`Run ${runId} no longer belongs to Core session ${options.expectedSessionId}.`);
+		}
+		await this.#detach(previousGeneration);
+		if (generation !== this.#selectionGeneration || this.#closed) return;
 		this.#runId = run.id;
 		this.#sessionId = run.session_id;
+		this.#projectId = run.project_id;
 		this.#addSystem(`Attached to run ${run.id} (${run.status}).`);
+		if (options.publish !== false) {
+			await this.#experience?.publish({
+				active: { project_id: run.project_id, session_id: run.session_id, run_id: run.id },
+				transcript_cursor: 0,
+				last_event_id: null,
+				selected_view: "tui:run",
+				composer_draft: this.#input.getValue(),
+			});
+			if (generation !== this.#selectionGeneration || this.#closed) return;
+		}
 		const controller = new AbortController();
 		this.#streamAbort = controller;
-		const task = this.#consumeStream(run.session_id, controller);
+		const task = this.#consumeStream(run.session_id, run.id, generation, controller, options.lastEventId);
 		this.#streamTask = task;
 		void task.finally(() => {
 			if (this.#streamTask === task) this.#streamTask = undefined;
 		});
 	}
 
-	async #consumeStream(sessionId: string, controller: AbortController): Promise<void> {
+	async #consumeStream(
+		sessionId: string,
+		runId: string,
+		generation: number,
+		controller: AbortController,
+		lastEventId?: string,
+	): Promise<void> {
 		try {
-			for await (const event of this.#client.attachSession(sessionId, ACTOR, { signal: controller.signal })) {
+			for await (const event of this.#client.attachSession(sessionId, ACTOR, {
+				signal: controller.signal,
+				runId,
+				lastEventId,
+			})) {
 				if (controller.signal.aborted || this.#closed) break;
+				if (event.type === "hello") {
+					const epoch = textValue(record(event.data).stream_epoch);
+					const envelope = this.#experience?.envelope;
+					if (epoch && envelope?.active.run_id === runId && envelope.transcript_epoch !== epoch) {
+						await this.#experience?.publish({
+							transcript_epoch: epoch,
+							transcript_cursor: 0,
+							last_event_id: null,
+						});
+					}
+					continue;
+				}
 				this.#renderEvent(event);
+				if (event.id) {
+					const cursor = Number(event.id);
+					const experience = this.#experience;
+					if (Number.isFinite(cursor) && experience) {
+						this.#cursorPublications.queue(
+							{
+								runId,
+								epoch: experience.envelope?.transcript_epoch ?? null,
+								cursor,
+								eventId: event.id,
+							},
+							generation,
+						);
+					}
+				}
 			}
 		} catch (error) {
 			if (!controller.signal.aborted) this.#addError(displayError(error));
 		} finally {
+			await this.#cursorPublications.flush(generation, true);
 			if (this.#streamAbort === controller) this.#streamAbort = undefined;
 			this.#ui.requestRender();
 		}
 	}
 
 	#renderEvent(event: FloydStreamEvent): void {
-		if (event.type === "hello") return;
 		const payload = record(event.data);
+		if (event.type === "transcript") {
+			this.#renderTranscriptSnapshot(payload.messages);
+			return;
+		}
 		const data = record(payload.data);
 		if (event.type === "token" && payload.channel === "text") {
 			const delta = textValue(data.delta, textValue(data.text));
@@ -287,7 +392,33 @@ export class FloydCoreMode {
 		}
 	}
 
-	async #detach(): Promise<void> {
+	#renderTranscriptSnapshot(value: unknown): void {
+		if (!Array.isArray(value)) return;
+		const messages = [...value].sort((left, right) => {
+			const leftTime = Number(record(record(left).time).created ?? 0);
+			const rightTime = Number(record(record(right).time).created ?? 0);
+			return leftTime - rightTime;
+		});
+		for (const raw of messages) {
+			const message = record(raw);
+			const role = textValue(message.type, textValue(record(message.info).role, "event"));
+			const content = Array.isArray(message.content)
+				? message.content
+				: Array.isArray(message.parts)
+					? message.parts
+					: [];
+			const text = content
+				.map(part => textValue(record(part).text))
+				.filter(Boolean)
+				.join("\n");
+			if (!text) continue;
+			if (role === "user") this.#addUser(text);
+			else this.#addTranscript(new Text(`${chalk.hex("#8be9fd")("Floyd")}\n${safeDisplay(text)}`, 1, 1));
+		}
+	}
+
+	async #detach(generation = this.#selectionGeneration): Promise<void> {
+		await this.#cursorPublications.flush(generation, true);
 		const controller = this.#streamAbort;
 		const task = this.#streamTask;
 		if (!controller && !task) return;
@@ -295,6 +426,73 @@ export class FloydCoreMode {
 		await task;
 		if (this.#streamAbort === controller) this.#streamAbort = undefined;
 		if (this.#streamTask === task) this.#streamTask = undefined;
+	}
+
+	#enqueueEnvelope(envelope: ExperienceEnvelope): Promise<void> {
+		const apply = this.#experienceApplyChain.then(() => this.#restoreEnvelope(envelope));
+		this.#experienceApplyChain = apply.catch(error => this.#addError(displayError(error)));
+		return apply;
+	}
+
+	async #restoreEnvelope(envelope: ExperienceEnvelope): Promise<void> {
+		if (this.#closed) return;
+		if (this.#input.getValue() === this.#lastPublishedDraft || this.#input.getValue() === "") {
+			this.#input.setValue(envelope.composer_draft);
+			this.#lastPublishedDraft = envelope.composer_draft;
+		}
+		const active = envelope.active;
+		if (active.project_id !== this.#projectId || !active.run_id || !active.session_id) {
+			if (this.#runId && active.run_id !== this.#runId) {
+				const previousGeneration = this.#selectionGeneration;
+				this.#selectionGeneration += 1;
+				this.#cursorPublications.setGeneration(this.#selectionGeneration);
+				await this.#detach(previousGeneration);
+				this.#runId = undefined;
+				this.#sessionId = undefined;
+			}
+			return;
+		}
+		if (active.run_id !== this.#runId || active.session_id !== this.#sessionId) {
+			await this.#selectRun(active.run_id, {
+				publish: false,
+				expectedSessionId: active.session_id,
+				lastEventId: envelope.last_event_id ?? undefined,
+			});
+		}
+	}
+
+	async #startNewRunContext(publish: boolean): Promise<void> {
+		const previousGeneration = this.#selectionGeneration;
+		this.#selectionGeneration += 1;
+		this.#cursorPublications.setGeneration(this.#selectionGeneration);
+		await this.#detach(previousGeneration);
+		this.#runId = undefined;
+		this.#sessionId = undefined;
+		if (publish) {
+			await this.#experience?.publish({
+				active: { project_id: this.#projectId ?? null, session_id: null, run_id: null },
+				transcript_cursor: 0,
+				last_event_id: null,
+				selected_artifact_id: null,
+				selected_view: "tui:new-task",
+				composer_draft: this.#input.getValue(),
+			});
+		}
+	}
+
+	async #publishDraftChanges(): Promise<void> {
+		while (!this.#closed) {
+			await Bun.sleep(350);
+			if (this.#closed) break;
+			const draft = this.#input.getValue();
+			if (draft === this.#lastPublishedDraft) continue;
+			try {
+				await this.#experience?.publish({ composer_draft: draft });
+				this.#lastPublishedDraft = draft;
+			} catch (error) {
+				this.#addError(displayError(error));
+			}
+		}
 	}
 
 	#addUser(text: string): void {
